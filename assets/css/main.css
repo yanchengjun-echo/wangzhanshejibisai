@@ -1,0 +1,556 @@
+/* ==========================================================================
+   银绣山河 — 首页
+   配色：靛蓝（蜡染底） / 银白（银饰高光） / 朱红·亮黄（点缀）
+   动效：淡入、纹样缓浮、慢速旋转，节奏偏慢，不做强互动
+   ========================================================================== */
+
+/* ---------- 标题字体：演示悠然小楷（子集） ---------- */
+@font-face {
+  font-family: "YouranXiaokai";
+  src: url("../fonts/youran-xiaokai-title.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------- 设计令牌 ---------- */
+:root {
+  --indigo-900: #061527;
+  --indigo-800: #0a1f38;
+  --indigo-700: #0f2c4c;
+  --indigo-600: #16395f;
+
+  --silver-50:  #f6faff;
+  --silver-100: #e6eefa;
+  --silver-200: #d3e0f1;
+  --silver-300: #b3c5dd;
+  --silver-400: #8ea5c2;
+
+  --cinnabar: #b03a2e;
+  --gold:     #d9b26a;
+
+  --ink: #12305b;              /* 纹样墨色 */
+
+  --font-brush: "YouranXiaokai", "Slideyouran", "STKaiti", "KaiTi", "Kaiti SC", "楷体", serif;
+  --font-serif: "Songti SC", "Noto Serif SC", "Source Han Serif SC", Georgia, "Times New Roman", serif;
+  --font-num:   "Songti SC", "Noto Serif SC", Georgia, "Times New Roman", serif;
+
+  /* 缓入缓出，整体偏慢 */
+  --ease-soft: cubic-bezier(.19, 1, .22, 1);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--indigo-900);
+}
+
+body {
+  color: var(--silver-200);
+  font-family: var(--font-serif);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* 屏幕阅读器可见、视觉隐藏 */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ==========================================================================
+   1. 舞台与背景
+   ========================================================================== */
+.stage {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: var(--indigo-900);
+}
+
+/* 第二张图：青花水波。压暗后当底纹用，保留笔触与水纹走向 */
+.layer-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url("../bg-water.jpg");
+  background-position: center 46%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: .64;
+  filter: brightness(.7) saturate(1.18) contrast(1.02);
+  transform: scale(1.04);           /* 吃掉 filter 边缘可能出现的浅色描边 */
+  animation: bgFloat 40s ease-in-out infinite alternate;
+}
+
+/* 靛蓝罩色：中心稍透，四周压深，保证标题与数字的对比度 */
+.layer-tint {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 46% 42% at 50% 45%, rgba(122, 168, 226, .14) 0%, rgba(122, 168, 226, 0) 72%),
+    radial-gradient(ellipse 60% 56% at 50% 44%, rgba(8, 26, 48, .12) 0%, rgba(7, 22, 42, .56) 62%, rgba(5, 16, 32, .90) 100%),
+    linear-gradient(180deg, rgba(6, 20, 38, .90) 0%, rgba(8, 26, 48, .42) 26%, rgba(8, 26, 48, .30) 62%, rgba(5, 15, 30, .95) 100%);
+}
+
+/* 极淡颗粒，给数字屏一点纸感 */
+.layer-grain {
+  position: absolute;
+  inset: 0;
+  opacity: .10;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ==========================================================================
+   2. 四角纹样（第四张图的角花，四向镜像）
+   ========================================================================== */
+.ornaments {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.orn {
+  position: absolute;
+  display: block;
+  height: clamp(168px, 32vh, 316px);
+  width: auto;
+  opacity: .82;
+  filter: drop-shadow(0 0 18px rgba(120, 165, 220, .22));
+}
+html.anim .orn {
+  opacity: 0;
+  animation: softFade 3s var(--ease-soft) .55s both;
+}
+
+.orn--tl { top: clamp(-30px, -1.6vh, -8px); left: clamp(-26px, -1.4vw, -8px); transform: scaleX(-1) rotate(1.2deg); }
+.orn--tr { top: clamp(-30px, -1.6vh, -8px); right: clamp(-26px, -1.4vw, -8px); transform: rotate(-1.2deg); }
+.orn--bl { bottom: clamp(-30px, -1.6vh, -8px); left: clamp(-26px, -1.4vw, -8px); transform: scaleX(-1) scaleY(-1) rotate(1.2deg); }
+.orn--br { bottom: clamp(-30px, -1.6vh, -8px); right: clamp(-26px, -1.4vw, -8px); transform: scaleY(-1) rotate(-1.2deg); }
+
+/* 下半边角花更小更淡，避免和导航抢注意力 */
+.orn--bl, .orn--br { height: clamp(132px, 24vh, 236px); opacity: .46; }
+
+/* 上下两排角花的最终透明度不同，用两组关键帧区分 */
+html.anim .orn--tl, html.anim .orn--tr { animation-name: fadeTop; }
+html.anim .orn--bl, html.anim .orn--br { animation-name: fadeLow; }
+@keyframes fadeTop { from { opacity: 0; } to { opacity: .82; } }
+@keyframes fadeLow { from { opacity: 0; } to { opacity: .46; } }
+
+/* ==========================================================================
+   3. 主体栅格
+   ========================================================================== */
+.hero {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-rows: 1fr auto;
+  column-gap: clamp(6px, 1.6vw, 34px);
+  align-items: center;
+  padding: clamp(20px, 3.4vh, 44px) clamp(20px, 4.6vw, 92px) clamp(14px, 2.6vh, 36px);
+}
+
+/* h1 在桌面下"透明"，让两个半标题直接成为栅格项 */
+.titles { display: contents; }
+
+.title {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  font-family: var(--font-brush);
+  font-weight: 400;
+  font-size: clamp(50px, min(13vh, 9.4vw), 148px);
+  line-height: 1;
+  letter-spacing: .05em;
+  white-space: nowrap;
+  grid-row: 1;
+  position: relative;
+  top: .035em;
+}
+
+.title--left  { grid-column: 1; justify-self: end;   padding-right: clamp(6px, 1.6vw, 30px); }
+.title--right { grid-column: 3; justify-self: start; padding-left:  clamp(6px, 1.6vw, 30px); }
+
+.title i {
+  font-style: normal;
+  display: inline-block;
+  background: linear-gradient(178deg, var(--silver-50) 6%, var(--silver-100) 46%, var(--silver-300) 88%, #9fb4cf 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 6px 26px rgba(120, 168, 224, .38));
+}
+
+/* 入场动画只在脚本标记了 html.anim 时启用——万一动画没跑，页面也是完整的 */
+html.anim .title i {
+  opacity: 0;
+  animation: riseIn 2s var(--ease-soft) var(--d, 0s) both;
+}
+
+/* 标题左侧的小朱印，做一点暖色点睛 */
+.title--left::after {
+  content: "苗";
+  margin-left: clamp(6px, .8vw, 14px);
+  align-self: flex-start;
+  font-family: var(--font-brush);
+  font-size: .3em;
+  line-height: 1;
+  padding: .16em .18em .2em;
+  color: #f3e2d6;
+  background: var(--cinnabar);
+  border-radius: 2px;
+  box-shadow: 0 2px 10px rgba(176, 58, 46, .45);
+}
+html.anim .title--left::after {
+  opacity: 0;
+  animation: softFade 1.8s var(--ease-soft) 1.05s both;
+}
+
+/* ==========================================================================
+   4. 中央徽章：苗银环 + 九幅飞鸟纹
+   ========================================================================== */
+.medallion {
+  grid-column: 2;
+  grid-row: 1;
+  position: relative;
+  width: clamp(212px, min(45vh, 38vw), 424px);
+  aspect-ratio: 1 / 1;
+  justify-self: center;
+}
+html.anim .medallion {
+  opacity: 0;
+  animation: scaleIn 2.6s var(--ease-soft) .15s both;
+}
+
+/* 徽章下方的一层落影，让银盘"浮"在背景之上 */
+.medallion::before {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -3%;
+  height: 16%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 50%, rgba(2, 10, 22, .78) 0%, rgba(2, 10, 22, 0) 72%);
+  filter: blur(14px);
+  z-index: 0;
+}
+
+/* 银白柔光 */
+.halo {
+  position: absolute;
+  inset: -4%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 46%, rgba(188, 214, 248, .13) 0%, rgba(150, 190, 240, .05) 48%, rgba(120, 165, 220, 0) 74%);
+  filter: blur(10px);
+  animation: breathe 13s ease-in-out infinite;
+  z-index: 1;
+}
+
+/* 银环 */
+.rings {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  z-index: 3;
+}
+
+.ring { fill: none; }
+.ring--hair  { stroke: rgba(214, 229, 247, .46); stroke-width: 1; }
+.ring--bead  { stroke: rgba(224, 236, 250, .56); stroke-width: 8; stroke-dasharray: 1.4 7.6; stroke-linecap: round; }
+.ring--dash  { stroke: rgba(196, 216, 240, .30); stroke-width: 1; stroke-dasharray: 2 6; }
+.ring--inner { stroke: rgba(214, 229, 247, .22); stroke-width: 1; }
+
+.spikes rect {
+  fill: rgba(226, 238, 252, .42);
+}
+
+/* 银盘 */
+.disc {
+  position: absolute;
+  inset: 17%;
+  border-radius: 50%;
+  z-index: 2;
+  background:
+    radial-gradient(circle at 38% 30%, #f6f9fe 0%, #e8eff9 34%, #d7e2f0 62%, #c1d0e3 86%, #a7bad0 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, .92),
+    inset 0 -16px 32px rgba(88, 118, 158, .34),
+    0 0 0 1px rgba(9, 28, 54, .30),
+    0 18px 46px rgba(2, 10, 22, .42);
+}
+
+/* 银面的锤纹反光，非常轻 */
+.disc::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 210deg,
+    rgba(255, 255, 255, .00) 0deg,
+    rgba(255, 255, 255, .34) 46deg,
+    rgba(255, 255, 255, .00) 96deg,
+    rgba(163, 189, 218, .20) 168deg,
+    rgba(255, 255, 255, .00) 232deg,
+    rgba(255, 255, 255, .22) 300deg,
+    rgba(255, 255, 255, .00) 360deg);
+  opacity: .38;
+  mix-blend-mode: soft-light;
+}
+
+/* 九幅飞鸟纹：整体缓慢旋转，逐幅淡入淡出 */
+.birds {
+  position: absolute;
+  inset: 25%;
+  z-index: 4;
+  animation: spin 200s linear infinite;
+}
+
+.birds img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  /* 54s ÷ 9 幅 = 每幅 6s */
+  animation: birdCycle 54s linear infinite;
+  animation-delay: calc(var(--i) * -6s);
+  will-change: opacity, transform;
+}
+
+/* ==========================================================================
+   5. 底部：分割线 + 中央小纹样 + 数字导航
+   ========================================================================== */
+.footer {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  position: relative;
+  width: 100%;
+}
+html.anim .footer {
+  opacity: 0;
+  animation: riseIn 2.2s var(--ease-soft) 1.15s both;
+}
+
+.divider {
+  position: relative;
+  height: 1px;
+  margin: 0 auto clamp(10px, 1.9vh, 26px);
+  background: linear-gradient(90deg,
+    rgba(196, 216, 240, 0) 0%,
+    rgba(196, 216, 240, .46) 14%,
+    rgba(226, 238, 252, .72) 50%,
+    rgba(196, 216, 240, .46) 86%,
+    rgba(196, 216, 240, 0) 100%);
+}
+
+.divider-gem {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  background: rgba(226, 238, 252, .82);
+  box-shadow: 0 0 12px rgba(170, 205, 245, .75);
+}
+
+/* 分割线中央上方的小角花 */
+.orn-center {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 4px);
+  width: clamp(62px, 7vw, 116px);
+  height: auto;
+  transform: translateX(-50%);
+  opacity: .5;
+  filter: drop-shadow(0 0 10px rgba(120, 165, 220, .3));
+  pointer-events: none;
+}
+
+.nav {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  justify-items: center;
+  align-items: start;
+  width: min(1160px, 92%);
+  margin: 0 auto;
+  padding-bottom: clamp(2px, 1vh, 12px);
+}
+
+.nav-item {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: clamp(6px, 1vh, 12px);
+  padding: 10px clamp(10px, 2vw, 30px);
+  color: var(--silver-200);
+  text-decoration: none;
+  border-radius: 2px;
+  transition: color .6s ease;
+}
+
+.nav-item .num {
+  font-family: var(--font-num);
+  font-size: clamp(12px, 1.6vh, 17px);
+  letter-spacing: .34em;
+  text-indent: .34em;          /* 抵消末字符的字距，保证视觉居中 */
+  font-variant-numeric: lining-nums tabular-nums;
+  opacity: .95;
+}
+
+.nav-item .tick {
+  display: block;
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(217, 178, 106, 0), var(--gold), rgba(217, 178, 106, 0));
+  transition: width .8s var(--ease-soft);
+}
+
+.nav-item:hover,
+.nav-item:focus-visible {
+  color: var(--silver-50);
+}
+.nav-item:hover .tick,
+.nav-item:focus-visible .tick { width: 100%; }
+
+.nav-item:focus-visible {
+  outline: 1px solid rgba(217, 178, 106, .8);
+  outline-offset: 4px;
+}
+
+/* ==========================================================================
+   6. 关键帧
+   ========================================================================== */
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes softFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: .62; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.04); }
+}
+
+@keyframes bgFloat {
+  from { transform: scale(1.04) translate3d(0, 0, 0); }
+  to   { transform: scale(1.07) translate3d(-1.2%, -.8%, 0); }
+}
+
+/* 每幅纹样在自己那 6s 内淡入、停留、淡出，与下一幅交叠淡切 */
+@keyframes birdCycle {
+  0%      { opacity: 0;    transform: scale(.94); }
+  3%      { opacity: 1;    transform: scale(1); }
+  11.11%  { opacity: 1;    transform: scale(1.012); }
+  15%     { opacity: 0;    transform: scale(1.03); }
+  100%    { opacity: 0;    transform: scale(1.03); }
+}
+
+/* ==========================================================================
+   7. 自适应
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .orn { height: clamp(140px, 30vh, 240px); }
+  .orn--bl, .orn--br { height: clamp(110px, 22vh, 180px); }
+  .nav { width: 100%; }
+}
+@media (max-width: 820px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr auto;
+    align-content: stretch;
+    justify-items: center;
+    row-gap: clamp(8px, 3vh, 30px);
+    padding: clamp(70px, 12vh, 120px) clamp(16px, 5vw, 40px) clamp(12px, 2.4vh, 26px);
+  }
+
+  .titles {
+    display: flex;
+    grid-column: 1;
+    grid-row: 1;
+    justify-content: center;
+    gap: .06em;
+  }
+
+  .title {
+    font-size: clamp(42px, 10vw, 78px);
+    grid-row: auto;
+    padding: 0;
+    justify-self: center;
+  }
+
+  .title--left { grid-column: auto; }
+  .title--right { grid-column: auto; }
+
+  /* 竖排堆叠时朱印会落在标题正中，干脆收起来 */
+  .title--left::after { display: none; }
+
+  .medallion {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: center;
+    width: clamp(210px, min(46vh, 74vw), 460px);
+  }
+
+  .footer { grid-row: 3; }
+
+  .nav { width: 100%; }
+  .nav-item { padding: 8px 2px; min-width: 0; }
+  .nav-item .num { letter-spacing: .3em; text-indent: .3em; }
+
+  .orn { height: clamp(104px, 17vh, 158px); }
+  /* 竖屏时上下角花会和标题、数字打架，只留上边两只 */
+  .orn--bl, .orn--br { display: none; }
+  .orn-center { display: none; }
+}
+
+/* 矮屏（笔记本横屏 / 投影）：收紧纵向留白 */
+@media (max-height: 620px) and (min-width: 821px) {
+  .title { font-size: clamp(38px, 9.4vh, 92px); }
+  .medallion { width: clamp(180px, 40vh, 320px); }
+  .orn { height: clamp(120px, 30vh, 200px); }
+  .divider { margin-bottom: 10px; }
+}
+
+/* 尊重系统的"减少动态效果" */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+  .birds { animation: none !important; }
+  .birds img { animation: none !important; opacity: 0; }
+  .birds img:first-child { opacity: 1; }
+}

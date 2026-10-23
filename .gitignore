@@ -1,0 +1,22 @@
+# ---- 系统 / 编辑器垃圾 ----
+desktop.ini
+Thumbs.db
+ehthumbs.db
+.DS_Store
+._*
+*.swp
+*~
+.vscode/
+.idea/
+
+# ---- 临时文件 / 日志 ----
+*.log
+*.tmp
+*.bak
+~$*
+
+# ---- 本地预览与调试产物 ----
+.edgeprofile/
+node_modules/
+__pycache__/
+*.pyc
