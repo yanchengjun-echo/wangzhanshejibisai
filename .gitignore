@@ -20,3 +20,6 @@ ehthumbs.db
 node_modules/
 __pycache__/
 *.pyc
+
+# ---- 工作区元数据（记忆、应用记录）----
+.workbuddy/
