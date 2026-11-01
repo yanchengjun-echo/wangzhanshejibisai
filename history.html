@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>枫启长歌 · 苗族历史脉络 | 银绣山河</title>
+<meta name="description" content="枫启长歌——银绣山河的历史专题。以枫树根脉为意象，用传说与信史双线时间轴，梳理苗族历史脉络与非遗源流，辨明传说与史实之分。">
+<meta name="theme-color" content="#08172c">
+<meta name="color-scheme" content="dark">
+<meta name="author" content="银绣山河">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a1f38'/%3E%3Ccircle cx='16' cy='16' r='9.5' fill='none' stroke='%23dce6f3' stroke-width='1.5' stroke-dasharray='1.6 2.4'/%3E%3Cpath d='M10.5 18.5c3-4.6 8.4-4.2 11-1.2-2.2-4.6-7.6-4.4-9.2-2.4' fill='%23dce6f3'/%3E%3C/svg%3E">
+<link rel="canonical" href="https://example.com/history.html">
+
+<!-- Open Graph -->
+<meta property="og:type" content="article">
+<meta property="og:title" content="枫启长歌 · 苗族历史脉络">
+<meta property="og:description" content="溯洄千年，歌以载史。传说与信史双线，梳理苗族历史脉络与非遗源流。">
+<meta property="og:image" content="assets/bg-water.jpg">
+<meta property="og:locale" content="zh_CN">
+
+<!-- 标题字体：演示悠然小楷子集（本地加载，不依赖外部 CDN） -->
+<link rel="preload" href="assets/fonts/youran-xiaokai-title.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="stylesheet" href="assets/css/history.css">
+
+<!-- 入场动画的开关：只有脚本确认能跑才加 anim 类，动画失败时页面依然完整可见 -->
+<script>
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.documentElement.classList.add('anim');
+  }
+</script>
+</head>
+<body>
+
+<div class="page">
+  <!-- 背景层：做旧书页 + 布纹 + 颗粒 -->
+  <div class="paper" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- 面包屑导航 -->
+  <nav class="crumb" aria-label="面包屑导航">
+    <ol>
+      <li><a href="index.html">首页</a></li>
+      <li aria-current="page">枫启长歌</li>
+    </ol>
+  </nav>
+
+  <!-- 页头：标题拆分为「枫启」「长歌」，中缝留一道金线 -->
+  <header class="head">
+    <h1 class="page-title" aria-label="枫启长歌">
+      <span aria-hidden="true" style="--d:.1s">枫启</span>
+      <span class="gap" aria-hidden="true"></span>
+      <span aria-hidden="true" style="--d:.34s">长歌</span>
+    </h1>
+    <p class="tagline">溯洄千年，歌以载史</p>
+  </header>
+
+  <div class="body">
+    <!-- 左侧：卷页目录（人物 / 非遗），入口页尚未制作 -->
+    <aside class="scroll-nav" aria-label="专题目录">
+      <a class="book" href="#people" data-todo="历史人物目录">
+        <span class="book-face">
+          <span class="b-kicker">目录 一</span>
+          <span class="b-title">历史人物</span>
+          <span class="b-hint">神话人物与史实人物<br>按拼音排序 · 下滑浏览</span>
+        </span>
+      </a>
+      <a class="book" href="#heritage" data-todo="非遗源流目录">
+        <span class="book-face">
+          <span class="b-kicker">目录 二</span>
+          <span class="b-title">非遗源流</span>
+          <span class="b-hint">银饰 · 苗绣 · 蜡染<br>按拼音排序 · 下滑浏览</span>
+        </span>
+      </a>
+    </aside>
+
+    <!-- 右侧：树状双线时间轴 -->
+    <section class="tl-region" aria-labelledby="tlTitle">
+      <div class="tl-head">
+        <h2 class="tl-title" id="tlTitle">历史脉络</h2>
+        <p class="tl-note">传说与信史双线 · 滚轮横向浏览</p>
+      </div>
+
+      <div class="tl-scroll" id="tlScroll" tabindex="0" role="region" aria-label="苗族历史时间轴，可横向滚动">
+        <div class="track">
+
+          <!-- 根系：从左侧铺开，收成主干后分成传说、信史两支 -->
+          <div class="roots" aria-hidden="true">
+            <svg viewBox="0 0 200 100" preserveAspectRatio="none" focusable="false">
+              <g class="root-line r-gold">
+                <path d="M0,4 C62,10 132,14 200,20"/>
+                <path d="M0,12 C58,15 132,17 200,20"/>
+                <path d="M0,30 C64,30 134,24 200,20"/>
+                <path d="M0,47 C64,41 132,27 200,20"/>
+                <path class="r-thin" d="M22,8 C32,16 26,25 16,30"/>
+                <path class="r-thin" d="M40,24 C48,30 42,38 51,43"/>
+                <path class="r-thin" d="M52,46 C44,54 51,62 40,68"/>
+                <path class="r-thin" d="M96,31 C104,26 108,20 118,19"/>
+                <path class="r-thin" d="M132,24 C140,29 144,35 154,35"/>
+              </g>
+              <g class="root-line r-silver">
+                <path d="M0,96 C62,90 132,86 200,80"/>
+                <path d="M0,88 C58,85 132,83 200,80"/>
+                <path d="M0,70 C64,70 134,76 200,80"/>
+                <path d="M0,53 C64,59 132,73 200,80"/>
+                <path class="r-thin" d="M28,92 C38,84 32,75 42,70"/>
+                <path class="r-thin" d="M46,76 C54,70 48,62 57,57"/>
+                <path class="r-thin" d="M58,54 C50,62 58,70 48,76"/>
+                <path class="r-thin" d="M104,69 C112,74 116,80 126,81"/>
+                <path class="r-thin" d="M140,76 C148,71 152,65 162,65"/>
+              </g>
+            </svg>
+          </div>
+
+          <!-- 传说线（暖金） -->
+          <div class="branch branch--legend">
+            <span class="b-tag" aria-hidden="true">传说</span>
+            <ol class="nodes">
+              <!--
+                节点填写方式：
+                1. 把 .nm 的文字换成事件名称，.era 换成年代或时期
+                2. 补 data-summary（一句话摘要）、data-keywords（顿号分隔）、data-href（详情页地址）
+                3. 内容填好后删掉 li 上的 is-empty 类，卡片就会从「待补」切成正式态
+              -->
+              <li class="node is-empty" data-line="legend" data-summary="" data-keywords="" data-href="">
+                <button class="node-btn" type="button" aria-label="传说线第 1 个节点：事件名称待补">
+                  <span class="nm">事件名称待补</span>
+                  <span class="era">年代待补</span>
+                </button>
+                <span class="dot" aria-hidden="true"></span>
+              </li>
+              <li class="node is-empty" data-line="legend" data-summary="" data-keywords="" data-href="">
+                <button class="node-btn" type="button" aria-label="传说线第 2 个节点：事件名称待补">
+                  <span class="nm">事件名称待补</span>
+                  <span class="era">年代待补</span>
+                </button>
+                <span class="dot" aria-hidden="true"></span>
+              </li>
+              <li class="node is-empty" data-line="legend" data-summary="" data-keywords="" data-href="">
+                <button class="node-btn" type="button" aria-label="传说线第 3 个节点：事件名称待补">
+                  <span class="nm">事件名称待补</span>
+                  <span class="era">年代待补</span>
+                </button>
+                <span class="dot" aria-hidden="true"></span>
+              </li>
+              <li class="node is-empty" data-line="legend" data-summary="" data-keywords="" data-href="">
+                <button class="node-btn" type="button" aria-label="传说线第 4 个节点：事件名称待补">
+                  <span class="nm">事件名称待补</span>
+                  <span class="era">年代待补</span>
+                </button>
+                <span class="dot" aria-hidden="true"></span>
+              </li>
+            </ol>
+          </div>
+
+          <!-- 信史线（银白） -->
+          <div class="branch branch--history">
+            <span class="b-tag" aria-hidden="true">信史</span>
+            <ol class="nodes">
+              <li class="node is-empty" data-line="history" data-summary="" data-keywords="" data-href="">
+                <button class="node-btn" type="button" aria-label="信史线第 1 个节点：事件名称待补">
+                  <span class="nm">事件名称待补</span>
+                  <span class="era">年代待补</span>
+                </button>
+                <span class="dot" aria-hidden="true"></span>
+              </li>
+              <li class="node is-empty" data-line="history" data-summary="" data-keywords="" data-href="">
+                <button class="node-btn" type="button" aria-label="信史线第 2 个节点：事件名称待补">
+                  <span class="nm">事件名称待补</span>
+                  <span class="era">年代待补</span>
+                </button>
+                <span class="dot" aria-hidden="true"></span>
+              </li>
+              <li class="node is-empty" data-line="history" data-summary="" data-keywords="" data-href="">
+                <button class="node-btn" type="button" aria-label="信史线第 3 个节点：事件名称待补">
+                  <span class="nm">事件名称待补</span>
+                  <span class="era">年代待补</span>
+                </button>
+                <span class="dot" aria-hidden="true"></span>
+              </li>
+              <li class="node is-empty" data-line="history" data-summary="" data-keywords="" data-href="">
+                <button class="node-btn" type="button" aria-label="信史线第 4 个节点：事件名称待补">
+                  <span class="nm">事件名称待补</span>
+                  <span class="era">年代待补</span>
+                </button>
+                <span class="dot" aria-hidden="true"></span>
+              </li>
+            </ol>
+          </div>
+
+        </div>
+      </div>
+
+      <button class="tl-arrow" id="tlArrow" type="button" aria-label="向右滚动时间轴">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M5 12h13M12.5 5.5 19 12l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </section>
+  </div>
+
+  <!-- 页脚：银簪检索 + 返回 -->
+  <footer class="page-foot">
+    <div class="foot-rule" aria-hidden="true"></div>
+
+    <form class="pin" id="pinSearch" role="search" autocomplete="off">
+      <span class="pin-head" aria-hidden="true"></span>
+      <div class="pin-body">
+        <div class="pin-face">
+          <input class="pin-input" id="pinInput" type="search" name="q"
+                 placeholder="检索人物、非遗、历史事件" aria-label="检索人物、非遗与历史事件">
+        </div>
+      </div>
+    </form>
+
+    <p class="search-status" id="searchStatus" role="status" aria-live="polite"></p>
+
+    <div class="foot-meta">
+      <a href="index.html">返回首页</a>
+      <span class="sep" aria-hidden="true"></span>
+      <span>框架初版 · 内容与图片待补</span>
+    </div>
+  </footer>
+</div>
+
+<!-- 枫叶形节点卡片（浮层，由脚本定位） -->
+<div class="card-layer" id="cardLayer" aria-hidden="true">
+  <div class="maple" id="maple" data-open="0">
+    <div class="maple-rim">
+      <div class="maple-fill">
+        <p class="m-kicker" id="mKicker">传说线</p>
+        <h3 class="m-title" id="mTitle">事件名称待补</h3>
+        <p class="m-desc" id="mDesc"></p>
+        <ul class="m-kw" id="mKw"></ul>
+        <span class="m-link" id="mLink">查看详情 →</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/js/history.js"></script>
+</body>
+</html>

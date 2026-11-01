@@ -416,6 +416,21 @@ html.anim .footer {
   opacity: .95;
 }
 
+/* 已开放板块名：只给可进入的导航位显示，未做的仍保留数字占位 */
+.nav-item .label {
+  font-family: var(--font-brush);
+  font-size: clamp(10px, 1.45vh, 13px);
+  letter-spacing: .14em;
+  text-indent: .14em;
+  color: rgba(240, 218, 172, .95);
+  transition: color .6s ease;
+}
+
+.nav-item:hover .label,
+.nav-item:focus-visible .label {
+  color: var(--gold);
+}
+
 .nav-item .tick {
   display: block;
   width: 0;
