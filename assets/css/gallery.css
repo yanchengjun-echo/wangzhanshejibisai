@@ -285,6 +285,10 @@ body { overflow-x: hidden; }
   display: flex;
   flex-direction: column;
   gap: .18em;
+  /* 暗红底色：衬托文字，避免与蜡染背景融为一体 */
+  background:
+    linear-gradient(180deg, rgba(74, 22, 16, .72), rgba(52, 15, 11, .88));
+  border-top: 1px solid rgba(217, 178, 106, .12);
 }
 .card .nm {
   font-family: var(--font-hei);
@@ -332,6 +336,10 @@ body { overflow-x: hidden; }
   justify-content: center;
   gap: .6em;
   align-self: center;
+  /* 暗红底色：衬托文字，与左图形成对比、保证可读性 */
+  background:
+    linear-gradient(135deg, rgba(96, 28, 20, .82), rgba(58, 16, 12, .9));
+  border-left: 1px solid rgba(217, 178, 106, .14);
 }
 .card--feature .nm {
   font-family: var(--font-kai);
