@@ -58,6 +58,46 @@
     return a;
   }
 
+  // 图片宽高比缓存：用 naturalWidth/Height 估算卡片高度，用于均衡列高
+  var ratioCache = {};
+
+  function loadRatio(src, cb) {
+    if (ratioCache[src]) { cb(ratioCache[src]); return; }
+    var img = new Image();
+    img.onload = function () {
+      var r = img.naturalHeight / img.naturalWidth; // 高/宽
+      ratioCache[src] = r;
+      cb(r);
+    };
+    img.onerror = function () {
+      ratioCache[src] = 1.3; // 兜底近似 4:3
+      cb(1.3);
+    };
+    img.src = src;
+  }
+
+  function cardHTML(it, isFeature) {
+    var author = it.author ? '<span class="author">· ' + it.author + '</span>' : '';
+    var cls = 'card' + (isFeature ? ' card--feature' : '');
+    var featureHint = isFeature
+      ? '<span class="feature-hint">本类精选 · 点击查看详情</span>'
+      : '';
+    var featureDesc = (isFeature && it.desc)
+      ? '<span class="feature-desc">' + it.desc + '</span>'
+      : '';
+    return '<article class="' + cls + '" tabindex="0" role="button" ' +
+        'data-id="' + it.id + '" ' +
+        'aria-label="查看藏品：' + it.name + '">' +
+        '<div class="thumb"><img src="' + (isFeature ? it.big : it.small) + '" alt="' + it.name + '" loading="' + (isFeature ? 'eager' : 'lazy') + '" decoding="async"></div>' +
+        '<div class="meta">' +
+          '<span class="nm">' + it.name + '</span>' +
+          '<span class="cat-tag">' + it.cat + author + '</span>' +
+          featureDesc +
+          featureHint +
+        '</div>' +
+      '</article>';
+  }
+
   function renderGrid() {
     var list = activeCat === '全部' ? items : items.filter(function (it) { return it.cat === activeCat; });
     curCat.textContent = activeCat;
@@ -71,43 +111,68 @@
     // 「全部」视图下打散类别；单个分类视图保持原顺序（本就同类）
     var ordered = activeCat === '全部' ? shuffle(list) : list;
 
-    // 首图固定为内容最丰富的精品（织金苗族少女缠绣背扇，id=463），
-    // 若打散后它不在首位，则把它提到最前作为首图
+    // 首图固定为内容最丰富的精品（织金苗族少女缠绣背扇，id=463）
     var FEATURE_ID = '463';
     var featureIdx = -1;
     for (var k = 0; k < ordered.length; k++) {
       if (ordered[k].id === FEATURE_ID) { featureIdx = k; break; }
     }
-    if (featureIdx > 0) {
-      var feat = ordered.splice(featureIdx, 1)[0];
-      ordered.unshift(feat);
+    var feature = null;
+    if (featureIdx >= 0) {
+      feature = ordered.splice(featureIdx, 1)[0];
     }
 
-    var html = '';
-    ordered.forEach(function (it, idx) {
-      var author = it.author ? '<span class="author">· ' + it.author + '</span>' : '';
-      var isFeature = idx === 0;
-      var cls = 'card' + (isFeature ? ' card--feature' : '');
-      var featureHint = isFeature
-        ? '<span class="feature-hint">本类精选 · 点击查看详情</span>'
-        : '';
-      var featureDesc = (isFeature && it.desc)
-        ? '<span class="feature-desc">' + it.desc + '</span>'
-        : '';
-      html +=
-        '<article class="' + cls + '" tabindex="0" role="button" ' +
-          'data-id="' + it.id + '" ' +
-          'aria-label="查看藏品：' + it.name + '">' +
-          '<div class="thumb"><img src="' + (isFeature ? it.big : it.small) + '" alt="' + it.name + '" loading="' + (isFeature ? 'eager' : 'lazy') + '" decoding="async"></div>' +
-          '<div class="meta">' +
-            '<span class="nm">' + it.name + '</span>' +
-            '<span class="cat-tag">' + it.cat + author + '</span>' +
-            featureDesc +
-            featureHint +
-          '</div>' +
-        '</article>';
+    // 读取当前列数（CSS 变量决定，响应式变化时 JS 同步读取）
+    var cs = getComputedStyle(grid);
+    var cols = parseInt(cs.getPropertyValue('--grid-cols'), 10) || 5;
+
+    // 预加载所有（非首图）缩略图宽高比，用于最短列优先分配
+    var rest = ordered;
+    var pending = rest.length;
+    var ratios = {};
+    // 每张卡片文字区（标题+分类标签）大致固定高度，纳入列高估算，
+    // 图片高度 + 文字区高度 ≈ 卡片真实高度，让列高估算更准
+    var META_H = 0.16; // 文字区相对列宽的系数（列宽约 300px 时 ≈ 48px）
+    var done = function () {
+      // 首图 + 各列容器
+      var featureHtml = feature ? cardHTML(feature, true) : '';
+
+      // 最短列优先：把每件放进当前累计高度最小的列
+      var colHeights = [];
+      var colCards = [];
+      for (var c = 0; c < cols; c++) { colHeights.push(0); colCards.push([]); }
+
+      rest.forEach(function (it) {
+        var r = ratios[it.id] !== undefined ? ratios[it.id] : 1.3;
+        var h = r + META_H; // 卡片高度 = 图片宽高比 + 文字区
+        // 找当前最短列
+        var minIdx = 0;
+        for (var c = 1; c < cols; c++) { if (colHeights[c] < colHeights[minIdx]) minIdx = c; }
+        colCards[minIdx].push(it);
+        colHeights[minIdx] += h;
+      });
+
+      var colsHtml = '';
+      for (var c2 = 0; c2 < cols; c2++) {
+        var inner = '';
+        colCards[c2].forEach(function (it2) {
+          inner += cardHTML(it2, false);
+        });
+        colsHtml += '<div class="col">' + inner + '</div>';
+      }
+
+      grid.innerHTML = featureHtml + colsHtml;
+    };
+
+    if (!pending) { done(); return; }
+
+    rest.forEach(function (it) {
+      loadRatio(it.small, function (r) {
+        ratios[it.id] = r;
+        pending--;
+        if (pending === 0) done();
+      });
     });
-    grid.innerHTML = html;
   }
 
   /* ---------- 详情浮层 ---------- */

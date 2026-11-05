@@ -237,17 +237,22 @@ body { overflow-x: hidden; }
   color: var(--silver-400);
 }
 
-/* 藏品瀑布流：等宽多列，高度随图片自然错落 */
+/* 藏品瀑布流：CSS Grid 固定列 + JS 按最短列优先均衡分配，末端尽量齐平 */
 .grid {
-  column-count: 5;
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols, 5), 1fr);
   column-gap: clamp(6px, .8vw, 10px);
+  align-items: start;
+}
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, .8vw, 10px);
+  min-width: 0;
 }
 .card {
   display: flex;
   flex-direction: column;
-  margin-bottom: clamp(6px, .8vw, 10px);
-  break-inside: avoid;
-  -webkit-column-break-inside: avoid;
   border-radius: 9px;
   background: rgba(20, 38, 62, .34);
   border: 1px solid rgba(214, 228, 246, .10);
@@ -301,8 +306,7 @@ body { overflow-x: hidden; }
 
 /* 首图：当前分类第一件，通栏放大、更醒目 */
 .card--feature {
-  column-span: all;
-  -webkit-column-span: all;
+  grid-column: 1 / -1;
   display: grid;
   grid-template-columns: 1.5fr 1fr;
   align-items: stretch;
@@ -529,7 +533,7 @@ html.anim .body { animation: riseIn 1s .15s var(--ease-soft) both; }
    ========================================================================== */
 @media (max-width: 1200px) {
   .grid {
-    column-count: 4;
+    --grid-cols: 4;
   }
 }
 
@@ -552,7 +556,7 @@ html.anim .body { animation: riseIn 1s .15s var(--ease-soft) both; }
   .cat-btn .cnt { margin-left: .4em; }
   .side-title { margin-bottom: .4em; }
   .grid {
-    column-count: 3;
+    --grid-cols: 3;
   }
   .modal-inner {
     grid-template-columns: 1fr;
@@ -563,10 +567,9 @@ html.anim .body { animation: riseIn 1s .15s var(--ease-soft) both; }
 
 @media (max-width: 620px) {
   .grid {
-    column-count: 2;
+    --grid-cols: 2;
     column-gap: 8px;
   }
-  .card { margin-bottom: 8px; }
   .card--feature {
     grid-template-columns: 1fr;
   }
