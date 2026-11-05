@@ -17,6 +17,7 @@ ehthumbs.db
 
 # ---- 本地预览与调试产物 ----
 .edgeprofile/
+.edgeprofile2/
 .dev/
 node_modules/
 __pycache__/
