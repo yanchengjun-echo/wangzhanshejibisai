@@ -48,6 +48,16 @@
   }
 
   /* ---------- 藏品网格 ---------- */
+  // Fisher-Yates 洗牌：打散类别，避免同类别连续扎堆
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
   function renderGrid() {
     var list = activeCat === '全部' ? items : items.filter(function (it) { return it.cat === activeCat; });
     curCat.textContent = activeCat;
@@ -58,8 +68,23 @@
       return;
     }
 
+    // 「全部」视图下打散类别；单个分类视图保持原顺序（本就同类）
+    var ordered = activeCat === '全部' ? shuffle(list) : list;
+
+    // 首图固定为内容最丰富的精品（织金苗族少女缠绣背扇，id=463），
+    // 若打散后它不在首位，则把它提到最前作为首图
+    var FEATURE_ID = '463';
+    var featureIdx = -1;
+    for (var k = 0; k < ordered.length; k++) {
+      if (ordered[k].id === FEATURE_ID) { featureIdx = k; break; }
+    }
+    if (featureIdx > 0) {
+      var feat = ordered.splice(featureIdx, 1)[0];
+      ordered.unshift(feat);
+    }
+
     var html = '';
-    list.forEach(function (it, idx) {
+    ordered.forEach(function (it, idx) {
       var author = it.author ? '<span class="author">· ' + it.author + '</span>' : '';
       var isFeature = idx === 0;
       var cls = 'card' + (isFeature ? ' card--feature' : '');
