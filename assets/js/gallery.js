@@ -59,16 +59,26 @@
     }
 
     var html = '';
-    list.forEach(function (it) {
+    list.forEach(function (it, idx) {
       var author = it.author ? '<span class="author">· ' + it.author + '</span>' : '';
+      var isFeature = idx === 0;
+      var cls = 'card' + (isFeature ? ' card--feature' : '');
+      var featureHint = isFeature
+        ? '<span class="feature-hint">本类精选 · 点击查看详情</span>'
+        : '';
+      var featureDesc = (isFeature && it.desc)
+        ? '<span class="feature-desc">' + it.desc + '</span>'
+        : '';
       html +=
-        '<article class="card" tabindex="0" role="button" ' +
+        '<article class="' + cls + '" tabindex="0" role="button" ' +
           'data-id="' + it.id + '" ' +
           'aria-label="查看藏品：' + it.name + '">' +
-          '<div class="thumb"><img src="' + it.small + '" alt="' + it.name + '" loading="lazy" decoding="async"></div>' +
+          '<div class="thumb"><img src="' + (isFeature ? it.big : it.small) + '" alt="' + it.name + '" loading="' + (isFeature ? 'eager' : 'lazy') + '" decoding="async"></div>' +
           '<div class="meta">' +
             '<span class="nm">' + it.name + '</span>' +
             '<span class="cat-tag">' + it.cat + author + '</span>' +
+            featureDesc +
+            featureHint +
           '</div>' +
         '</article>';
     });

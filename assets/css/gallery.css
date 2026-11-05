@@ -235,52 +235,50 @@ body { overflow-x: hidden; }
   color: var(--silver-400);
 }
 
-/* 藏品网格 */
+/* 藏品瀑布流：等宽多列，高度随图片自然错落 */
 .grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
-  gap: clamp(14px, 1.8vw, 22px);
+  column-count: 3;
+  column-gap: clamp(12px, 1.4vw, 20px);
 }
 .card {
   display: flex;
   flex-direction: column;
-  border: 1px solid rgba(179, 197, 221, .14);
-  border-radius: 8px;
+  margin-bottom: clamp(12px, 1.4vw, 20px);
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  border-radius: 6px;
   background: rgba(15, 44, 76, .28);
   overflow: hidden;
   cursor: pointer;
-  transition: transform .6s var(--ease-soft), border-color .6s ease, box-shadow .6s ease;
+  transition: transform .6s var(--ease-soft), box-shadow .6s ease;
 }
 .card:hover, .card:focus-visible {
   transform: translateY(-4px);
-  border-color: rgba(217, 178, 106, .42);
-  box-shadow: 0 14px 30px rgba(2, 8, 18, .5);
+  box-shadow: 0 14px 30px rgba(2, 8, 18, .55);
 }
 .card:focus-visible { outline: 1px solid var(--gold); outline-offset: 2px; }
 .card .thumb {
   position: relative;
-  aspect-ratio: 4 / 3;
   background: rgba(6, 21, 39, .5);
   overflow: hidden;
 }
 .card .thumb img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
   display: block;
   transition: transform 1s var(--ease-soft);
 }
-.card:hover .thumb img { transform: scale(1.05); }
+.card:hover .thumb img { transform: scale(1.04); }
 .card .meta {
-  padding: .7em .8em .8em;
+  padding: .6em .75em .7em;
   display: flex;
   flex-direction: column;
-  gap: .2em;
+  gap: .18em;
 }
 .card .nm {
   font-family: var(--font-hei);
-  font-size: clamp(13px, 1.7vh, 15px);
-  line-height: 1.35;
+  font-size: clamp(12px, 1.6vh, 14px);
+  line-height: 1.4;
   color: var(--silver-100);
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -289,10 +287,68 @@ body { overflow-x: hidden; }
 }
 .card .cat-tag {
   font-family: var(--font-kai);
-  font-size: clamp(11px, 1.4vh, 12px);
-  letter-spacing: .1em;
+  font-size: clamp(10px, 1.3vh, 11px);
+  letter-spacing: .08em;
   color: var(--gold-mid, #d9b26a);
+  opacity: .8;
+}
+
+/* 首图：当前分类第一件，通栏放大、更醒目 */
+.card--feature {
+  column-span: all;
+  -webkit-column-span: all;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  align-items: stretch;
+  margin-bottom: clamp(14px, 1.8vw, 24px);
+  border-radius: 8px;
+  background: linear-gradient(160deg, rgba(23, 57, 95, .5), rgba(10, 30, 53, .4));
+}
+.card--feature .thumb {
+  min-height: 100%;
+  display: flex;
+}
+.card--feature .thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  max-height: 420px;
+}
+.card--feature .meta {
+  padding: clamp(20px, 3.4vh, 34px) clamp(18px, 2.4vw, 32px);
+  justify-content: center;
+  gap: .6em;
+  align-self: center;
+}
+.card--feature .nm {
+  font-family: var(--font-kai);
+  font-size: clamp(26px, 3.8vh, 38px);
+  line-height: 1.25;
+  letter-spacing: .04em;
+  color: var(--silver-50);
+  -webkit-line-clamp: 3;
+}
+.card--feature .cat-tag {
+  font-size: clamp(14px, 2vh, 16px);
+  letter-spacing: .18em;
+}
+.card--feature .feature-hint {
+  margin-top: .4em;
+  font-family: var(--font-hei);
+  font-size: clamp(12px, 1.6vh, 14px);
+  color: var(--silver-400);
   opacity: .85;
+}
+.card--feature .feature-desc {
+  margin-top: .2em;
+  font-family: var(--font-serif);
+  font-size: clamp(13px, 1.7vh, 15px);
+  line-height: 1.8;
+  color: var(--silver-300);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* 空态 */
@@ -480,6 +536,9 @@ html.anim .body { animation: riseIn 1s .15s var(--ease-soft) both; }
   }
   .cat-btn .cnt { margin-left: .4em; }
   .side-title { margin-bottom: .4em; }
+  .grid {
+    column-count: 2;
+  }
   .modal-inner {
     grid-template-columns: 1fr;
   }
@@ -489,8 +548,13 @@ html.anim .body { animation: riseIn 1s .15s var(--ease-soft) both; }
 
 @media (max-width: 620px) {
   .grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    column-count: 2;
+    column-gap: 10px;
   }
+  .card { margin-bottom: 10px; }
+  .card--feature {
+    grid-template-columns: 1fr;
+  }
+  .card--feature .thumb { min-height: auto; }
   .page-title { font-size: clamp(30px, 8vw, 40px); }
 }
