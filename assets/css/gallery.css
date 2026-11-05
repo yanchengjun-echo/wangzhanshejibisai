@@ -237,13 +237,13 @@ body { overflow-x: hidden; }
 
 /* 藏品瀑布流：等宽多列，高度随图片自然错落 */
 .grid {
-  column-count: 3;
-  column-gap: clamp(12px, 1.4vw, 20px);
+  column-count: 5;
+  column-gap: clamp(8px, 1vw, 14px);
 }
 .card {
   display: flex;
   flex-direction: column;
-  margin-bottom: clamp(12px, 1.4vw, 20px);
+  margin-bottom: clamp(8px, 1vw, 14px);
   break-inside: avoid;
   -webkit-column-break-inside: avoid;
   border-radius: 6px;
@@ -518,6 +518,12 @@ html.anim .body { animation: riseIn 1s .15s var(--ease-soft) both; }
 /* ==========================================================================
    7. 响应式
    ========================================================================== */
+@media (max-width: 1200px) {
+  .grid {
+    column-count: 4;
+  }
+}
+
 @media (max-width: 900px) {
   .body {
     grid-template-columns: 1fr;
@@ -537,7 +543,7 @@ html.anim .body { animation: riseIn 1s .15s var(--ease-soft) both; }
   .cat-btn .cnt { margin-left: .4em; }
   .side-title { margin-bottom: .4em; }
   .grid {
-    column-count: 2;
+    column-count: 3;
   }
   .modal-inner {
     grid-template-columns: 1fr;
@@ -549,9 +555,9 @@ html.anim .body { animation: riseIn 1s .15s var(--ease-soft) both; }
 @media (max-width: 620px) {
   .grid {
     column-count: 2;
-    column-gap: 10px;
+    column-gap: 8px;
   }
-  .card { margin-bottom: 10px; }
+  .card { margin-bottom: 8px; }
   .card--feature {
     grid-template-columns: 1fr;
   }
