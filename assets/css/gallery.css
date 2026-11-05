@@ -33,12 +33,12 @@ body { overflow-x: hidden; }
   z-index: -2;
   background:
     radial-gradient(ellipse 62% 48% at 50% 34%, rgba(217, 178, 106, .08) 0%, rgba(217, 178, 106, 0) 68%),
-    radial-gradient(ellipse 90% 70% at 50% 110%, rgba(5, 14, 26, .88) 0%, rgba(5, 14, 26, 0) 62%),
-    linear-gradient(165deg, rgba(8, 22, 40, .72) 0%, rgba(7, 18, 32, .78) 45%, rgba(4, 12, 22, .84) 100%),
+    radial-gradient(ellipse 90% 70% at 50% 110%, rgba(5, 14, 26, .9) 0%, rgba(5, 14, 26, 0) 62%),
+    linear-gradient(165deg, rgba(8, 22, 40, .78) 0%, rgba(7, 18, 32, .82) 45%, rgba(4, 12, 22, .86) 100%),
     url("../bg-batik.jpg");
-  background-size: cover;
+  background-size: 420px auto;
   background-position: center;
-  background-repeat: no-repeat;
+  background-repeat: repeat;
   background-blend-mode: normal, normal, normal, normal;
 }
 
@@ -240,18 +240,17 @@ body { overflow-x: hidden; }
 /* 藏品瀑布流：等宽多列，高度随图片自然错落 */
 .grid {
   column-count: 5;
-  column-gap: clamp(8px, 1vw, 14px);
+  column-gap: clamp(6px, .8vw, 10px);
 }
 .card {
   display: flex;
   flex-direction: column;
-  margin-bottom: clamp(8px, 1vw, 14px);
+  margin-bottom: clamp(6px, .8vw, 10px);
   break-inside: avoid;
   -webkit-column-break-inside: avoid;
-  border-radius: 10px;
+  border-radius: 9px;
   background: rgba(20, 38, 62, .34);
   border: 1px solid rgba(214, 228, 246, .10);
-  padding: clamp(4px, .5vw, 7px);
   box-shadow: 0 2px 10px rgba(2, 8, 18, .25);
   overflow: hidden;
   cursor: pointer;
@@ -268,7 +267,6 @@ body { overflow-x: hidden; }
   position: relative;
   background: rgba(6, 21, 39, .5);
   overflow: hidden;
-  border-radius: 7px;
 }
 .card .thumb img {
   width: 100%;
@@ -278,7 +276,7 @@ body { overflow-x: hidden; }
 }
 .card:hover .thumb img { transform: scale(1.04); }
 .card .meta {
-  padding: .6em .25em .3em;
+  padding: .6em .5em .65em;
   display: flex;
   flex-direction: column;
   gap: .18em;
@@ -309,8 +307,7 @@ body { overflow-x: hidden; }
   grid-template-columns: 1.5fr 1fr;
   align-items: stretch;
   margin-bottom: clamp(14px, 1.8vw, 24px);
-  border-radius: 12px;
-  padding: clamp(5px, .6vw, 8px);
+  border-radius: 11px;
   border: 1px solid rgba(214, 228, 246, .12);
   background: linear-gradient(160deg, rgba(23, 57, 95, .5), rgba(10, 30, 53, .42));
   box-shadow: 0 4px 18px rgba(2, 8, 18, .35);
@@ -318,7 +315,6 @@ body { overflow-x: hidden; }
 .card--feature .thumb {
   min-height: 100%;
   display: flex;
-  border-radius: 8px;
   overflow: hidden;
 }
 .card--feature .thumb img {
