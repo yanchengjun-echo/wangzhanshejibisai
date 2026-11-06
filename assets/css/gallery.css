@@ -137,6 +137,10 @@ body { overflow-x: hidden; }
   display: flex;
   flex-direction: column;
   gap: 4px;
+  /* 关键：grid 子项默认 min-width:auto，内容（分类按钮 nowrap 文字）会撑宽
+     导致移动端横向溢出；置 0 让容器能正确收缩，分类按钮正常换行 */
+  min-width: 0;
+  max-width: 100%;
 }
 .side-title {
   margin: 0 0 .5em;
@@ -153,6 +157,7 @@ body { overflow-x: hidden; }
   display: flex;
   flex-direction: column;
   gap: 3px;
+  max-width: 100%;
 }
 .cat-btn {
   position: relative;
@@ -189,12 +194,6 @@ body { overflow-x: hidden; }
   font-weight: 600;
   font-variant-numeric: lining-nums tabular-nums;
   color: var(--gold);
-  /* 更醒目：亮金数字 + 淡金衬底胶囊，一眼看清藏品数量 */
-  background: rgba(217, 178, 106, .14);
-  border: 1px solid rgba(217, 178, 106, .28);
-  border-radius: 999px;
-  padding: .08em .55em;
-  line-height: 1.4;
 }
 .cat-btn:hover .cnt {
   color: var(--gold-hi, #f7e6c2);
@@ -291,13 +290,18 @@ body { overflow-x: hidden; }
   position: relative;
   background: rgba(6, 21, 39, .5);
   overflow: hidden;
+  /* 占位高度：图片懒加载前不塌缩，避免「只剩文字」的空白卡片 */
+  min-height: 120px;
 }
 .card .thumb img {
   width: 100%;
   height: auto;
   display: block;
-  transition: transform 1s var(--ease-soft);
+  transition: transform 1s var(--ease-soft), opacity .5s ease;
 }
+/* 懒加载过渡：普通卡片图片未加载时占位底色可见，加载后淡入 */
+.card:not(.card--feature) .thumb img:not(.loaded) { opacity: 0; }
+.card:not(.card--feature) .thumb img.loaded { opacity: 1; }
 .card:hover .thumb img { transform: scale(1.04); }
 .card .meta {
   padding: .6em .5em .65em;

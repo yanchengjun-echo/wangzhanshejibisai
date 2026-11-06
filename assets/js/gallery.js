@@ -35,8 +35,8 @@
     all.forEach(function (c) {
       var n = c === '全部' ? items.length : countBy(c);
       var cur = c === activeCat ? ' aria-current="true"' : '';
-      html += '<li><button class="cat-btn" type="button" data-cat="' + c + '"' + cur + '>' +
-              c + '<span class="cnt">' + n + '</span></button></li>';
+      html += '<button class="cat-btn" type="button" data-cat="' + c + '"' + cur + '>' +
+              c + '<span class="cnt">' + n + '</span></button>';
     });
     catList.innerHTML = html;
   }
@@ -58,6 +58,41 @@
     return a;
   }
 
+  // 图片懒加载：改用 data-src + IntersectionObserver，替代原生 loading="lazy"。
+  // 原因：CSS column-count 多列布局会重排元素，原生 lazy 的「视口判定」与实际
+  // 视觉位置错位，导致大量图片不触发加载、只剩文字（.thumb 高度塌缩为 0）。
+  var io = null;
+  function initLazyObserver() {
+    if (!('IntersectionObserver' in window)) {
+      // 兜底：不支持 IntersectionObserver 时直接全量加载
+      var imgs = grid.querySelectorAll('img[data-src]');
+      for (var i = 0; i < imgs.length; i++) {
+        imgs[i].src = imgs[i].getAttribute('data-src');
+        imgs[i].removeAttribute('data-src');
+      }
+      return;
+    }
+    if (io) io.disconnect();
+    io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          var img = entry.target;
+          img.src = img.getAttribute('data-src');
+          img.removeAttribute('data-src');
+          img.classList.add('loaded');
+          io.unobserve(img);
+        }
+      });
+    }, {
+      rootMargin: '200px 0px', // 提前 200px 预加载，滚动时无感知
+      threshold: 0.01
+    });
+    var imgs = grid.querySelectorAll('img[data-src]');
+    for (var j = 0; j < imgs.length; j++) {
+      io.observe(imgs[j]);
+    }
+  }
+
   function cardHTML(it, isFeature) {
     var author = it.author ? '<span class="author">· ' + it.author + '</span>' : '';
     var cls = 'card' + (isFeature ? ' card--feature' : '');
@@ -67,10 +102,14 @@
     var featureDesc = (isFeature && it.desc)
       ? '<span class="feature-desc">' + it.desc + '</span>'
       : '';
+    // 首图立即加载（eager），其余卡片用 data-src 延迟加载
+    var imgTag = isFeature
+      ? '<img src="' + it.big + '" alt="' + it.name + '" decoding="async">'
+      : '<img data-src="' + it.small + '" alt="' + it.name + '" decoding="async">';
     return '<article class="' + cls + '" tabindex="0" role="button" ' +
         'data-id="' + it.id + '" ' +
         'aria-label="查看藏品：' + it.name + '">' +
-        '<div class="thumb"><img src="' + (isFeature ? it.big : it.small) + '" alt="' + it.name + '" loading="' + (isFeature ? 'eager' : 'lazy') + '" decoding="async"></div>' +
+        '<div class="thumb">' + imgTag + '</div>' +
         '<div class="meta">' +
           '<span class="nm">' + it.name + '</span>' +
           '<span class="cat-tag">' + it.cat + author + '</span>' +
@@ -106,7 +145,7 @@
 
     // 直接同步渲染：首图通栏 + 其余卡片流入 CSS columns 瀑布流。
     // 不再为「均衡列高」预加载所有缩略图宽高比——那是点进展馆长时间白屏的元凶。
-    // 图片用 loading="lazy" 懒加载，浏览器按需请求，首屏立即出内容。
+    // 其余卡片用 data-src + IntersectionObserver 懒加载，首屏立即出内容。
     var html = feature ? cardHTML(feature, true) : '';
     html += '<div class="masonry">';
     for (var i = 0; i < ordered.length; i++) {
@@ -115,6 +154,7 @@
     html += '</div>';
 
     grid.innerHTML = html;
+    initLazyObserver();
   }
 
   /* ---------- 详情浮层 ---------- */
