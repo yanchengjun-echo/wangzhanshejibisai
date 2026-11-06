@@ -239,16 +239,14 @@ body { overflow-x: hidden; }
 
 /* 藏品瀑布流：CSS Grid 固定列 + JS 按最短列优先均衡分配，末端尽量齐平 */
 .grid {
-  display: grid;
-  grid-template-columns: repeat(var(--grid-cols, 5), 1fr);
-  column-gap: clamp(6px, .8vw, 10px);
-  align-items: start;
+  /* 纯块级容器：首图 + .masonry 瀑布流 */
+  display: block;
 }
-.col {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(6px, .8vw, 10px);
-  min-width: 0;
+/* CSS 原生多列瀑布流：卡片按文档顺序自动流入各列，
+   无需 JS 预加载宽高比，首屏即可渲染，图片随滚动懒加载 */
+.masonry {
+  column-count: var(--masonry-cols, 5);
+  column-gap: clamp(6px, .8vw, 10px);
 }
 .card {
   display: flex;
@@ -259,6 +257,10 @@ body { overflow-x: hidden; }
   box-shadow: 0 2px 10px rgba(2, 8, 18, .25);
   overflow: hidden;
   cursor: pointer;
+  /* 关键：防卡片在 CSS columns 中被列截断 */
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  margin-bottom: clamp(6px, .8vw, 10px);
   transition: transform .55s var(--ease-soft), box-shadow .55s ease, border-color .55s ease, background .55s ease;
 }
 .card:hover, .card:focus-visible {
@@ -310,7 +312,6 @@ body { overflow-x: hidden; }
 
 /* 首图：当前分类第一件，通栏放大、更醒目 */
 .card--feature {
-  grid-column: 1 / -1;
   display: grid;
   grid-template-columns: 1.5fr 1fr;
   align-items: stretch;
@@ -540,8 +541,8 @@ html.anim .body { animation: riseIn 1s .15s var(--ease-soft) both; }
    7. 响应式
    ========================================================================== */
 @media (max-width: 1200px) {
-  .grid {
-    --grid-cols: 4;
+  .masonry {
+    --masonry-cols: 4;
   }
 }
 
@@ -563,8 +564,8 @@ html.anim .body { animation: riseIn 1s .15s var(--ease-soft) both; }
   }
   .cat-btn .cnt { margin-left: .4em; }
   .side-title { margin-bottom: .4em; }
-  .grid {
-    --grid-cols: 3;
+  .masonry {
+    --masonry-cols: 3;
   }
   .modal-inner {
     grid-template-columns: 1fr;
@@ -574,8 +575,8 @@ html.anim .body { animation: riseIn 1s .15s var(--ease-soft) both; }
 }
 
 @media (max-width: 620px) {
-  .grid {
-    --grid-cols: 2;
+  .masonry {
+    --masonry-cols: 2;
     column-gap: 8px;
   }
   .card--feature {
