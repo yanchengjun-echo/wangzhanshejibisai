@@ -407,19 +407,10 @@ html.anim .footer {
   transition: color .6s ease;
 }
 
-.nav-item .num {
-  font-family: var(--font-num);
-  font-size: clamp(12px, 1.6vh, 17px);
-  letter-spacing: .34em;
-  text-indent: .34em;          /* 抵消末字符的字距，保证视觉居中 */
-  font-variant-numeric: lining-nums tabular-nums;
-  opacity: .95;
-}
-
 /* 已开放板块名：只给可进入的导航位显示，未做的仍保留数字占位 */
 .nav-item .label {
-  font-family: var(--font-brush);
-  font-size: clamp(10px, 1.45vh, 13px);
+  font-family: var(--font-serif);
+  font-size: clamp(15px, 2vh, 19px);
   letter-spacing: .14em;
   text-indent: .14em;
   color: rgba(240, 218, 172, .95);
@@ -542,7 +533,6 @@ html.anim .footer {
 
   .nav { width: 100%; }
   .nav-item { padding: 8px 2px; min-width: 0; }
-  .nav-item .num { letter-spacing: .3em; text-indent: .3em; }
 
   .orn { height: clamp(104px, 17vh, 158px); }
   /* 竖屏时上下角花会和标题、数字打架，只留上边两只 */

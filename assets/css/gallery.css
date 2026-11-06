@@ -185,9 +185,26 @@ body { overflow-x: hidden; }
 .cat-btn .cnt {
   margin-left: auto;
   font-family: var(--font-num);
-  font-size: .82em;
-  color: var(--silver-400);
-  opacity: .8;
+  font-size: 1em;
+  font-weight: 600;
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--gold);
+  /* 更醒目：亮金数字 + 淡金衬底胶囊，一眼看清藏品数量 */
+  background: rgba(217, 178, 106, .14);
+  border: 1px solid rgba(217, 178, 106, .28);
+  border-radius: 999px;
+  padding: .08em .55em;
+  line-height: 1.4;
+}
+.cat-btn:hover .cnt {
+  color: var(--gold-hi, #f7e6c2);
+  background: rgba(217, 178, 106, .2);
+  border-color: rgba(217, 178, 106, .4);
+}
+.cat-btn[aria-current="true"] .cnt {
+  color: #fff7e6;
+  background: rgba(217, 178, 106, .28);
+  border-color: rgba(217, 178, 106, .5);
 }
 .cat-btn:hover {
   color: var(--gold-hi, #f7e6c2);
