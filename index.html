@@ -21,6 +21,7 @@
 <link rel="preload" href="assets/fonts/youran-xiaokai-title.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/css/main.css">
 <link rel="stylesheet" href="assets/css/bgm.css">
+<link rel="stylesheet" href="assets/css/chrome.css">
 
 <!-- 入场动画的开关：只有脚本确认能跑，才给 html 加 anim 类。
      这样即使脚本被拦截、动画失败，页面也是完整可见的，不会白屏。 -->
@@ -31,6 +32,25 @@
 </script>
 </head>
 <body>
+
+<a class="skip-link" href="#main">跳到主要内容</a>
+
+<!-- 全站顶栏：四个页面同一份结构，只改 aria-current 的位置 -->
+<header class="topbar">
+  <div class="topbar__inner">
+    <a class="topbar__brand" href="index.html" aria-label="银绣山河 · 返回首页">
+      <span class="topbar__mark" aria-hidden="true">绣</span>
+      <span class="topbar__name">银绣山河</span>
+    </a>
+    <span class="topbar__divider" aria-hidden="true"></span>
+    <nav class="topbar__nav" aria-label="主导航">
+      <a class="topbar__link" href="index.html" aria-current="page">首页</a>
+      <a class="topbar__link" href="history.html">历史溯源</a>
+      <a class="topbar__link" href="gallery.html">纹样图鉴</a>
+      <a class="topbar__link" href="experience.html">互动创作</a>
+    </nav>
+  </div>
+</header>
 
 <div class="stage">
   <!-- 背景层：第二张图（青花水波）+ 靛蓝罩色 -->
@@ -46,7 +66,7 @@
     <img class="orn orn--br" src="assets/orn-bird.png" alt="" width="660" height="827">
   </div>
 
-  <main class="hero" id="top">
+  <main class="hero" id="main">
 
     <!-- 标题：银绣（左） 山河（右），中间留出纹样徽章 -->
     <h1 class="titles" aria-label="银绣山河">
@@ -94,11 +114,10 @@
     <div class="footer">
       <div class="divider" aria-hidden="true"><span class="divider-gem"></span></div>
       <img class="orn-center" src="assets/orn-sprig.png" alt="" width="220" height="197" aria-hidden="true">
-      <nav class="nav" aria-label="主导航">
-        <a class="nav-item" href="history.html" aria-label="第一板块：枫启长歌 · 苗族历史脉络"><span class="label">枫启长歌</span><span class="tick"></span></a>
-        <a class="nav-item" href="gallery.html" aria-label="第二板块：银绣珍藏 · 线上展馆"><span class="label">银绣珍藏</span><span class="tick"></span></a>
-        <a class="nav-item" href="experience.html" aria-label="第三板块：巧手成纹 · 蜡染与苗绣线上体验"><span class="label">巧手成纹</span><span class="tick"></span></a>
-        <a class="nav-item" href="#" aria-label="第四板块（待命名）"><span class="label">待命名</span><span class="tick"></span></a>
+      <nav class="nav" aria-label="板块入口">
+        <a class="nav-item" href="history.html" aria-label="第一板块：历史溯源 · 苗族历史脉络"><span class="label">枫启长歌</span><span class="tick"></span></a>
+        <a class="nav-item" href="gallery.html" aria-label="第二板块：纹样图鉴 · 线上展馆"><span class="label">银绣珍藏</span><span class="tick"></span></a>
+        <a class="nav-item" href="experience.html" aria-label="第三板块：互动创作 · 蜡染与苗绣线上体验"><span class="label">巧手成纹</span><span class="tick"></span></a>
       </nav>
     </div>
 

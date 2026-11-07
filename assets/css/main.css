@@ -387,7 +387,7 @@ html.anim .footer {
 
 .nav {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   justify-items: center;
   align-items: start;
   width: min(1160px, 92%);

@@ -64,63 +64,122 @@
 * { box-sizing: border-box; }
 
 .exp-page {
-  min-height: 100dvh;
+  position: relative;
+  isolation: isolate;
+  /* 顶栏是 sticky 且占文档流，这里必须减掉它的高度 */
+  min-height: calc(100dvh - var(--nav-h, 64px));
   margin: 0;
-  padding: clamp(16px, 2.4vh, 30px) clamp(16px, 2.6vw, 42px) clamp(14px, 2vh, 24px);
-  display: flex;
-  flex-direction: column;
-  gap: clamp(12px, 1.8vh, 22px);
-  background:
-    radial-gradient(1100px 620px at 50% -8%, rgba(51, 80, 107, .38), transparent 62%),
-    radial-gradient(900px 520px at 88% 108%, rgba(91, 44, 111, .18), transparent 60%),
-    linear-gradient(180deg, var(--exp-indigo-900) 0%, var(--exp-indigo-950) 100%);
+  padding: clamp(14px, 2.2vh, 26px) clamp(16px, 3vw, 54px) clamp(12px, 2.2vh, 26px);
+  /* 与展馆 / 历史两页同一套网格：面包屑 / 页头 / 正文 / 页脚 */
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 0;
+  background: none;
   color: var(--exp-text);
   font-family: var(--exp-font-body);
   overflow-x: hidden;
 }
 
-/* ---------- 3. 页头 ---------- */
-.exp-head {
-  text-align: center;
-  flex: 0 0 auto;
+/* 纸面颗粒：压在整页最底层，材质和历史页一致 */
+.exp-page > .grain {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: .07;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-.exp-title {
+/* ---------- 3. 面包屑 + 页头（与展馆 / 历史两页同构） ---------- */
+.exp-page .crumb {
+  font-family: var(--exp-font-body);
+  font-size: clamp(12px, 1.5vh, 14px);
+  letter-spacing: .04em;
+}
+.exp-page .crumb ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: .5em;
+  align-items: center;
+}
+.exp-page .crumb li {
+  display: flex;
+  align-items: center;
+  gap: .5em;
+  color: var(--exp-text-mute);
+}
+.exp-page .crumb li:not(:last-child)::after {
+  content: "/";
+  color: rgba(233, 237, 242, .28);
+}
+.exp-page .crumb a {
+  color: var(--exp-text-dim);
+  text-decoration: none;
+  transition: color .45s var(--exp-ease);
+}
+.exp-page .crumb a:hover { color: var(--exp-wax); }
+.exp-page .crumb [aria-current] { color: var(--exp-text); }
+
+.exp-page .head {
+  text-align: center;
+  padding: clamp(4px, 1.4vh, 16px) 0 clamp(2px, 1.2vh, 12px);
+}
+
+/* 「巧手」「成纹」分置两侧，中缝留一道金线——和历史页同构 */
+.exp-page .page-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: .18em;
   margin: 0;
   font-family: var(--exp-font-title);
   font-weight: 500;
-  font-size: clamp(24px, 3.4vw, 38px);
-  letter-spacing: .18em;
-  text-indent: .18em;
-  color: var(--exp-paper);
-  text-shadow: 0 2px 22px rgba(194, 59, 34, .22);
-}
-
-/* 标题下的朱红短线 */
-.exp-title::after {
-  content: "";
-  display: block;
-  width: 46px;
-  height: 2px;
-  margin: .5em auto 0;
-  background: linear-gradient(90deg, transparent, var(--exp-red), transparent);
-}
-
-.exp-sub {
-  margin: .7em 0 0;
-  font-size: clamp(12px, 1.5vw, 14px);
+  font-size: clamp(30px, min(7.6vh, 4.6vw), 58px);
+  line-height: 1.06;
   letter-spacing: .1em;
+  white-space: nowrap;
+}
+
+/* 银器抛光的折光：上亮下暗 */
+.exp-page .page-title > span:not(.gap) {
+  background: linear-gradient(178deg, #fdfefe 4%, #eaeff7 40%, #b7c8de 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 5px 22px rgba(194, 59, 34, .16));
+}
+
+.exp-page .page-title .gap {
+  align-self: center;
+  flex: 0 0 auto;
+  width: 1px;
+  height: .8em;
+  background: linear-gradient(180deg,
+    rgba(217, 178, 106, 0) 0%,
+    rgba(217, 178, 106, .5) 50%,
+    rgba(217, 178, 106, 0) 100%);
+}
+
+.exp-page .tagline {
+  margin: clamp(8px, 1.3vh, 14px) 0 0;
+  font-family: var(--exp-font-body);
+  font-size: clamp(12px, 1.5vh, 14px);
+  letter-spacing: .16em;
+  text-indent: .16em;
   color: var(--exp-text-dim);
 }
 
 /* ---------- 4. 三栏主体 ---------- */
 .exp-body {
-  flex: 1 1 auto;
+  /* 网格的 1fr 行：撑满页头与页脚之间的剩余高度 */
+  min-height: 0;
   display: grid;
   grid-template-columns: var(--exp-side-w) minmax(0, 1fr) var(--exp-side-w);
   gap: clamp(12px, 1.6vw, 22px);
   align-items: stretch;
-  min-height: 0;
 }
 
 /* 侧栏容器 */
@@ -407,9 +466,22 @@
    工具栏折叠为横向滚动条，画布固定比例 */
 @media (max-width: 860px) {
   .exp-page {
-    padding: 14px 12px 18px;
-    gap: 10px;
+    padding: 10px 12px 16px;
+    row-gap: 6px;
   }
+  /* 窄屏页头收一收，把高度让给画布 */
+  .exp-page .head { padding: 2px 0 0; }
+  .exp-page .page-title {
+    font-size: clamp(24px, 6.4vw, 32px);
+    letter-spacing: .08em;
+  }
+  .exp-page .tagline {
+    margin-top: 6px;
+    font-size: 11.5px;
+    letter-spacing: .1em;
+    text-indent: .1em;
+  }
+  .exp-page .crumb { font-size: 11.5px; }
   .exp-body {
     grid-template-columns: 1fr;
     gap: 10px;

@@ -21,11 +21,17 @@
     : false;
 
   var intro = document.getElementById('intro');
+  var scene = document.querySelector('.intro__scene');
   var thread = document.getElementById('threadPath');
   var needle = document.getElementById('threadNeedle');
 
   var pathLen = 0;
   var ticking = false;
+
+  /* 版式量：顶栏把画面往下压了 --nav-h，行程必须按「场景粘住时的上沿」来算，
+     不能再用 getBoundingClientRect().top 直接当已滚距离，否则整体偏一个顶栏高 */
+  var travelLen = 0;   // 滚动行程（px）
+  var stickyTop = 0;   // 场景粘住时的视口上沿（= 顶栏高度）
 
   /* ---------- 丝线初始化 ---------- */
   function initThread() {
@@ -71,19 +77,28 @@
     placeNeedle(pathLen * p);
   }
 
+  /* ---------- 读取版式：只在初始化与尺寸变化时跑 ---------- */
+  function layout() {
+    if (!intro) return;
+    var cs = scene ? window.getComputedStyle(scene) : null;
+    stickyTop = cs ? (parseFloat(cs.top) || 0) : 0;
+    var sceneH = scene ? scene.offsetHeight : window.innerHeight;
+    travelLen = intro.offsetHeight - sceneH;
+  }
+
   /* ---------- 读取滚动位置并换算进度 ---------- */
   function measure() {
     ticking = false;
     if (!intro) return;
 
-    var travel = intro.offsetHeight - window.innerHeight;
-    if (travel <= 0) {
+    if (travelLen <= 0) {
       render(0);
       return;
     }
 
-    var passed = -intro.getBoundingClientRect().top;
-    var p = passed / travel;
+    // 场景上沿离开「粘住位置」的距离，才是真正消耗掉的行程
+    var passed = -(intro.getBoundingClientRect().top - stickyTop);
+    var p = passed / travelLen;
     render(p < 0 ? 0 : p > 1 ? 1 : p);
   }
 
@@ -91,6 +106,11 @@
     if (ticking) return;
     ticking = true;
     window.requestAnimationFrame(measure);
+  }
+
+  function onResize() {
+    layout();
+    onScroll();
   }
 
   /* ---------- 入口按钮：广播模式，交给后续模块处理 ---------- */
@@ -120,8 +140,9 @@
     }
 
     initThread();
+    layout();
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
+    window.addEventListener('resize', onResize, { passive: true });
     measure();
   }
 

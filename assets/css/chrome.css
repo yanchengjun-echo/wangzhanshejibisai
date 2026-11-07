@@ -1,0 +1,269 @@
+/* ==========================================================================
+   银绣山河 · 全站共享外观层（顶栏 / 焦点 / 页头小字 / 页脚）
+   --------------------------------------------------------------------------
+   本文件在四个页面都引入，且必须排在各自的页面 CSS 之后（最后加载），
+   这样它对 .page / .stage / .hero 的高度修正才能覆盖单页样式。
+
+   结构参照「非遗剪纸」式横向导航条：
+     左  方形徽标（字）+ 站点名
+     中  一条竖分隔线
+     右  导航项，当前项加金色下划线
+   配色沿用本站靛蓝 + 银白，金色只做当前项指示
+   ========================================================================== */
+
+/* ---------- 1. 令牌 ---------- */
+:root {
+  /* 顶栏高度：所有页面用它让出顶部空间，统一在这里改 */
+  --nav-h: 64px;
+
+  /* 页面左右留白：顶栏和页面主体共用同一个值，右边界才对得齐 */
+  --page-pad: clamp(16px, 3.4vw, 54px);
+
+  /* UI 字体：导航、面包屑、页脚这类界面文字，不用标题楷体 */
+  --font-ui: "PingFang SC", "Microsoft YaHei", "Source Han Sans SC",
+             "Noto Sans SC", "Heiti SC", -apple-system, BlinkMacSystemFont,
+             "Segoe UI", sans-serif;
+}
+
+@media (max-width: 760px) {
+  :root { --nav-h: 56px; }
+}
+
+@media (max-width: 860px) {
+  :root { --page-pad: 15px; }
+}
+
+/* ---------- 2. 跳转链接（键盘用户可见，鼠标用户不可见） ---------- */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 12px;
+  z-index: 300;
+  padding: 10px 18px;
+  border-radius: 0 0 6px 6px;
+  background: var(--silver-100, #e6eefa);
+  color: var(--indigo-900, #061527);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  letter-spacing: .08em;
+  text-decoration: none;
+  transition: top .24s var(--ease-soft, cubic-bezier(.19, 1, .22, 1));
+}
+.skip-link:focus-visible,
+.skip-link:focus {
+  top: 0;
+  outline: 2px solid var(--gold, #d9b26a);
+  outline-offset: 2px;
+}
+
+/* ---------- 3. 顶栏 ---------- */
+.topbar {
+  /* sticky：滚动时留在顶部；z-index 低于展馆详情浮层(50)、音乐按钮(90)，
+     高于正文，避免浮层被它压住 */
+  position: sticky;
+  top: 0;
+  z-index: 40;
+
+  height: var(--nav-h);
+  /* 比页面底色亮一档，才看得出是一条独立的横条 */
+  background: linear-gradient(180deg, #14304e 0%, #0e2440 55%, #0a1d34 100%);
+  /* 下缘一道细金线 + 上缘一道银高光，代替阴影，更贴合银饰质感 */
+  border-bottom: 1px solid rgba(217, 178, 106, .26);
+  box-shadow: inset 0 1px 0 rgba(214, 230, 250, .07),
+              0 12px 30px -20px rgba(0, 0, 0, .95);
+  font-family: var(--font-ui);
+}
+
+.topbar__inner {
+  height: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 var(--page-pad);
+  display: flex;
+  align-items: center;
+}
+
+/* --- 左侧：徽标 + 站点名 --- */
+.topbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+  text-decoration: none;
+  transition: opacity .4s var(--ease-soft, cubic-bezier(.19, 1, .22, 1));
+}
+.topbar__brand:hover { opacity: .82; }
+
+/* 方形印章式徽标：细边框 + 单字，和参考图的 logo 方块同构 */
+.topbar__mark {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(230, 238, 250, .68);
+  border-radius: 2px;
+  color: var(--silver-50, #f6faff);
+  font-family: var(--font-brush, serif);
+  font-size: 16px;
+  line-height: 1;
+  /* 楷体字重心偏下，往上提一点才在方框里居中 */
+  padding-bottom: 1px;
+}
+
+.topbar__name {
+  color: var(--silver-100, #e6eefa);
+  font-family: var(--font-brush, serif);
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: .14em;
+  white-space: nowrap;
+}
+
+/* --- 中：竖分隔线 --- */
+.topbar__divider {
+  flex: 0 0 auto;
+  width: 1px;
+  height: 20px;
+  margin: 0 clamp(12px, 1.8vw, 24px);
+  background: linear-gradient(180deg,
+    rgba(230, 238, 250, 0) 0%,
+    rgba(230, 238, 250, .3) 50%,
+    rgba(230, 238, 250, 0) 100%);
+}
+
+/* --- 右：导航项 --- */
+.topbar__nav {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 2.4vw, 40px);
+}
+
+.topbar__link {
+  position: relative;
+  padding: 6px 0;
+  color: var(--silver-300, #b3c5dd);
+  font-size: 14px;
+  letter-spacing: .12em;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color .45s var(--ease-soft, cubic-bezier(.19, 1, .22, 1));
+}
+
+/* 下划线：默认缩到 0，hover 探出 55%，当前页整条拉满 */
+.topbar__link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 1px;
+  height: 2px;
+  background: var(--gold, #d9b26a);
+  border-radius: 1px;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform .42s var(--ease-soft, cubic-bezier(.19, 1, .22, 1)),
+              opacity .32s ease;
+  opacity: .55;
+}
+
+.topbar__link:hover { color: var(--silver-100, #e6eefa); }
+.topbar__link:hover::after { transform: scaleX(.55); opacity: .7; }
+
+/* 当前页 */
+.topbar__link[aria-current="page"] {
+  color: var(--silver-50, #f6faff);
+  font-weight: 600;
+}
+.topbar__link[aria-current="page"]::after {
+  transform: scaleX(1);
+  opacity: 1;
+  box-shadow: 0 0 10px rgba(217, 178, 106, .5);
+}
+
+/* 键盘焦点：不要去掉描边，改成不占位的柔和光环 */
+.topbar__link:focus-visible,
+.topbar__brand:focus-visible {
+  outline: 2px solid var(--gold, #d9b26a);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+/* ---------- 4. 让出顶栏高度 ----------
+   顶栏是 sticky 且占据文档流的顶部，页面主体必须减掉这一段，
+   否则每页都会多出一条滚动条 */
+.stage,
+.hero { min-height: calc(100dvh - var(--nav-h)); }
+
+.page { min-height: calc(100dvh - var(--nav-h)); }
+
+/* 左右留白统一：顶栏、展馆、历史、体验四者右边界对齐 */
+.page,
+.exp-page { padding-left: var(--page-pad); padding-right: var(--page-pad); }
+
+/* 体验页的粘性舞台同理：贴在顶栏下沿，而不是盖到顶栏底下 */
+.intro__scene {
+  top: var(--nav-h);
+  height: calc(100dvh - var(--nav-h));
+}
+
+/* ---------- 5. 页脚（三页共用同一形态） ---------- */
+.page-foot {
+  display: grid;
+  justify-items: center;
+  gap: clamp(10px, 1.6vh, 16px);
+  padding-top: clamp(12px, 1.8vh, 20px);
+}
+
+.foot-rule {
+  width: min(560px, 82%);
+  height: 1px;
+  background: linear-gradient(90deg,
+    rgba(196, 216, 240, 0) 0%,
+    rgba(196, 216, 240, .28) 22%,
+    rgba(226, 238, 252, .5) 50%,
+    rgba(196, 216, 240, .28) 78%,
+    rgba(196, 216, 240, 0) 100%);
+}
+
+.foot-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: .7em;
+  font-family: var(--font-ui);
+  font-size: clamp(11px, 1.4vh, 13px);
+  letter-spacing: .06em;
+  color: var(--silver-400, #8ea5c2);
+  text-align: center;
+}
+.foot-meta a {
+  color: var(--silver-300, #b3c5dd);
+  text-decoration: none;
+  transition: color .4s ease;
+}
+.foot-meta a:hover { color: var(--gold, #d9b26a); }
+.foot-meta .sep { color: rgba(142, 165, 194, .4); }
+
+/* ---------- 7. 响应式 ---------- */
+@media (max-width: 760px) {
+  .topbar__mark { width: 24px; height: 24px; font-size: 14px; }
+  .topbar__name { font-size: 14px; letter-spacing: .06em; }
+  .topbar__brand { gap: 8px; }
+  .topbar__divider { margin: 0 8px; height: 16px; }
+  .topbar__nav { gap: 11px; }
+  .topbar__link { font-size: 12.5px; letter-spacing: .04em; }
+}
+
+/* 再窄（小屏 SE 一类）才把站名和分隔线一起收掉，只留方形徽标。
+   两者必须同进同退，否则会剩一条孤零零的竖线 */
+@media (max-width: 379px) {
+  .topbar__name,
+  .topbar__divider { display: none; }
+  .topbar__brand { gap: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .topbar__link::after { transition: none; }
+}

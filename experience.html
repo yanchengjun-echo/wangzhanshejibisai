@@ -21,8 +21,28 @@
 <link rel="stylesheet" href="assets/css/main.css">
 <link rel="stylesheet" href="assets/css/experience.css">
 <link rel="stylesheet" href="assets/css/bgm.css">
+<link rel="stylesheet" href="assets/css/chrome.css">
 </head>
 <body class="exp-root">
+
+<a class="skip-link" href="#intro">跳到主要内容</a>
+
+<!-- 全站顶栏：四个页面同一份结构，只改 aria-current 的位置 -->
+<header class="topbar">
+  <div class="topbar__inner">
+    <a class="topbar__brand" href="index.html" aria-label="银绣山河 · 返回首页">
+      <span class="topbar__mark" aria-hidden="true">绣</span>
+      <span class="topbar__name">银绣山河</span>
+    </a>
+    <span class="topbar__divider" aria-hidden="true"></span>
+    <nav class="topbar__nav" aria-label="主导航">
+      <a class="topbar__link" href="index.html">首页</a>
+      <a class="topbar__link" href="history.html">历史溯源</a>
+      <a class="topbar__link" href="gallery.html">纹样图鉴</a>
+      <a class="topbar__link" href="experience.html" aria-current="page">互动创作</a>
+    </nav>
+  </div>
+</header>
 
 <!-- ======================================================================
      入口屏：滚动联动
@@ -69,7 +89,7 @@
 
     <!-- 中：标题与两个入口 -->
     <div class="intro__content">
-      <p class="intro__kicker">03 · 线上体验</p>
+      <p class="intro__kicker">03 · 互动创作</p>
       <h1 class="intro__title">巧手成纹</h1>
       <p class="intro__lede">
         画一笔蜡，浸一次染缸，看冰裂纹在靛蓝布上慢慢蔓延；<br>
@@ -128,16 +148,31 @@
 <!-- ======================================================================
      工作台：蜡染（画蜡 → 浸染 → 冰裂）与苗绣（虚拟绣绷）
      ====================================================================== -->
-<div class="exp-page" id="workbench">
+<div class="page exp-page" id="workbench">
 
-  <!-- ===== 页头 ===== -->
-  <header class="exp-head">
-    <h1 class="exp-title">巧手成纹</h1>
-    <p class="exp-sub">画一笔蜡 · 浸一次染缸 · 走一针苗绣</p>
+  <!-- 纸面颗粒：与展馆 / 历史两页同一种材质，压在工作台最底层 -->
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- ===== 面包屑 ===== -->
+  <nav class="crumb" aria-label="面包屑导航">
+    <ol>
+      <li><a href="index.html">首页</a></li>
+      <li aria-current="page">互动创作</li>
+    </ol>
+  </nav>
+
+  <!-- ===== 页头：与展馆 / 历史两页同构（大标题拆两块，中缝留金线）===== -->
+  <header class="head">
+    <h1 class="page-title" aria-label="巧手成纹">
+      <span aria-hidden="true" style="--d:.1s">巧手</span>
+      <span class="gap" aria-hidden="true"></span>
+      <span aria-hidden="true" style="--d:.34s">成纹</span>
+    </h1>
+    <p class="tagline">画一笔蜡 · 浸一次染缸 · 走一针苗绣</p>
   </header>
 
   <!-- ===== 三栏主体 ===== -->
-  <div class="exp-body">
+  <div class="exp-body" id="main">
 
     <!-- 左：工具面板 -->
     <aside class="exp-side exp-side--left" aria-label="创作工具">
@@ -277,6 +312,16 @@
     </aside>
 
   </div>
+
+  <!-- ===== 页脚 ===== -->
+  <footer class="page-foot">
+    <div class="foot-rule" aria-hidden="true"></div>
+    <div class="foot-meta">
+      <a href="index.html">返回首页</a>
+      <span class="sep" aria-hidden="true">|</span>
+      <span>画蜡 · 浸染 · 冰裂 · 平绣 · 打籽绣　五种技法</span>
+    </div>
+  </footer>
 </div>
 
 <script src="assets/js/intro.js"></script>

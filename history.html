@@ -23,6 +23,7 @@
 <link rel="stylesheet" href="assets/css/main.css">
 <link rel="stylesheet" href="assets/css/history.css">
 <link rel="stylesheet" href="assets/css/bgm.css">
+<link rel="stylesheet" href="assets/css/chrome.css">
 
 <!-- 入场动画的开关：只有脚本确认能跑才加 anim 类，动画失败时页面依然完整可见 -->
 <script>
@@ -33,6 +34,25 @@
 </head>
 <body>
 
+<a class="skip-link" href="#main">跳到主要内容</a>
+
+<!-- 全站顶栏：四个页面同一份结构，只改 aria-current 的位置 -->
+<header class="topbar">
+  <div class="topbar__inner">
+    <a class="topbar__brand" href="index.html" aria-label="银绣山河 · 返回首页">
+      <span class="topbar__mark" aria-hidden="true">绣</span>
+      <span class="topbar__name">银绣山河</span>
+    </a>
+    <span class="topbar__divider" aria-hidden="true"></span>
+    <nav class="topbar__nav" aria-label="主导航">
+      <a class="topbar__link" href="index.html">首页</a>
+      <a class="topbar__link" href="history.html" aria-current="page">历史溯源</a>
+      <a class="topbar__link" href="gallery.html">纹样图鉴</a>
+      <a class="topbar__link" href="experience.html">互动创作</a>
+    </nav>
+  </div>
+</header>
+
 <div class="page">
   <!-- 背景层：做旧书页 + 布纹 + 颗粒 -->
   <div class="paper" aria-hidden="true"></div>
@@ -42,7 +62,7 @@
   <nav class="crumb" aria-label="面包屑导航">
     <ol>
       <li><a href="index.html">首页</a></li>
-      <li aria-current="page">枫启长歌</li>
+      <li aria-current="page">历史溯源</li>
     </ol>
   </nav>
 
@@ -56,7 +76,7 @@
     <p class="tagline">溯洄千年，歌以载史</p>
   </header>
 
-  <div class="body">
+  <div class="body" id="main">
     <!-- 左侧：卷页目录（人物 / 非遗），入口页尚未制作 -->
     <aside class="scroll-nav" aria-label="专题目录">
       <a class="book" href="#people" data-todo="历史人物目录">

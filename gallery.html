@@ -22,6 +22,7 @@
 <link rel="stylesheet" href="assets/css/main.css">
 <link rel="stylesheet" href="assets/css/gallery.css">
 <link rel="stylesheet" href="assets/css/bgm.css">
+<link rel="stylesheet" href="assets/css/chrome.css">
 
 <script>
   if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -31,6 +32,25 @@
 </head>
 <body>
 
+<a class="skip-link" href="#main">跳到主要内容</a>
+
+<!-- 全站顶栏：四个页面同一份结构，只改 aria-current 的位置 -->
+<header class="topbar">
+  <div class="topbar__inner">
+    <a class="topbar__brand" href="index.html" aria-label="银绣山河 · 返回首页">
+      <span class="topbar__mark" aria-hidden="true">绣</span>
+      <span class="topbar__name">银绣山河</span>
+    </a>
+    <span class="topbar__divider" aria-hidden="true"></span>
+    <nav class="topbar__nav" aria-label="主导航">
+      <a class="topbar__link" href="index.html">首页</a>
+      <a class="topbar__link" href="history.html">历史溯源</a>
+      <a class="topbar__link" href="gallery.html" aria-current="page">纹样图鉴</a>
+      <a class="topbar__link" href="experience.html">互动创作</a>
+    </nav>
+  </div>
+</header>
+
 <div class="page">
   <div class="paper" aria-hidden="true"></div>
   <div class="grain" aria-hidden="true"></div>
@@ -39,7 +59,7 @@
   <nav class="crumb" aria-label="面包屑导航">
     <ol>
       <li><a href="index.html">首页</a></li>
-      <li aria-current="page">银绣珍藏</li>
+      <li aria-current="page">纹样图鉴</li>
     </ol>
   </nav>
 
@@ -53,7 +73,7 @@
     <p class="tagline">一器一物 · 皆载山河</p>
   </header>
 
-  <div class="body">
+  <div class="body" id="main">
     <!-- 左侧分类索引 -->
     <aside class="side" aria-label="藏品分类">
       <h2 class="side-title">藏品分类</h2>
@@ -106,5 +126,6 @@
 
 <script src="assets/js/museum-data.js"></script>
 <script src="assets/js/gallery.js"></script>
+<script src="assets/js/bgm.js"></script>
 </body>
 </html>
