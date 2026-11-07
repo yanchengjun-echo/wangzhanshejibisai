@@ -1,0 +1,929 @@
+/* ==========================================================================
+   银绣山河 · 03 板块「巧手成纹」线上体验
+   参考版式：三栏创作工作台（左工具栏 / 中画布 / 右预览）
+   视觉：靛蓝底 + 素白纸面 + 苗绣红/紫点缀
+   --------------------------------------------------------------------------
+   文件职责：
+     experience.css      本文件 —— 设计令牌、布局骨架、面板/按钮/色板等通用组件
+     (后续) 蜡染/苗绣模块专属样式追加在本文件末尾，分区标注
+   ========================================================================== */
+
+/* ---------- 1. 设计令牌 ---------- */
+:root {
+  /* 靛蓝系：蜡染缸 */
+  --exp-indigo-950: #0A1219;
+  --exp-indigo-900: #101B26;
+  --exp-indigo-800: #1A2A3A;   /* 主靛蓝 */
+  --exp-indigo-700: #24384C;
+  --exp-indigo-600: #33506B;
+
+  /* 素白系：待染坯布 */
+  --exp-paper:      #F5F5F0;   /* 素白（画布/预览底） */
+  --exp-paper-2:    #E8E8E0;
+  --exp-paper-3:    #D6D6CC;
+
+  /* 苗绣红：朱线 */
+  --exp-red:        #C23B22;
+  --exp-red-soft:   #D9573C;
+  --exp-red-deep:   #8F2A17;
+
+  /* 苗绣紫：靛紫 */
+  --exp-purple:     #5B2C6F;
+  --exp-purple-soft:#7A4291;
+
+  /* 蜡与裂 */
+  --exp-wax:        #F5E6C8;   /* 半透明蜡黄 */
+  --exp-crack:      #0A1017;   /* 冰裂纹深蓝黑 */
+
+  /* 文字 */
+  --exp-text:       #E9EDF2;
+  --exp-text-dim:   #9FB0C2;
+  --exp-text-mute:  #6C7F92;
+
+  /* 线/边 */
+  --exp-line:       rgba(233, 237, 242, .12);
+  --exp-line-soft:  rgba(233, 237, 242, .07);
+
+  /* 字体 */
+  --exp-font-title: "Noto Serif SC", "Songti SC", "Source Han Serif SC", Georgia, serif;
+  --exp-font-body:  Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
+                    "PingFang SC", "Microsoft YaHei", sans-serif;
+  --exp-font-num:   Inter, "SF Mono", Consolas, monospace;
+
+  /* 节奏 */
+  --exp-ease: cubic-bezier(.22, 1, .36, 1);
+  --exp-ease-out: cubic-bezier(.16, 1, .3, 1);
+
+  /* 尺寸 */
+  --exp-side-w: clamp(196px, 15vw, 232px);
+  --exp-radius: 12px;
+  --exp-radius-sm: 8px;
+}
+
+/* ---------- 2. 页面骨架 ---------- */
+* { box-sizing: border-box; }
+
+.exp-page {
+  min-height: 100dvh;
+  margin: 0;
+  padding: clamp(16px, 2.4vh, 30px) clamp(16px, 2.6vw, 42px) clamp(14px, 2vh, 24px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.8vh, 22px);
+  background:
+    radial-gradient(1100px 620px at 50% -8%, rgba(51, 80, 107, .38), transparent 62%),
+    radial-gradient(900px 520px at 88% 108%, rgba(91, 44, 111, .18), transparent 60%),
+    linear-gradient(180deg, var(--exp-indigo-900) 0%, var(--exp-indigo-950) 100%);
+  color: var(--exp-text);
+  font-family: var(--exp-font-body);
+  overflow-x: hidden;
+}
+
+/* ---------- 3. 页头 ---------- */
+.exp-head {
+  text-align: center;
+  flex: 0 0 auto;
+}
+
+.exp-title {
+  margin: 0;
+  font-family: var(--exp-font-title);
+  font-weight: 500;
+  font-size: clamp(24px, 3.4vw, 38px);
+  letter-spacing: .18em;
+  text-indent: .18em;
+  color: var(--exp-paper);
+  text-shadow: 0 2px 22px rgba(194, 59, 34, .22);
+}
+
+/* 标题下的朱红短线 */
+.exp-title::after {
+  content: "";
+  display: block;
+  width: 46px;
+  height: 2px;
+  margin: .5em auto 0;
+  background: linear-gradient(90deg, transparent, var(--exp-red), transparent);
+}
+
+.exp-sub {
+  margin: .7em 0 0;
+  font-size: clamp(12px, 1.5vw, 14px);
+  letter-spacing: .1em;
+  color: var(--exp-text-dim);
+}
+
+/* ---------- 4. 三栏主体 ---------- */
+.exp-body {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: var(--exp-side-w) minmax(0, 1fr) var(--exp-side-w);
+  gap: clamp(12px, 1.6vw, 22px);
+  align-items: stretch;
+  min-height: 0;
+}
+
+/* 侧栏容器 */
+.exp-side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(233, 237, 242, .18) transparent;
+}
+.exp-side::-webkit-scrollbar { width: 5px; }
+.exp-side::-webkit-scrollbar-thumb {
+  background: rgba(233, 237, 242, .18);
+  border-radius: 3px;
+}
+
+/* 中间舞台 */
+.exp-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  border-radius: var(--exp-radius);
+  background: rgba(20, 33, 46, .5);
+  border: 1px solid var(--exp-line-soft);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, .3);
+  overflow: hidden;
+}
+
+/* ---------- 5. 面板（参考图左栏分组卡） ---------- */
+.panel {
+  padding: 14px 14px 16px;
+  border-radius: var(--exp-radius);
+  background: linear-gradient(180deg, rgba(36, 56, 76, .58), rgba(20, 33, 46, .58));
+  border: 1px solid var(--exp-line-soft);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.panel__title {
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  color: var(--exp-text-dim);
+}
+
+/* 标题前的朱红小菱形 */
+.panel__title::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 5px;
+  height: 5px;
+  background: var(--exp-red);
+  transform: rotate(45deg);
+}
+
+/* 分组内的分隔细线 */
+.panel__rule {
+  height: 1px;
+  margin: 14px 0;
+  background: var(--exp-line-soft);
+  border: 0;
+}
+
+/* ---------- 6. 按钮 ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5em;
+  padding: .62em 1em;
+  border-radius: var(--exp-radius-sm);
+  border: 1px solid var(--exp-line);
+  background: rgba(36, 56, 76, .5);
+  color: var(--exp-text);
+  font-family: var(--exp-font-body);
+  font-size: 13px;
+  letter-spacing: .06em;
+  cursor: pointer;
+  transition: background .35s var(--exp-ease), border-color .35s var(--exp-ease),
+              color .35s var(--exp-ease), transform .35s var(--exp-ease);
+}
+.btn:hover {
+  background: rgba(51, 80, 107, .62);
+  border-color: rgba(233, 237, 242, .24);
+}
+.btn:active { transform: translateY(1px); }
+.btn:focus-visible {
+  outline: 2px solid var(--exp-wax);
+  outline-offset: 2px;
+}
+
+/* 主按钮：朱红 */
+.btn--primary {
+  background: linear-gradient(180deg, var(--exp-red-soft), var(--exp-red));
+  border-color: transparent;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(194, 59, 34, .32);
+}
+.btn--primary:hover {
+  background: linear-gradient(180deg, #E2664B, var(--exp-red-soft));
+  box-shadow: 0 6px 22px rgba(194, 59, 34, .42);
+}
+.btn--primary:disabled {
+  background: rgba(143, 42, 23, .4);
+  color: rgba(255, 255, 255, .45);
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* 幽灵按钮 */
+.btn--ghost {
+  background: transparent;
+  border-color: var(--exp-line);
+}
+
+/* 整行按钮 */
+.btn--block { width: 100%; }
+
+/* ---------- 7. 分段选择器（粗细 / 针法 等） ---------- */
+.seg {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 6px;
+}
+
+.seg__item {
+  padding: .55em .2em;
+  border-radius: var(--exp-radius-sm);
+  border: 1px solid var(--exp-line);
+  background: rgba(20, 33, 46, .4);
+  color: var(--exp-text-dim);
+  font-size: 12.5px;
+  letter-spacing: .04em;
+  cursor: pointer;
+  transition: all .3s var(--exp-ease);
+}
+.seg__item:hover {
+  border-color: rgba(233, 237, 242, .22);
+  color: var(--exp-text);
+}
+.seg__item[aria-pressed="true"] {
+  border-color: var(--exp-red);
+  background: rgba(194, 59, 34, .18);
+  color: #F3C9BE;
+  box-shadow: inset 0 0 0 1px rgba(194, 59, 34, .35);
+}
+.seg__item:focus-visible {
+  outline: 2px solid var(--exp-wax);
+  outline-offset: 1px;
+}
+
+/* ---------- 8. 色板 ---------- */
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(28px, 1fr));
+  gap: 8px;
+}
+
+.swatch {
+  position: relative;
+  aspect-ratio: 1;
+  width: 100%;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: var(--c, #fff);
+  cursor: pointer;
+  transition: transform .25s var(--exp-ease), border-color .25s var(--exp-ease);
+}
+.swatch:hover { transform: scale(1.12); }
+.swatch[aria-pressed="true"] {
+  border-color: var(--exp-paper);
+  box-shadow: 0 0 0 2px rgba(245, 245, 240, .22);
+}
+.swatch:focus-visible {
+  outline: 2px solid var(--exp-wax);
+  outline-offset: 2px;
+}
+
+/* ---------- 9. 阶段指示（画蜡 → 浸染 → 冰裂） ---------- */
+.steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  font-size: 11.5px;
+  letter-spacing: .06em;
+  color: var(--exp-text-mute);
+  transition: color .4s var(--exp-ease);
+}
+
+/* 连接线 */
+.step::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: -50%;
+  width: 100%;
+  height: 1px;
+  background: var(--exp-line-soft);
+  z-index: 0;
+}
+.step:first-child::before { display: none; }
+
+.step__dot {
+  position: relative;
+  z-index: 1;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1px solid var(--exp-line);
+  background: var(--exp-indigo-800);
+  transition: all .4s var(--exp-ease);
+}
+
+.step.is-active { color: var(--exp-wax); }
+.step.is-active .step__dot {
+  border-color: var(--exp-wax);
+  background: var(--exp-wax);
+  box-shadow: 0 0 0 4px rgba(245, 230, 200, .16);
+}
+
+.step.is-done { color: var(--exp-text-dim); }
+.step.is-done .step__dot {
+  border-color: var(--exp-red);
+  background: var(--exp-red);
+}
+
+/* ---------- 10. 预览框（右栏） ---------- */
+.preview-box {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--exp-radius-sm);
+  background: var(--exp-paper);
+  border: 1px solid rgba(214, 228, 246, .18);
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .04);
+}
+
+/* ---------- 11. 无障碍：视觉隐藏 ---------- */
+.exp-sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- 12. 响应式 ---------- */
+/* 平板：右栏折到下方 */
+@media (max-width: 1080px) {
+  :root { --exp-side-w: 190px; }
+}
+
+/* 移动端：切换为「观看 + 滑动轻交互」——单列纵向滚动，
+   工具栏折叠为横向滚动条，画布固定比例 */
+@media (max-width: 860px) {
+  .exp-page {
+    padding: 14px 12px 18px;
+    gap: 10px;
+  }
+  .exp-body {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .exp-side {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 4px;
+  }
+  .panel {
+    flex: 0 0 auto;
+    min-width: 168px;
+  }
+  .exp-stage {
+    min-height: 62dvh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
+
+/* ==========================================================================
+   13. 入口屏「巧手成纹」——滚动联动的开场
+   --------------------------------------------------------------------------
+   左：素布上的朱红丝线随滚动游走，针尖由 JS 用 getPointAtLength 实时贴住线头
+   右：染缸靛蓝液面上涨，同心涟漪渐起
+   中：标题 + 两个入口按钮
+   进度变量：--exp-p ∈ [0,1]，由 assets/js/intro.js 写入 <html>
+   ========================================================================== */
+
+html { scroll-behavior: smooth; }
+
+/* 13.1 页面根背景：铺满入口屏 + 工作台，用固定伪元素避免滚动重绘 */
+body.exp-root {
+  color: var(--exp-text);
+  font-family: var(--exp-font-body);
+  overflow-x: hidden;
+}
+
+body.exp-root::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(1200px 700px at 50% -10%, rgba(51, 80, 107, .42), transparent 62%),
+    radial-gradient(900px 560px at 90% 104%, rgba(91, 44, 111, .20), transparent 60%),
+    radial-gradient(760px 480px at 6% 92%, rgba(194, 59, 34, .10), transparent 62%),
+    linear-gradient(180deg, #101B26 0%, #0A1219 100%);
+}
+
+/* 背景统一由 body.exp-root 承担，工作台自身不再铺底 */
+.exp-page { background: none; }
+
+/* 13.2 滚动行程与粘性舞台 */
+.intro {
+  position: relative;
+  height: 172dvh;
+}
+
+.intro__scene {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(0, .88fr) minmax(0, 1.2fr) minmax(0, .88fr);
+  align-items: center;
+  gap: clamp(8px, 1.8vw, 36px);
+  padding: clamp(18px, 3.4vh, 46px) clamp(16px, 3vw, 54px) clamp(34px, 5.4vh, 66px);
+  overflow: hidden;
+}
+
+/* ---------- 13.3 左：素布 ---------- */
+.cloth {
+  position: relative;
+  justify-self: end;
+  height: min(70dvh, 580px);
+  aspect-ratio: 5 / 9;
+  width: auto;
+  max-width: 100%;
+  transform: rotate(-1.8deg);
+  border-radius: 3px;
+  overflow: hidden;
+  /* 经纬织纹 + 微暖米白，模拟未染坯布（细密，避免出现方格纸感） */
+  background:
+    repeating-linear-gradient(90deg, rgba(120, 104, 74, .035) 0 .5px, transparent .5px 2.5px),
+    repeating-linear-gradient(0deg, rgba(120, 104, 74, .04) 0 .5px, transparent .5px 2.5px),
+    radial-gradient(130% 100% at 26% 12%, #FBF8EE 0%, #F1EBDC 52%, #E1D8C2 100%);
+  box-shadow:
+    0 30px 64px rgba(0, 0, 0, .52),
+    0 1px 0 rgba(255, 255, 255, .5) inset,
+    -14px 0 34px rgba(0, 0, 0, .16) inset;
+}
+
+/* 布边暗角 */
+.cloth::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(120% 90% at 50% 46%, transparent 58%, rgba(90, 74, 48, .16) 100%);
+}
+
+/* 绣绷内框 */
+.cloth__frame {
+  position: absolute;
+  inset: 5.5% 7%;
+  border: 1px dashed rgba(194, 59, 34, .2);
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.cloth__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  overflow: visible;
+}
+
+/* 底纹：随滚动渐显的苗绣纹样 */
+.cloth__pattern {
+  fill: none;
+  stroke: rgba(194, 59, 34, .55);
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  opacity: calc(var(--exp-p, 0) * .3);
+}
+
+/* 游走的朱红丝线 */
+.cloth__thread {
+  fill: none;
+  stroke: var(--exp-red);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 1px 2px rgba(143, 42, 23, .45));
+}
+/* 针：针尖在原点，针身朝上；JS 按路径切向旋转。
+   素布是米白的，所以针身用深钢灰（白针在坯布上几乎看不见） */
+.cloth__needle {
+  filter: drop-shadow(0 1.5px 2.5px rgba(40, 30, 16, .38));
+}
+.cloth__needle .needle-body {
+  stroke: #454F5C;
+  stroke-width: 3.6;
+  stroke-linecap: round;
+}
+.cloth__needle .needle-eye {
+  fill: #FBF8EE;
+  stroke: #454F5C;
+  stroke-width: 1;
+}
+
+/* ---------- 13.4 右：染缸 ---------- */
+.vat {
+  position: relative;
+  justify-self: start;
+  height: min(50dvh, 430px);
+  aspect-ratio: 1;
+  width: auto;
+  max-width: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 36% 26%, rgba(122, 66, 145, .2), transparent 52%),
+    radial-gradient(circle at 50% 50%, #1F3853 0%, #16273A 46%, #0C1725 80%, #060C14 100%);
+  box-shadow:
+    0 0 0 1px rgba(233, 237, 242, .12),
+    0 0 0 10px rgba(16, 27, 38, .7),
+    0 0 0 11px rgba(233, 237, 242, .07),
+    0 34px 74px rgba(0, 0, 0, .55),
+    inset 0 0 70px rgba(0, 0, 0, .55);
+}
+
+/* 染液：随滚动从缸底涌起。液面用大纵向圆角做缓弧，
+   避免正圆的缸出现「半杯水」那种水平直切 */
+.vat__liquid {
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  bottom: 0;
+  height: calc(8% + 72% * var(--exp-p, 0));
+  border-radius: 50% 50% 0 0 / 17% 17% 0 0;
+  background: linear-gradient(180deg,
+    rgba(40, 76, 112, .94) 0%,
+    rgba(22, 48, 76, .96) 38%,
+    rgba(10, 22, 36, .99) 100%);
+  box-shadow: 0 -16px 34px rgba(74, 128, 178, .3) inset;
+}
+
+/* 液面高光 */
+.vat__liquid::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, rgba(158, 206, 248, .8), transparent);
+  opacity: calc(.25 + .75 * var(--exp-p, 0));
+}
+
+/* 涟漪层：整体透明度由滚动进度控制。
+   上半部用渐隐遮罩，让圆环不硬穿到液面上方的深色区域，又能从液面附近自然浮出 */
+.vat__rings {
+  position: absolute;
+  inset: 0;
+  opacity: calc(var(--exp-p, 0) * .95);
+  -webkit-mask-image: linear-gradient(180deg,
+    transparent 10%, rgba(0, 0, 0, .3) 40%, #000 64%);
+  mask-image: linear-gradient(180deg,
+    transparent 10%, rgba(0, 0, 0, .3) 40%, #000 64%);
+  transition: opacity .4s linear;
+}
+
+.vat__ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 26%;
+  height: 26%;
+  margin: -13% 0 0 -13%;
+  border-radius: 50%;
+  border: 1px solid rgba(168, 214, 252, .9);
+  box-shadow: 0 0 8px rgba(120, 190, 250, .4);
+  opacity: 0;
+  animation: expRipple 7s cubic-bezier(.16, 1, .3, 1) infinite;
+  animation-delay: var(--d, 0s);
+  will-change: transform, opacity;
+}
+
+@keyframes expRipple {
+  0%   { transform: scale(.22); opacity: 0; }
+  12%  { opacity: .85; }
+  55%  { opacity: .34; }
+  100% { transform: scale(3.05); opacity: 0; }
+}
+
+/* ---------- 13.5 中：标题与入口 ---------- */
+.intro__content {
+  justify-self: center;
+  width: min(100%, 430px);
+  text-align: center;
+  padding-bottom: 2dvh;
+}
+
+.intro__kicker {
+  margin: 0 0 1.15em;
+  display: inline-flex;
+  align-items: center;
+  gap: .75em;
+  font-family: var(--exp-font-num);
+  font-size: 11.5px;
+  letter-spacing: .26em;
+  text-indent: .26em;
+  color: var(--exp-red-soft);
+}
+.intro__kicker::before,
+.intro__kicker::after {
+  content: "";
+  width: 22px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(194, 59, 34, .7));
+}
+.intro__kicker::after {
+  background: linear-gradient(90deg, rgba(194, 59, 34, .7), transparent);
+}
+
+.intro__title {
+  margin: 0;
+  font-family: var(--exp-font-title);
+  font-weight: 500;
+  font-size: clamp(32px, 4.6vw, 58px);
+  line-height: 1.16;
+  letter-spacing: .16em;
+  text-indent: .16em;
+  color: var(--exp-paper);
+  text-shadow: 0 4px 34px rgba(194, 59, 34, .24);
+}
+
+.intro__lede {
+  margin: 1.25em auto 0;
+  max-width: 32em;
+  font-size: clamp(12.5px, 1.5vw, 14.5px);
+  line-height: 1.95;
+  letter-spacing: .04em;
+  color: var(--exp-text-dim);
+}
+
+.intro__enter {
+  margin-top: clamp(20px, 3.4vh, 34px);
+  display: grid;
+  gap: 10px;
+  width: 100%;
+}
+
+/* 入口按钮 */
+.enter-btn {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 13px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--exp-line);
+  background: rgba(20, 33, 46, .5);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  color: var(--exp-text);
+  text-decoration: none;
+  text-align: left;
+  transition: transform .4s var(--exp-ease), border-color .4s var(--exp-ease),
+              background .4s var(--exp-ease), box-shadow .4s var(--exp-ease);
+}
+.enter-btn:hover {
+  transform: translateX(4px);
+  border-color: rgba(194, 59, 34, .45);
+  background: rgba(36, 56, 76, .76);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .34);
+}
+.enter-btn:focus-visible {
+  outline: 2px solid var(--exp-wax);
+  outline-offset: 3px;
+}
+
+.enter-btn__tag {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background: linear-gradient(155deg, var(--exp-red-soft), var(--exp-red-deep));
+  color: #FFF6F2;
+  font-family: var(--exp-font-title);
+  font-size: 12.5px;
+  line-height: 1;
+  letter-spacing: .1em;
+  writing-mode: vertical-rl;
+  box-shadow: 0 3px 12px rgba(143, 42, 23, .4);
+}
+.enter-btn--embroidery .enter-btn__tag {
+  background: linear-gradient(155deg, var(--exp-purple-soft), var(--exp-purple));
+  box-shadow: 0 3px 12px rgba(91, 44, 111, .45);
+}
+
+.enter-btn__body {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.enter-btn__name {
+  font-family: var(--exp-font-title);
+  font-size: 15px;
+  letter-spacing: .12em;
+  color: var(--exp-paper);
+}
+
+.enter-btn__note {
+  font-size: 11.5px;
+  letter-spacing: .05em;
+  color: var(--exp-text-mute);
+}
+
+.enter-btn__arrow {
+  width: 15px;
+  height: 15px;
+  color: var(--exp-text-mute);
+  transition: transform .4s var(--exp-ease), color .4s var(--exp-ease);
+}
+.enter-btn:hover .enter-btn__arrow {
+  transform: translateX(3px);
+  color: var(--exp-red-soft);
+}
+
+/* ---------- 13.6 滚动提示与进度线 ---------- */
+.intro__hint {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(16px, 2.8vh, 30px);
+  transform: translateX(-50%);
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  font-size: 10.5px;
+  letter-spacing: .3em;
+  text-indent: .3em;
+  color: var(--exp-text-mute);
+  opacity: clamp(0, calc(1 - var(--exp-p, 0) * 2.2), 1);
+  pointer-events: none;
+}
+.intro__hint i {
+  display: block;
+  width: 1px;
+  height: 26px;
+  background: linear-gradient(180deg, rgba(194, 59, 34, .9), transparent);
+  animation: expHintDrop 2.2s var(--exp-ease-out) infinite;
+}
+@keyframes expHintDrop {
+  0%   { transform: scaleY(.15); transform-origin: top; opacity: 0; }
+  40%  { opacity: 1; }
+  100% { transform: scaleY(1); transform-origin: top; opacity: 0; }
+}
+
+.intro__progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: rgba(233, 237, 242, .06);
+  overflow: hidden;
+}
+.intro__progress::after {
+  content: "";
+  display: block;
+  height: 100%;
+  width: calc(var(--exp-p, 0) * 100%);
+  background: linear-gradient(90deg, var(--exp-purple), var(--exp-red), var(--exp-wax));
+  box-shadow: 0 0 14px rgba(194, 59, 34, .55);
+}
+
+/* ---------- 13.7 工作台与入口屏的衔接 ---------- */
+.exp-page {
+  position: relative;
+}
+.exp-page::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(92%, 1180px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(233, 237, 242, .14), transparent);
+}
+
+/* ---------- 13.8 入口屏响应式 ---------- */
+/* 移动端：标题在上，素布与染缸缩小并排在下，滚动行程缩短 */
+@media (max-width: 860px) {
+  .intro { height: 150dvh; }
+
+  .intro__scene {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    align-content: center;
+    gap: 20px 14px;
+    padding: 22px 18px 52px;
+  }
+
+  .intro__content {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    padding-bottom: 0;
+  }
+
+  .cloth {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: end;
+    height: min(28dvh, 200px);
+  }
+
+  /* 窄屏布面小、SVG 缩放比大，线宽要按比例补回来才不会细成发丝
+     （针由 intro.js 用 scale 单独补偿，见 needleScale） */
+  .cloth__thread { stroke-width: 6; }
+
+  /* 小染缸里的涟漪要描粗一点才看得见 */
+  .vat__ring {
+    border-width: 1.5px;
+    box-shadow: 0 0 6px rgba(120, 190, 250, .5);
+  }
+
+  .vat {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: start;
+    height: min(24dvh, 180px);
+  }
+
+  .intro__lede {
+    font-size: 12.5px;
+    line-height: 1.85;
+  }
+
+  .intro__enter { margin-top: 20px; }
+
+  .intro__kicker { font-size: 10.5px; }
+}
+
+/* 矮屏：压缩两侧图形，避免标题被挤压 */
+@media (min-width: 861px) and (max-height: 680px) {
+  .cloth { height: min(64dvh, 400px); }
+  .vat { height: min(44dvh, 310px); }
+  .intro__lede {
+    margin-top: .9em;
+    font-size: 12.5px;
+    line-height: 1.8;
+  }
+}
+
+/* 减少动效：涟漪与滚动提示都静止 */
+@media (prefers-reduced-motion: reduce) {
+  .vat__ring { animation: none; opacity: .25; }
+  .intro__hint i { animation: none; }
+  html { scroll-behavior: auto; }
+}
