@@ -657,6 +657,14 @@ html:not(.js-tree) .tnode__card {
 }
 html:not(.js-tree) .tnode__body { position: static; width: auto; }
 html:not(.js-tree) .tnode__panel { max-height: none; overflow: visible; box-shadow: none; }
+/* 降级后画布变成很高的单栏，根脉图若继续按 100% 撑满会被拉成怪比例。
+   这里给固定高度 + 按比例裁切，只留顶部树冠当背景纹样。 */
+html:not(.js-tree) .tree-ink { height: 1400px; bottom: auto; }
+html:not(.js-tree) .tree-ink__art {
+  object-fit: cover;
+  object-position: center top;
+  opacity: .38;
+}
 
 /* 尊重系统的"减少动态效果" */
 @media (prefers-reduced-motion: reduce) {

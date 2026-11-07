@@ -20,6 +20,33 @@
 
 <!-- 标题字体：演示悠然小楷子集（本地加载，不依赖外部 CDN） -->
 <link rel="preload" href="assets/fonts/youran-xiaokai-title.woff2" as="font" type="font/woff2" crossorigin>
+<!-- 样式表自愈：分享链接偶发中途断流时，某张 CSS 会整份不生效，页面退化成无样式
+     （导航消失、列表序号露出来、卡片排版消失）。解析完成后再核对每张表是否真的
+     解析出规则，失败的带时间戳重取，最多两次；正常加载时什么都不做，不影响缓存。 -->
+<script data-css-guard>
+(function () {
+  var MAX = 2;
+  function heal() {
+    var links = document.querySelectorAll('link[rel="stylesheet"]');
+    for (var i = 0; i < links.length; i++) {
+      var l = links[i];
+      var n = parseInt(l.getAttribute('data-css-retry') || '0', 10);
+      if (n >= MAX) continue;
+      var ok = false;
+      if (l.sheet) {
+        try { ok = !!(l.sheet.cssRules && l.sheet.cssRules.length); }
+        catch (e) { ok = true; }   /* 跨源时读不到规则，视为正常 */
+      }
+      if (!ok) {
+        l.setAttribute('data-css-retry', String(n + 1));
+        l.href = l.href.split('?')[0] + '?fix=' + Date.now();
+      }
+    }
+  }
+  window.addEventListener('load', heal);
+  setTimeout(heal, 3000);
+})();
+</script>
 <link rel="stylesheet" href="assets/css/main.css">
 <link rel="stylesheet" href="assets/css/history.css">
 <link rel="stylesheet" href="assets/css/bgm.css">
