@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>枫启长歌 · 苗族历史脉络 | 银绣山河</title>
-<meta name="description" content="枫启长歌——银绣山河的历史专题。以枫树根脉为意象，用传说与信史双线时间轴，梳理苗族历史脉络与非遗源流，辨明传说与史实之分。">
+<title>枫启长歌 · 苗族千年史 | 银绣山河</title>
+<meta name="description" content="一树枫脉，金银同根。金脉循古歌，银脉依史籍，苗族千年记忆在枝脉间交汇。选择节点，展开阅读。">
 <meta name="theme-color" content="#08172c">
 <meta name="color-scheme" content="dark">
 <meta name="author" content="银绣山河">
@@ -13,8 +13,8 @@
 
 <!-- Open Graph -->
 <meta property="og:type" content="article">
-<meta property="og:title" content="枫启长歌 · 苗族历史脉络">
-<meta property="og:description" content="溯洄千年，歌以载史。传说与信史双线，梳理苗族历史脉络与非遗源流。">
+<meta property="og:title" content="枫启长歌 · 苗族千年史">
+<meta property="og:description" content="一树枫脉，金银同根。金脉循古歌，银脉依史籍，苗族千年记忆在枝脉间交汇。">
 <meta property="og:image" content="assets/bg-water.jpg">
 <meta property="og:locale" content="zh_CN">
 
@@ -25,8 +25,14 @@
 <link rel="stylesheet" href="assets/css/bgm.css">
 <link rel="stylesheet" href="assets/css/chrome.css">
 
-<!-- 入场动画的开关：只有脚本确认能跑才加 anim 类，动画失败时页面依然完整可见 -->
+<!-- 脚本开关：只有确认能跑，才折叠节点、才加动画。
+     js-tree 让节点默认收成概要；2.5 秒内 history.js 没报到位就撤掉，
+     内容退回"全部展开"的静态形态，绝不让读者看到空页。 -->
 <script>
+  document.documentElement.classList.add('js-tree');
+  setTimeout(function () {
+    if (!window.__treeReady) document.documentElement.classList.remove('js-tree');
+  }, 2500);
   if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     document.documentElement.classList.add('anim');
   }
@@ -53,213 +59,285 @@
   </div>
 </header>
 
-<div class="page">
-  <!-- 背景层：做旧书页 + 布纹 + 颗粒 -->
-  <div class="paper" aria-hidden="true"></div>
-  <div class="grain" aria-hidden="true"></div>
+<div class="stage stage--page">
 
-  <!-- 面包屑导航 -->
-  <nav class="crumb" aria-label="面包屑导航">
-    <ol>
-      <li><a href="index.html">首页</a></li>
-      <li aria-current="page">历史溯源</li>
-    </ol>
-  </nav>
+  <!-- 背景三层：与首页同一套水波底、靛蓝罩色、颗粒（子页整页滚动，故改为 fixed） -->
+  <div class="layer-bg" aria-hidden="true"></div>
+  <div class="layer-tint" aria-hidden="true"></div>
+  <div class="layer-grain" aria-hidden="true"></div>
 
-  <!-- 页头：标题拆分为「枫启」「长歌」，中缝留一道金线 -->
-  <header class="head">
-    <h1 class="page-title" aria-label="枫启长歌">
-      <span aria-hidden="true" style="--d:.1s">枫启</span>
-      <span class="gap" aria-hidden="true"></span>
-      <span aria-hidden="true" style="--d:.34s">长歌</span>
-    </h1>
-    <p class="tagline">溯洄千年，歌以载史</p>
-  </header>
+  <!-- 四角纹样 -->
+  <div class="ornaments" aria-hidden="true">
+    <img class="orn orn--tl" src="assets/orn-bird.png" alt="" width="660" height="827">
+    <img class="orn orn--tr" src="assets/orn-bird.png" alt="" width="660" height="827">
+    <img class="orn orn--bl" src="assets/orn-bird.png" alt="" width="660" height="827">
+    <img class="orn orn--br" src="assets/orn-bird.png" alt="" width="660" height="827">
+  </div>
 
-  <div class="body" id="main">
-    <!-- 左侧：卷页目录（人物 / 非遗），入口页尚未制作 -->
-    <aside class="scroll-nav" aria-label="专题目录">
-      <a class="book" href="#people" data-todo="历史人物目录">
-        <span class="book-face">
-          <span class="b-kicker">目录 一</span>
-          <span class="b-title">历史人物</span>
-          <span class="b-hint">神话人物与史实人物<br>按拼音排序 · 下滑浏览</span>
-        </span>
-      </a>
-      <a class="book" href="#heritage" data-todo="非遗源流目录">
-        <span class="book-face">
-          <span class="b-kicker">目录 二</span>
-          <span class="b-title">非遗源流</span>
-          <span class="b-hint">银饰 · 苗绣 · 蜡染<br>按拼音排序 · 下滑浏览</span>
-        </span>
-      </a>
+  <div class="page">
+
+<main class="page__main" id="main">
+
+    <!-- ================= 章节头 ================= -->
+    <section class="chapter" id="top">
+      <h1 class="chapter__title">枫启长歌</h1>
+      <p class="chapter__lede">金脉循古歌，从开天辟地、枫木生人唱到英雄传说；银脉依史籍，自三苗、秦汉一路记到民族自治。两条线索各成其序，在一树枫脉上并行展开——选择节点，展开阅读。</p>
+    </section>
+
+    <!-- ================= 枫脉谱系树 ================= -->
+    <section class="lineage" id="lineage">
+
+      <!-- 枫脉谱系树：以「历史树」为形——一道地平线，金银两脉交缠成干、
+           向下分叉、蔓延成根。12 个节点按手绘草图的点位落在枝头：金链左右交织成枝，
+           银链自上而下 Z 字折返；画面只留树、点、线与节点卡片，不设分区标题。
+           素材保留原图明暗光影（金箔颗粒、干笔飞白、半透明淡影），仅将白底转透明
+           并映射到站点银 / 金金属色；根脉层铺满视口宽度：assets/tree-root.png
+
+           内容脉络据《中国苗族通史：增订本》传说与史实梳理重排：
+           金脉 6 节按古歌叙事阶段推进，银脉 6 节按史籍年代推进，左右交替。 -->
+      <div class="tree-wrap" id="tree-scroll" aria-label="枫脉谱系树">
+        <div class="tree-stage" id="tree-stage">
+
+          <!-- 根脉：纯装饰，不参与交互与朗读；节点文字压在其上 -->
+          <div class="tree-ink" aria-hidden="true">
+            <span class="tree-ink__horizon"></span>
+            <img class="tree-ink__art" src="assets/tree-root.png" alt="" width="1800" height="1869" fetchpriority="high">
+          </div>
+
+          <!-- 点位细线：坐标与 12 个节点的 --x / --y 共用同一套画布百分比。
+               金色 5 条弧线左右交织成编织枝（末端双圈补一条短分叉）；
+               灰色自右上斜穿而下，左右来回折返成一条连续 Z 字链。 -->
+          <svg class="tree-lines" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            <g class="tree-lines__gold" fill="none" stroke="currentColor" stroke-width="1.15">
+              <path d="M294 104 Q430 120 571 156"/>
+              <path d="M274 301 Q420 218 571 156"/>
+              <path d="M274 301 Q450 292 632 327"/>
+              <path d="M326 416 Q480 392 632 327"/>
+              <path d="M326 416 Q286 436 260 478"/>
+            </g>
+            <g class="tree-lines__silver" fill="none" stroke="currentColor" stroke-width="1.15">
+              <path d="M561 83 Q410 280 294 512"/>
+              <path d="M294 512 Q470 505 639 535"/>
+              <path d="M639 535 Q400 600 152 694"/>
+              <path d="M152 694 Q440 648 729 691"/>
+              <path d="M729 691 Q510 790 287 896"/>
+            </g>
+          </svg>
+
+          <div class="tree-cols">
+          <ol class="tree">
+
+            <!-- 1 · 金脉 / 创世古歌 -->
+            <li class="tnode tnode--myth tnode--east" id="node-kaitian" data-label="开天辟地 · 创世古歌" style="--x: 29.4%; --y: 10.4%;">
+              <div class="tnode__card">
+                <h3 class="tnode__head">
+                  <button class="tnode__toggle" type="button" id="tg-kaitian" aria-expanded="false" aria-controls="body-kaitian">
+                    <span class="tnode__type">创世古歌</span>
+                    <span class="tnode__name">开天辟地 · 创世古歌</span>
+                  </button>
+                </h3>
+                <div class="tnode__body" id="body-kaitian">
+                  <div class="tnode__body-in"><div class="tnode__panel"><p class="tnode__brief">天地初生、撑天铸日，古歌赞颂人的力量。</p><p class="tnode__text">《开天辟地》《打柱撑天》《铸日造月》等古歌，叙述天地初生、天地分离、山川形成，以及打造金银柱撑天、铸造日月，表现先民对自然起源的想象和对人的力量的赞颂。古歌中的形象有府方、宝公、雄公、且公、当公等。书中指出，大量古歌、史诗以诗歌、神话和传说故事的形式口头相传，直接或间接反映远古苗族先民的生活与斗争，保存了有关天地形成、万物起源、祖先迁徙和社会组织的文化记忆。</p><p class="tnode__caveat">出处：《中国苗族通史：增订本》「原始口头文学」「创世古歌」。</p></div></div>
+                </div>
+              </div>
+            </li>
+
+            <!-- 2 · 金脉 / 万物起源 -->
+            <li class="tnode tnode--myth tnode--west" id="node-fengmu" data-label="枫木生人 · 蝴蝶妈妈与姜央" style="--x: 57.1%; --y: 15.6%;">
+              <div class="tnode__card">
+                <h3 class="tnode__head">
+                  <button class="tnode__toggle" type="button" id="tg-fengmu" aria-expanded="false" aria-controls="body-fengmu">
+                    <span class="tnode__type">万物起源</span>
+                    <span class="tnode__name">枫木生人 · 蝴蝶妈妈与姜央</span>
+                  </button>
+                </h3>
+                <div class="tnode__body" id="body-fengmu">
+                  <div class="tnode__body-in"><div class="tnode__panel"><p class="tnode__brief">枫树化生万物，树心生长出妹榜妹留。</p><p class="tnode__text">《枫木歌》讲述枫树种子的传播、枫树被砍及其变化：树根、树干、树梢化为不同生物，树干和树心生出「妹榜妹留」，即蝴蝶妈妈。妹榜妹留与小水泡相配，生下十二个蛋，经鹡宇鸟孵抱，生出雷公、老虎、水牛、蜈蚣和姜央等；姜央在古歌中被叙述为地上人类的始祖。相关叙事中另出现榜香、香两等形象。</p><p class="tnode__caveat">出处：《中国苗族通史：增订本》「枫木歌与人类起源」。</p></div></div>
+                </div>
+              </div>
+            </li>
+
+            <!-- 3 · 金脉 / 人类再生 -->
+            <li class="tnode tnode--myth tnode--east" id="node-hongshui" data-label="洪水滔天 · 兄妹结婚" style="--x: 27.4%; --y: 30.1%;">
+              <div class="tnode__card">
+                <h3 class="tnode__head">
+                  <button class="tnode__toggle" type="button" id="tg-hongshui" aria-expanded="false" aria-controls="body-hongshui">
+                    <span class="tnode__type">人类再生</span>
+                    <span class="tnode__name">洪水滔天 · 兄妹结婚</span>
+                  </button>
+                </h3>
+                <div class="tnode__body" id="body-hongshui">
+                  <div class="tnode__body-in"><div class="tnode__panel"><p class="tnode__brief">洪水之后兄妹成婚，人类重新繁衍。</p><p class="tnode__text">《洪水滔天》《兄妹结婚》相互衔接，叙述姜央与雷公的矛盾、洪水泛滥，以及洪水之后兄妹结婚、重新繁衍人类的故事。姜央既是从十二蛋中孵出的人类始祖，也在洪水古歌中继续承担人类再生的角色；与之相关的形象还有雷公、姜央之妹。</p><p class="tnode__caveat">出处：《中国苗族通史：增订本》「口头文学」「苗族文学」（洪水与人类再生叙事）。</p></div></div>
+                </div>
+              </div>
+            </li>
+
+            <!-- 4 · 金脉 / 远祖传说 -->
+            <li class="tnode tnode--myth tnode--west" id="node-chiyou" data-label="蚩尤九黎 · 远古战事与南徙" style="--x: 63.2%; --y: 32.7%;">
+              <div class="tnode__card">
+                <h3 class="tnode__head">
+                  <button class="tnode__toggle" type="button" id="tg-chiyou" aria-expanded="false" aria-controls="body-chiyou">
+                    <span class="tnode__type">远祖传说</span>
+                    <span class="tnode__name">蚩尤九黎 · 远古战事与南徙</span>
+                  </button>
+                </h3>
+                <div class="tnode__body" id="body-chiyou">
+                  <div class="tnode__body-in"><div class="tnode__panel"><p class="tnode__brief">古籍记载与各地传说交织的九黎首领形象。</p><p class="tnode__text">书中汇集古籍及川南、滇东北、黔西北、贵州关岭等地的蚩尤传说，叙述蚩尤九黎部落与炎帝、黄帝部落之间的战争，以及战败后部分族人向南流徙。蚩尤为九黎部落首领，书中既引用其同黄帝作战的古籍记载，也介绍各地苗族祭祀蚩尤、讲述蚩尤带领生产及战败迁徙的传说；相关人物另有夸佛、格蚩爷老等。这一形象兼具古籍记载与民间传说双重性质。</p><p class="tnode__caveat">出处：《中国苗族通史：增订本》「苗族远祖蚩尤」。</p></div></div>
+                </div>
+              </div>
+            </li>
+
+            <!-- 5 · 金脉 / 迁徙古歌 -->
+            <li class="tnode tnode--myth tnode--east" id="node-bashan" data-label="跋山涉水 · 西迁与议榔" style="--x: 32.6%; --y: 41.6%;">
+              <div class="tnode__card">
+                <h3 class="tnode__head">
+                  <button class="tnode__toggle" type="button" id="tg-bashan" aria-expanded="false" aria-controls="body-bashan">
+                    <span class="tnode__type">迁徙古歌</span>
+                    <span class="tnode__name">跋山涉水 · 西迁与议榔</span>
+                  </button>
+                </h3>
+                <div class="tnode__body" id="body-bashan">
+                  <div class="tnode__body-in"><div class="tnode__panel"><p class="tnode__brief">迁徙路线与立寨分田，保存在代代传唱的古歌里。</p><p class="tnode__text">《跋山涉水》等古歌保存了祖先迁徙、寻找新居地的叙事；书中还引用「雄公议榔」的内容，讲述各支分开居住、建立村寨和分配土地。古歌中的雄公及迁徙各支祖先，把迁徙路线与寨落的来历一并留在口头传统里，成为族群关于自身来历的共同记忆。</p><p class="tnode__caveat">出处：《中国苗族通史：增订本》「分布和迁徙」及《跋山涉水》等迁徙古歌。</p></div></div>
+                </div>
+              </div>
+            </li>
+
+            <!-- 6 · 金脉 / 民间叙事 -->
+            <li class="tnode tnode--myth tnode--west" id="node-renwu" data-label="历史人物的传说化" style="--x: 26.0%; --y: 47.8%;">
+              <div class="tnode__card">
+                <h3 class="tnode__head">
+                  <button class="tnode__toggle" type="button" id="tg-renwu" aria-expanded="false" aria-controls="body-renwu">
+                    <span class="tnode__type">民间叙事</span>
+                    <span class="tnode__name">历史人物的传说化</span>
+                  </button>
+                </h3>
+                <div class="tnode__body" id="body-renwu">
+                  <div class="tnode__body-in"><div class="tnode__panel"><p class="tnode__brief">起义领袖进入诗歌与传说，被赋予更多传奇色彩。</p><p class="tnode__text">雍乾、乾嘉、咸同等起义以后，苗族民间产生大量歌颂起义人物的诗歌和传说，如《守寨记》《草鞋记》《张秀眉的故事》《杨大六的故事》等；被传诵的人物包括吴天半、张秀眉、杨大六、包大度等。真实历史人物进入民间叙事后，被赋予更多传奇色彩——这也是传说线与史实线彼此衔接而非相互排斥的地方。</p><p class="tnode__caveat">出处：《中国苗族通史：增订本》「历史人物的传说化」「苗族文学」。</p></div></div>
+                </div>
+              </div>
+            </li>
+
+            <!-- 7 · 银脉 / 先秦古籍 -->
+            <li class="tnode tnode--hist tnode--east" id="node-sanmiao" data-label="三苗的兴衰 · 古籍中的远祖" style="--x: 56.1%; --y: 8.3%;">
+              <div class="tnode__card">
+                <h3 class="tnode__head">
+                  <button class="tnode__toggle" type="button" id="tg-sanmiao" aria-expanded="false" aria-controls="body-sanmiao">
+                    <span class="tnode__type">先秦古籍</span>
+                    <span class="tnode__name">三苗的兴衰 · 古籍中的远祖</span>
+                  </button>
+                </h3>
+                <div class="tnode__body" id="body-sanmiao">
+                  <div class="tnode__body-in"><div class="tnode__panel"><p class="tnode__brief">《尚书》《史记》所记三苗，与尧、舜、禹之间的冲突。</p><p class="tnode__text">作者依据《尚书》《史记》等古籍，叙述三苗与尧、舜、禹之间的冲突，并将三苗的瓦解、分化与迁徙同苗族先民的历史联系起来。此部分属古籍记载与作者分析，是建立时代与事件脉络的依据；书中同时指出，在蚩尤、三苗等内容中，古籍记载、作者分析与民间传说相互交织，并非界限分明的两套内容。</p><p class="tnode__caveat">出处：《中国苗族通史：增订本》「三苗的兴衰」。</p></div></div>
+                </div>
+              </div>
+            </li>
+
+            <!-- 8 · 银脉 / 秦汉至唐宋 -->
+            <li class="tnode tnode--hist tnode--east" id="node-qinhan" data-label="秦汉至唐宋 · 族称、分布与迁徙" style="--x: 29.4%; --y: 51.2%;">
+              <div class="tnode__card">
+                <h3 class="tnode__head">
+                  <button class="tnode__toggle" type="button" id="tg-qinhan" aria-expanded="false" aria-controls="body-qinhan">
+                    <span class="tnode__type">秦汉—唐宋</span>
+                    <span class="tnode__name">秦汉至唐宋 · 族称、分布与迁徙</span>
+                  </button>
+                </h3>
+                <div class="tnode__body" id="body-qinhan">
+                  <div class="tnode__body-in"><div class="tnode__panel"><p class="tnode__brief">活动于武陵五溪，「苗」逐渐从「蛮」称中区分出来。</p><p class="tnode__text">秦汉至南北朝，苗族先民主要活动于武陵、五溪及相邻地区，并在长期迁徙中逐渐进入今贵州、川南、桂北等地。唐宋时期，「苗」逐渐从宽泛的「蛮」称中区分出来；唐后期至五代及北宋，战乱推动部分苗族继续向黔西北、滇东北等地迁徙。作者将这一时期的族称沿革、地理分布置于各朝政治制度与社会结构中讨论。</p><p class="tnode__caveat">出处：《中国苗族通史：增订本》「族称沿革」「分布和迁徙」。</p></div></div>
+                </div>
+              </div>
+            </li>
+
+            <!-- 9 · 银脉 / 元明 -->
+            <li class="tnode tnode--hist tnode--west" id="node-yuanming" data-label="元明 · 反抗斗争与迁徙" style="--x: 63.9%; --y: 53.5%;">
+              <div class="tnode__card">
+                <h3 class="tnode__head">
+                  <button class="tnode__toggle" type="button" id="tg-yuanming" aria-expanded="false" aria-controls="body-yuanming">
+                    <span class="tnode__type">14—16 世纪</span>
+                    <span class="tnode__name">元明 · 反抗斗争与迁徙</span>
+                  </button>
+                </h3>
+                <div class="tnode__body" id="body-yuanming">
+                  <div class="tnode__body-in"><div class="tnode__panel"><p class="tnode__brief">从宋隆济、蛇节到腊尔山，一连串有年代可考的起事。</p><p class="tnode__text">1301—1304 年，宋隆济、蛇节等领导的起义反对元朝征调与压迫，最终失败，但迫使元朝停止相关远征并诛刘深。1346 年起，吴天保、杨留总在靖州、武冈一带领导苗、瑶、侗等族人民起义，先后进攻黔阳、武冈、沅州等地。1511 年，龙麻阳、龙童保在川、湖、贵交界地区领导苗民起事。1539 年起，以腊尔山为中心的湘黔川边区发生大规模起义，龙许保、吴黑苗等成为重要领袖。</p><p class="tnode__caveat">出处：《中国苗族通史：增订本》「元代的反抗斗争」「明代的反抗斗争」「元明和清初苗族的迁徙」。</p></div></div>
+                </div>
+              </div>
+            </li>
+
+            <!-- 10 · 银脉 / 清中叶 -->
+            <li class="tnode tnode--hist tnode--east tnode--flip" id="node-qingzhong" data-label="清中叶 · 雍乾与乾嘉起义" style="--x: 15.2%; --y: 69.4%;">
+              <div class="tnode__card">
+                <h3 class="tnode__head">
+                  <button class="tnode__toggle" type="button" id="tg-qingzhong" aria-expanded="false" aria-controls="body-qingzhong">
+                    <span class="tnode__type">1735—1797</span>
+                    <span class="tnode__name">清中叶 · 雍乾与乾嘉起义</span>
+                  </button>
+                </h3>
+                <div class="tnode__body" id="body-qingzhong">
+                  <div class="tnode__body-in"><div class="tnode__panel"><p class="tnode__brief">「开辟」苗疆与土地矛盾下的两次大规模起义。</p><p class="tnode__text">1735 年，包利、红银等领导黔东南苗民起义。书中将其置于清朝武力「开辟」苗疆、建官筑城、驻军征粮的背景中分析。1795 年，石柳邓、石三保、吴八月、吴天半等在湘黔边区起事，起义以土地问题和改土归流后的社会矛盾为重要背景，提出「逐客民，复故地」；吴八月被各路义军推为「吴王」，平陇、石隆失陷后，大规模斗争基本失败。</p><p class="tnode__caveat">出处：《中国苗族通史：增订本》「雍乾苗民起义」「乾嘉苗民起义」。</p></div></div>
+                </div>
+              </div>
+            </li>
+
+            <!-- 11 · 银脉 / 清后期至民国 -->
+            <li class="tnode tnode--hist tnode--west tnode--flip" id="node-qingmo" data-label="清后期至民国 · 咸同、抗法与辛亥革命" style="--x: 72.9%; --y: 69.1%;">
+              <div class="tnode__card">
+                <h3 class="tnode__head">
+                  <button class="tnode__toggle" type="button" id="tg-qingmo" aria-expanded="false" aria-controls="body-qingmo">
+                    <span class="tnode__type">1855—1911</span>
+                    <span class="tnode__name">清后期至民国 · 咸同、抗法与辛亥革命</span>
+                  </button>
+                </h3>
+                <div class="tnode__body" id="body-qingmo">
+                  <div class="tnode__body-in"><div class="tnode__panel"><p class="tnode__brief">从台拱议榔到猛洞抗法，再到武昌起义。</p><p class="tnode__text">1855 年，张秀眉在台拱掌梅尼组织议榔、誓师起义，义军提出「打倒官家」「夺回土地」，逐步控制黔东南许多地区，建立根据地、分配土地、废除苛捐杂税，1872 年最后失败；杨大六在丹江响应，包大度等为重要人物。1885 年起，项崇周在云南猛洞联合苗、瑶、壮、汉等族群众，以伏击、偷袭和山地游击开展抗法斗争。1911 年，王宪章参与组织、指挥武昌起义，是书中重点介绍的苗族民主革命人物。</p><p class="tnode__caveat">出处：《中国苗族通史：增订本》「咸同苗民起义」「同法国侵略者的斗争」「苗族民主革命先驱王宪章与辛亥革命」。</p></div></div>
+                </div>
+              </div>
+            </li>
+
+            <!-- 12 · 银脉 / 近现代 -->
+            <li class="tnode tnode--hist tnode--east tnode--flip" id="node-jinxiandai" data-label="近现代 · 革屯运动与民族自治" style="--x: 28.7%; --y: 89.6%;">
+              <div class="tnode__card">
+                <h3 class="tnode__head">
+                  <button class="tnode__toggle" type="button" id="tg-jinxiandai" aria-expanded="false" aria-controls="body-jinxiandai">
+                    <span class="tnode__type">1936—1950s</span>
+                    <span class="tnode__name">近现代 · 革屯运动与民族自治</span>
+                  </button>
+                </h3>
+                <div class="tnode__body" id="body-jinxiandai">
+                  <div class="tnode__body-in"><div class="tnode__panel"><p class="tnode__brief">废屯升科，到自治州、自治县与民族乡的建立。</p><p class="tnode__text">革屯运动源于清代屯田、屯租制度在民国时期的延续和加重。1936 年永绥事变后和平请愿未获实质结果，1937 年转向武装起义，最终达成「废屯升科」和「收编抗日」的原则协议，吴恒良、梁明元、龙云飞等为主要人物。1944 年以后，经清丈土地、统一科征田赋等措施，延续一百四十多年的屯田、屯租制度最终废除。20 世纪 50 年代，各苗族地区建立人民政权、开展土地改革，逐步建立自治州、自治县和民族乡，1956 年黔东南苗族侗族自治州建立。</p><p class="tnode__caveat">出处：《中国苗族通史：增订本》「湘西苗民『革屯』运动」「苗族地区自治州、自治县和民族乡的建立」。</p></div></div>
+                </div>
+              </div>
+            </li>
+
+          </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 呼吸位 ================= -->
+    <aside class="breathe" aria-label="苗族古歌">
+      <blockquote class="breathe__quote">
+        枫木在天家，枝桠满天涯，结出千样种，开出百样花。
+        <cite class="breathe__cite">《苗族古歌·枫木歌》</cite>
+      </blockquote>
     </aside>
 
-    <!-- 右侧：树状双线时间轴 -->
-    <section class="tl-region" aria-labelledby="tlTitle">
-      <div class="tl-head">
-        <h2 class="tl-title" id="tlTitle">历史脉络</h2>
-        <p class="tl-note">传说与信史双线 · 滚轮横向浏览</p>
+    </main>
+
+<footer class="page-foot">
+      <div class="foot-rule" aria-hidden="true"></div>
+      <div class="divider" aria-hidden="true"><span class="divider-gem"></span></div>
+      <div class="page-foot__row">
+        <a class="back" href="index.html">
+          <svg class="back__arrow" viewBox="0 0 24 12" width="24" height="12" aria-hidden="true" focusable="false">
+            <path d="M23 6H2M6.5 1.5 1.5 6l5 4.5" fill="none" stroke="currentColor" stroke-width="1"/>
+          </svg>
+          <span>返回首页</span>
+        </a>
+        <span class="page-foot__note">银绣山河 · 苗族银饰与刺绣数字馆</span>
       </div>
-
-      <div class="tl-scroll" id="tlScroll" tabindex="0" role="region" aria-label="苗族历史时间轴，可横向滚动">
-        <div class="track">
-
-          <!-- 根系：从左侧铺开，收成主干后分成传说、信史两支 -->
-          <div class="roots" aria-hidden="true">
-            <svg viewBox="0 0 200 100" preserveAspectRatio="none" focusable="false">
-              <g class="root-line r-gold">
-                <path d="M0,4 C62,10 132,14 200,20"/>
-                <path d="M0,12 C58,15 132,17 200,20"/>
-                <path d="M0,30 C64,30 134,24 200,20"/>
-                <path d="M0,47 C64,41 132,27 200,20"/>
-                <path class="r-thin" d="M22,8 C32,16 26,25 16,30"/>
-                <path class="r-thin" d="M40,24 C48,30 42,38 51,43"/>
-                <path class="r-thin" d="M52,46 C44,54 51,62 40,68"/>
-                <path class="r-thin" d="M96,31 C104,26 108,20 118,19"/>
-                <path class="r-thin" d="M132,24 C140,29 144,35 154,35"/>
-              </g>
-              <g class="root-line r-silver">
-                <path d="M0,96 C62,90 132,86 200,80"/>
-                <path d="M0,88 C58,85 132,83 200,80"/>
-                <path d="M0,70 C64,70 134,76 200,80"/>
-                <path d="M0,53 C64,59 132,73 200,80"/>
-                <path class="r-thin" d="M28,92 C38,84 32,75 42,70"/>
-                <path class="r-thin" d="M46,76 C54,70 48,62 57,57"/>
-                <path class="r-thin" d="M58,54 C50,62 58,70 48,76"/>
-                <path class="r-thin" d="M104,69 C112,74 116,80 126,81"/>
-                <path class="r-thin" d="M140,76 C148,71 152,65 162,65"/>
-              </g>
-            </svg>
-          </div>
-
-          <!-- 传说线（暖金） -->
-          <div class="branch branch--legend">
-            <span class="b-tag" aria-hidden="true">传说</span>
-            <ol class="nodes">
-              <!--
-                节点填写方式：
-                1. 把 .nm 的文字换成事件名称，.era 换成年代或时期
-                2. 补 data-summary（一句话摘要）、data-keywords（顿号分隔）、data-href（详情页地址）
-                3. 内容填好后删掉 li 上的 is-empty 类，卡片就会从「待补」切成正式态
-              -->
-              <li class="node is-empty" data-line="legend" data-summary="" data-keywords="" data-href="">
-                <button class="node-btn" type="button" aria-label="传说线第 1 个节点：事件名称待补">
-                  <span class="nm">事件名称待补</span>
-                  <span class="era">年代待补</span>
-                </button>
-                <span class="dot" aria-hidden="true"></span>
-              </li>
-              <li class="node is-empty" data-line="legend" data-summary="" data-keywords="" data-href="">
-                <button class="node-btn" type="button" aria-label="传说线第 2 个节点：事件名称待补">
-                  <span class="nm">事件名称待补</span>
-                  <span class="era">年代待补</span>
-                </button>
-                <span class="dot" aria-hidden="true"></span>
-              </li>
-              <li class="node is-empty" data-line="legend" data-summary="" data-keywords="" data-href="">
-                <button class="node-btn" type="button" aria-label="传说线第 3 个节点：事件名称待补">
-                  <span class="nm">事件名称待补</span>
-                  <span class="era">年代待补</span>
-                </button>
-                <span class="dot" aria-hidden="true"></span>
-              </li>
-              <li class="node is-empty" data-line="legend" data-summary="" data-keywords="" data-href="">
-                <button class="node-btn" type="button" aria-label="传说线第 4 个节点：事件名称待补">
-                  <span class="nm">事件名称待补</span>
-                  <span class="era">年代待补</span>
-                </button>
-                <span class="dot" aria-hidden="true"></span>
-              </li>
-            </ol>
-          </div>
-
-          <!-- 信史线（银白） -->
-          <div class="branch branch--history">
-            <span class="b-tag" aria-hidden="true">信史</span>
-            <ol class="nodes">
-              <li class="node is-empty" data-line="history" data-summary="" data-keywords="" data-href="">
-                <button class="node-btn" type="button" aria-label="信史线第 1 个节点：事件名称待补">
-                  <span class="nm">事件名称待补</span>
-                  <span class="era">年代待补</span>
-                </button>
-                <span class="dot" aria-hidden="true"></span>
-              </li>
-              <li class="node is-empty" data-line="history" data-summary="" data-keywords="" data-href="">
-                <button class="node-btn" type="button" aria-label="信史线第 2 个节点：事件名称待补">
-                  <span class="nm">事件名称待补</span>
-                  <span class="era">年代待补</span>
-                </button>
-                <span class="dot" aria-hidden="true"></span>
-              </li>
-              <li class="node is-empty" data-line="history" data-summary="" data-keywords="" data-href="">
-                <button class="node-btn" type="button" aria-label="信史线第 3 个节点：事件名称待补">
-                  <span class="nm">事件名称待补</span>
-                  <span class="era">年代待补</span>
-                </button>
-                <span class="dot" aria-hidden="true"></span>
-              </li>
-              <li class="node is-empty" data-line="history" data-summary="" data-keywords="" data-href="">
-                <button class="node-btn" type="button" aria-label="信史线第 4 个节点：事件名称待补">
-                  <span class="nm">事件名称待补</span>
-                  <span class="era">年代待补</span>
-                </button>
-                <span class="dot" aria-hidden="true"></span>
-              </li>
-            </ol>
-          </div>
-
-        </div>
-      </div>
-
-      <button class="tl-arrow" id="tlArrow" type="button" aria-label="向右滚动时间轴">
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M5 12h13M12.5 5.5 19 12l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-    </section>
-  </div>
-
-  <!-- 页脚：银簪检索 + 返回 -->
-  <footer class="page-foot">
-    <div class="foot-rule" aria-hidden="true"></div>
-
-    <form class="pin" id="pinSearch" role="search" autocomplete="off">
-      <span class="pin-head" aria-hidden="true"></span>
-      <div class="pin-body">
-        <div class="pin-face">
-          <input class="pin-input" id="pinInput" type="search" name="q"
-                 placeholder="检索人物、非遗、历史事件" aria-label="检索人物、非遗与历史事件">
-        </div>
-      </div>
-    </form>
-
-    <p class="search-status" id="searchStatus" role="status" aria-live="polite"></p>
-
-    <div class="foot-meta">
-      <a href="index.html">返回首页</a>
-      <span class="sep" aria-hidden="true"></span>
-      <span>框架初版 · 内容与图片待补</span>
-    </div>
-  </footer>
-</div>
-
-<!-- 枫叶形节点卡片（浮层，由脚本定位） -->
-<div class="card-layer" id="cardLayer" aria-hidden="true">
-  <div class="maple" id="maple" data-open="0">
-    <div class="maple-rim">
-      <div class="maple-fill">
-        <p class="m-kicker" id="mKicker">传说线</p>
-        <h3 class="m-title" id="mTitle">事件名称待补</h3>
-        <p class="m-desc" id="mDesc"></p>
-        <ul class="m-kw" id="mKw"></ul>
-        <span class="m-link" id="mLink">查看详情 →</span>
-      </div>
-    </div>
+    </footer>
   </div>
 </div>
-
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="assets/js/history.js"></script>
 <script src="assets/js/bgm.js"></script>

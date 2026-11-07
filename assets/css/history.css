@@ -1,1076 +1,684 @@
 /* ==========================================================================
-   枫启长歌 — 苗族历史脉络（01 板块）
-   依据《枫启长歌-历史部分设计方案 1.0》
-   - 版式：横向树状双线时间轴（传说 / 信史），左侧卷页目录
-   - 色彩：沿用全站靛蓝 + 银白；本页新增暖金为主标题与传说线
-   - 原则：动效轻量慢节奏；装饰不压过内容；缺内容处明确标注「待补」
+   银绣山河 — 枫启长歌（章节页）· 苗族千年史
+   复用 main.css 的设计令牌、背景三层、四角纹样、分割线与关键帧。
+   本文件负责：页面骨架、章节头、上下滚动的枫脉谱系树、土布底呼吸位、页脚。
+
+   视觉纪律（来自设计提示词包 L2 / L4）：
+   · 一屏最多 1 个刺绣色作强调点，其余用银白与 1px 银线；
+   · 树取「历史树」之形：一道地平线 + 金银交缠、向下分叉的根脉，不做直线树干；
+   · 银脉在右（历史）、金脉在左（传说），与节点分栏一致；
+   · 通篇深色会读累，每 3 屏插入一段土布底浅色区。
    ========================================================================== */
 
-/* 本页文字与控件用到的补充令牌 */
+/* ---------- 0. 令牌补齐 ----------
+   原稿依赖 main.css 里另外几个令牌。本项目 main.css 的 :root 只保留全站
+   共用的那一套，缺的在这里就地补上——只在加载本文件的 history.html 生效，
+   不会外溢影响首页 / 展馆 / 体验页。 */
+
 :root {
-  --font-hei: "PingFang SC", "Microsoft YaHei", "Source Han Sans SC", "Noto Sans SC", "Heiti SC", sans-serif;
-  --font-kai: "STKaiti", "KaiTi", "Kaiti SC", "楷体", var(--font-brush), serif;
+  /* 苗绣浓彩：本页只用朱红一处（当前节点竖线），其余两色备而不用 */
+  --embroidery-red:   #c8342b;
+  --embroidery-gold:  #d9a32b;
+  --embroidery-green: #2e6b4f;
+  --embroidery-plum:  #7a3b6b;
 
-  --gold-hi:  #f7e6c2;
-  --gold-mid: #d9b26a;
-  --gold-low: #b98d47;
+  /* 土布底：呼吸位浅色段的底色 */
+  --hemp:      #e8e2d3;
+  --hemp-deep: #d6cdb8;
 
-  --paper-hi: #f0e5cc;
-  --paper-mid:#e3d4b2;
-  --paper-low:#d3c09a;
+  /* 1px 银线：模拟银饰錾刻高光 */
+  --silver-line:       rgba(217, 226, 233, .6);
+  --silver-line-faint: rgba(217, 226, 233, .22);
 
-  /* 时间轴节点间距与行高：桌面端横向 */
-  --node-gap: clamp(52px, 6.4vw, 104px);
-  --row-h: clamp(112px, 17vh, 176px);
-  --row-gap: clamp(36px, 8vh, 96px);
+  /* 正文用无衬线：标题宋体（刻本质感）+ 正文黑体，长文阅读更稳 */
+  --font-sans: "HarmonyOS Sans SC", "PingFang SC", "Hiragino Sans GB", "Source Han Sans SC",
+               "Microsoft YaHei", "微软雅黑", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-num-ui: "Inter", ui-sans-serif, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* 全站字号基数：1.2 = 在原有排版上整体放大 20%，调这一个数即可整页缩放 */
+  --type-scale: 1.2;
 }
 
-/* ==========================================================================
-   1. 页面骨架与做旧纸背景
-   ========================================================================== */
-body {
-  overflow-x: hidden;
+/* ---------- 1. 页面骨架 ---------- */
+.stage--page {
+  overflow-x: clip;      /* 裁掉横向溢出（呼吸位是 100vw 通栏），纵向要能滚 */
+  overflow-y: visible;
+}
+
+.stage--page .layer-bg,
+.stage--page .layer-tint,
+.stage--page .layer-grain,
+.stage--page .ornaments {
+  position: fixed;       /* 滚动时水波与角花留在视野里，不随页面拉长 */
+}
+
+/* 子页内容多，背景必须退让：底纹压暗一档，避免青花大纹和图文抢注意力 */
+.stage--page .layer-bg {
+  opacity: .30;
+  filter: brightness(.58) saturate(1.04) contrast(1.02);
+}
+.stage--page .layer-tint {
+  background:
+    radial-gradient(ellipse 52% 38% at 50% 24%, rgba(122, 168, 226, .10) 0%, rgba(122, 168, 226, 0) 74%),
+    linear-gradient(180deg, rgba(5, 15, 30, .93) 0%, rgba(7, 22, 42, .64) 32%, rgba(6, 18, 34, .70) 100%);
+}
+
+/* 上排角花会压住顶栏文字，这张页把它调淡（下排保持原样作压角） */
+.stage--page .orn--tl,
+.stage--page .orn--tr { opacity: .38; }
+@keyframes fadeTopPage { from { opacity: 0; } to { opacity: .38; } }
+html.anim .stage--page .orn--tl,
+html.anim .stage--page .orn--tr { animation-name: fadeTopPage; }
+
+/* 正文用无衬线：本页是长文阅读页，宋体只留给标题与引文 */
+.stage--page {
+  font-family: var(--font-sans);
 }
 
 .page {
   position: relative;
-  isolation: isolate;
-  min-height: 100vh;
-  min-height: 100dvh;
-  display: grid;
-  grid-template-rows: auto auto 1fr auto;
-  padding: clamp(14px, 2.2vh, 26px) clamp(16px, 3.4vw, 54px) clamp(12px, 2.2vh, 28px);
-}
-
-/* 做旧书页 + 布纹：压暗后当底，只在中央留一点暖光 */
-.paper {
-  position: absolute;
-  inset: 0;
-  z-index: -2;
-  background:
-    radial-gradient(ellipse 62% 48% at 50% 34%, rgba(217, 178, 106, .10) 0%, rgba(217, 178, 106, 0) 68%),
-    radial-gradient(ellipse 90% 70% at 50% 110%, rgba(5, 14, 26, .90) 0%, rgba(5, 14, 26, 0) 62%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23f)' opacity='.5'/%3E%3C/svg%3E"),
-    repeating-linear-gradient(92deg, rgba(226, 212, 178, .022) 0 1px, rgba(226, 212, 178, 0) 1px 4px),
-    linear-gradient(165deg, #0b1d33 0%, #081828 42%, #061120 74%, #050e1b 100%);
-  background-blend-mode: normal, normal, overlay, normal, normal;
-  opacity: 1;
-}
-
-/* 纸面纤维的极淡颗粒，和首页保持同一种材质感 */
-.grain {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  opacity: .08;
-  mix-blend-mode: overlay;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
-/* 页面四周压暗的暗角，让视线收向中央 */
-.page::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background: radial-gradient(ellipse 74% 66% at 50% 46%, rgba(3, 10, 20, 0) 46%, rgba(3, 10, 20, .62) 100%);
-}
-
-/* ==========================================================================
-   2. 面包屑
-   ========================================================================== */
-.crumb ol {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: .55em;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  font-family: var(--font-hei);
-  font-size: clamp(11px, 1.35vh, 13px);
-  letter-spacing: .1em;
-  color: var(--silver-400);
-}
-
-.crumb li + li::before {
-  content: "/";
-  margin-right: .55em;
-  color: rgba(179, 197, 221, .34);
-}
-
-.crumb a {
-  color: var(--silver-300);
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition: color .5s ease, border-color .5s ease;
-}
-
-.crumb a:hover,
-.crumb a:focus-visible {
-  color: var(--silver-50);
-  border-bottom-color: rgba(217, 178, 106, .7);
-}
-
-.crumb [aria-current="page"] {
-  color: var(--gold-mid);
-}
-
-/* ==========================================================================
-   3. 页头：标题 + 标语
-   ========================================================================== */
-.head {
-  text-align: center;
-  padding: clamp(4px, 1.4vh, 16px) 0 clamp(2px, 1.2vh, 12px);
-}
-
-/* 「枫启」与「长歌」分置左右，中缝留白，与首页标题同构 */
-.page-title {
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: .18em;
-  margin: 0;
-  font-family: var(--font-brush);
-  font-weight: 400;
-  font-size: clamp(44px, min(11vh, 7.8vw), 122px);
-  line-height: 1.06;
-  letter-spacing: .06em;
-  white-space: nowrap;
-}
-
-.page-title span {
-  display: inline-block;
-  /* 暖金的金属反光：上亮下暗再回亮，模拟银器抛光的折光 */
-  background: linear-gradient(176deg,
-    #fdf4de 2%,
-    #eddcb4 22%,
-    var(--gold-mid) 46%,
-    #a87f3d 68%,
-    #d8bc86 84%,
-    #f6e8c6 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 5px 22px rgba(217, 178, 106, .3));
-}
-
-/* 中缝的一道极细金线，代替首页的徽章位置 */
-.page-title .gap {
-  align-self: center;
-  width: 1px;
-  height: .82em;
-  background: linear-gradient(180deg, rgba(217, 178, 106, 0), rgba(217, 178, 106, .42), rgba(217, 178, 106, 0));
-  flex: 0 0 auto;
-}
-
-html.anim .page-title span {
-  opacity: 0;
-  animation: riseIn 1.9s var(--ease-soft) var(--d, .1s) both;
-}
-
-/* 标语：华文楷体，宽度对齐「启」到「长」 */
-.tagline {
-  margin: clamp(8px, 1.4vh, 16px) 0 0;
-  font-family: var(--font-kai);
-  font-size: clamp(12px, 1.75vh, 18px);
-  letter-spacing: .46em;
-  text-indent: .46em;
-  color: rgba(233, 205, 149, .80);
-}
-
-html.anim .tagline {
-  opacity: 0;
-  animation: softFade 2.4s var(--ease-soft) .9s both;
-}
-
-/* ==========================================================================
-   4. 主体：左侧卷页目录 + 右侧时间轴
-   ========================================================================== */
-.body {
-  display: grid;
-  grid-template-columns: clamp(142px, 14vw, 198px) minmax(0, 1fr);
-  align-items: center;
-  gap: clamp(12px, 2.2vw, 36px);
-  min-height: 0;
-}
-
-/* ---------- 侧页目录：做旧卷轴书页 ---------- */
-.scroll-nav {
-  display: grid;
-  gap: clamp(10px, 1.8vh, 18px);
-  align-content: center;
-  min-width: 0;
-}
-
-.book {
-  display: block;
-  text-decoration: none;
-  color: #3a2a16;
-  transform: rotate(-.8deg);
-  filter: drop-shadow(6px 10px 20px rgba(2, 9, 19, .62));
-  transition: transform .8s var(--ease-soft), filter .8s var(--ease-soft);
-}
-
-.book:nth-child(2) {
-  transform: rotate(.9deg) translateX(4px);
-}
-
-.book:hover,
-.book:focus-visible {
-  transform: rotate(0deg) translateY(-3px);
-  filter: drop-shadow(8px 16px 30px rgba(2, 9, 19, .74));
-}
-
-.book:focus-visible {
-  outline: 1px solid rgba(217, 178, 106, .85);
-  outline-offset: 6px;
-}
-
-/* 不规则书页轮廓：左上角略残、右下角微卷 */
-.book-face {
-  position: relative;
-  display: grid;
-  gap: .3em;
-  padding: clamp(14px, 2.1vh, 22px) clamp(12px, 1.5vw, 18px) clamp(16px, 2.4vh, 26px);
-  background:
-    radial-gradient(140% 110% at 8% 0%, rgba(255, 250, 236, .92) 0%, rgba(240, 229, 204, 0) 52%),
-    linear-gradient(148deg, var(--paper-hi) 0%, var(--paper-mid) 54%, var(--paper-low) 100%);
-  clip-path: polygon(0 5%, 3% 0, 97% 0, 100% 4%, 99% 63%, 100% 96%, 94% 100%, 3% 98%, 0 93%);
-  box-shadow: inset -10px 0 18px rgba(120, 96, 60, .16);
-}
-
-/* 书页右缘的深色压影，做出「一叠纸」的厚度 */
-.book-face::after {
-  content: "";
-  position: absolute;
-  top: 4%;
-  bottom: 4%;
-  right: 0;
-  width: 7px;
-  background: linear-gradient(90deg, rgba(92, 70, 40, 0), rgba(92, 70, 40, .30));
-  pointer-events: none;
-}
-
-.b-kicker {
-  font-family: var(--font-hei);
-  font-size: clamp(9px, 1.1vh, 11px);
-  letter-spacing: .22em;
-  color: rgba(92, 62, 26, .62);
-}
-
-.b-title {
-  font-family: var(--font-brush);
-  font-size: clamp(19px, 2.5vh, 26px);
-  line-height: 1.24;
-  letter-spacing: .1em;
-  color: #43301a;
-}
-
-.b-hint {
-  font-family: var(--font-hei);
-  font-size: clamp(9px, 1.05vh, 11px);
-  line-height: 1.6;
-  letter-spacing: .04em;
-  color: rgba(92, 62, 26, .58);
-}
-
-/* ==========================================================================
-   5. 树状双线时间轴
-   ========================================================================== */
-.tl-region {
-  position: relative;
-  min-width: 0;
-}
-
-.tl-head {
-  display: flex;
-  align-items: baseline;
-  gap: clamp(8px, 1.2vw, 16px);
-  margin: 0 0 clamp(2px, .8vh, 10px);
-  padding-left: 2px;
-}
-
-.tl-title {
-  margin: 0;
-  font-family: var(--font-brush);
-  font-weight: 400;
-  font-size: clamp(14px, 1.9vh, 19px);
-  letter-spacing: .22em;
-  color: var(--silver-100);
-}
-
-.tl-note {
-  margin: 0;
-  font-family: var(--font-hei);
-  font-size: clamp(10px, 1.15vh, 12px);
-  letter-spacing: .06em;
-  color: var(--silver-400);
-}
-
-/* 横向滚动容器：滚轮上下 = 内容左右（仅指针在区域内生效） */
-.tl-scroll {
-  position: relative;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(179, 197, 221, .26) transparent;
-  padding-block: clamp(4px, 1vh, 12px);
-  outline: none;
-}
-
-.tl-scroll::-webkit-scrollbar { height: 3px; }
-.tl-scroll::-webkit-scrollbar-track { background: transparent; }
-.tl-scroll::-webkit-scrollbar-thumb {
-  background: rgba(179, 197, 221, .24);
-  border-radius: 3px;
-}
-
-.tl-scroll:focus-visible {
-  outline: 1px solid rgba(217, 178, 106, .55);
-  outline-offset: 6px;
-}
-
-/* ---------- 栅格：根系 | 传说线 / 信史线 ---------- */
-.track {
-  display: grid;
-  grid-template-columns: clamp(96px, 12vw, 178px) auto;
-  grid-template-rows: auto auto;
-  row-gap: var(--row-gap);
-  align-items: stretch;
-  width: max-content;
-  min-width: 100%;
-}
-
-/* 根系：从左侧铺开，收成主干后分成两支 */
-.roots {
-  grid-column: 1;
-  grid-row: 1 / 3;
-  align-self: stretch;
-  display: flex;
-  align-items: stretch;
-  opacity: .9;
-}
-
-/* 根系铺满所在列，线再往左接上它 */
-.roots svg {
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.root-line {
-  fill: none;
-  stroke-linecap: round;
-  stroke-width: 1;
-}
-
-.roots .r-gold { stroke: rgba(217, 178, 106, .34); }
-.roots .r-silver { stroke: rgba(200, 216, 238, .28); }
-.roots .r-thin { stroke-width: .7; opacity: .7; }
-
-/* ---------- 单条线 ---------- */
-.branch {
-  position: relative;
-  display: flex;
-  align-items: stretch;
-  gap: var(--node-gap);
-  height: var(--row-h);
-  grid-column: 2;
-  /* 给线首的竖排标签让出位置 */
-  padding-left: clamp(22px, 2.4vw, 32px);
-}
-
-.branch--legend { grid-row: 1; --line-c: var(--gold-mid); --line-hi: #f7e6c2; }
-.branch--history { grid-row: 2; --line-c: var(--silver-200); --line-hi: #f2f8ff; }
-
-/* 线本身：左暗右亮；左端伸回根系那一列，让主干和根系接上 */
-.branch::before {
-  content: "";
-  position: absolute;
-  left: calc(-1 * clamp(22px, 2.4vw, 32px));
-  right: 0;
-  top: 50%;
-  height: 1px;
-  pointer-events: none;
-}
-
-.branch--legend::before {
-  background: linear-gradient(90deg,
-    rgba(217, 178, 106, .10) 0%,
-    rgba(217, 178, 106, .46) 16%,
-    rgba(230, 196, 138, .82) 62%,
-    rgba(247, 230, 194, .96) 100%);
-}
-
-.branch--history::before {
-  background: linear-gradient(90deg,
-    rgba(179, 197, 221, .08) 0%,
-    rgba(179, 197, 221, .42) 16%,
-    rgba(211, 224, 241, .78) 62%,
-    rgba(242, 248, 255, .95) 100%);
-}
-
-/* 线的起点标签：传说 / 信史，竖排在主干起点，垫一层暗底压住后面的线条 */
-.b-tag {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  padding: .5em .34em;
-  font-family: var(--font-brush);
-  font-size: clamp(11px, 1.45vh, 14px);
-  letter-spacing: .26em;
-  color: var(--line-c);
-  white-space: nowrap;
-  writing-mode: vertical-rl;
-  text-orientation: upright;
-  background: rgba(7, 19, 33, .94);
-  border: 1px solid rgba(179, 197, 221, .26);
-  border-radius: 2px;
   z-index: 2;
-}
-
-.branch--legend .b-tag { border-color: rgba(217, 178, 106, .44); }
-.branch--history .b-tag { border-color: rgba(179, 197, 221, .38); }
-
-/* ---------- 节点 ---------- */
-.nodes {
-  display: flex;
-  align-items: stretch;
-  gap: var(--node-gap);
-  margin: 0;
-  padding: 0 clamp(16px, 2vw, 40px) 0 0;
-  list-style: none;
-}
-
-.node {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  flex: 0 0 auto;
-}
-
-/* 传说线的标签在线上方，信史线在下方——两线各自向外生长 */
-.branch--legend .node { justify-content: flex-start; }
-.branch--history .node { justify-content: flex-end; }
-
-/* 节点到线的那一小截枝 */
-.node::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  width: 1px;
-  height: clamp(10px, 1.6vh, 16px);
-  background: var(--line-c);
-  opacity: .42;
-}
-
-.branch--legend .node::before { top: calc(50% - clamp(10px, 1.6vh, 16px)); }
-.branch--history .node::before { top: 50%; }
-
-.node-btn {
-  display: block;
-  margin: 0;
-  padding: 4px 6px;
-  border: 0;
-  background: none;
-  color: var(--line-c);
-  font-family: var(--font-hei);
-  font-size: clamp(12px, 1.5vh, 15px);
-  line-height: 1.5;
-  letter-spacing: .06em;
-  text-align: center;
-  cursor: pointer;
-  border-radius: 2px;
-  transition: color .5s ease, text-shadow .6s ease;
-  white-space: nowrap;
-}
-
-.branch--legend .node-btn { margin-bottom: clamp(12px, 1.8vh, 18px); }
-.branch--history .node-btn { margin-top: clamp(12px, 1.8vh, 18px); }
-
-.node-btn .nm { display: block; }
-
-.node-btn .era {
-  display: block;
-  margin-top: .25em;
-  font-size: .74em;
-  letter-spacing: .1em;
-  opacity: .5;
-}
-
-.node-btn:hover,
-.node-btn:focus-visible {
-  color: var(--line-hi);
-  text-shadow: 0 0 16px rgba(217, 178, 106, .35);
-}
-
-.node-btn:focus-visible {
-  outline: 1px solid rgba(217, 178, 106, .8);
-  outline-offset: 3px;
-}
-
-/* 线上的点 */
-.dot {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 11px;
-  height: 11px;
-  transform: translate(-50%, -50%) rotate(45deg);
-  background: var(--line-c);
-  box-shadow: 0 0 14px rgba(217, 178, 106, .55);
-  transition: box-shadow .6s ease, transform .6s var(--ease-soft);
-}
-
-.branch--history .dot { box-shadow: 0 0 12px rgba(190, 214, 244, .45); }
-
-.node.is-active .dot,
-.node:focus-within .dot {
-  transform: translate(-50%, -50%) rotate(45deg) scale(1.5);
-  box-shadow: 0 0 20px rgba(247, 230, 194, .85);
-}
-
-/* 占位节点：虚线框提示「此处内容待补」，填了真内容后这个类会被去掉 */
-.node.is-empty .node-btn .nm {
-  color: rgba(179, 197, 221, .55);
-  font-style: normal;
-}
-
-/* 检索时被过滤掉的节点 */
-.node.is-hidden { display: none; }
-
-.node.is-empty .dot {
-  background: transparent;
-  box-shadow: inset 0 0 0 1px var(--line-c);
-}
-
-/* 右侧的方向箭头 */
-.tl-arrow {
-  position: absolute;
-  right: -6px;
-  top: 50%;
-  transform: translateY(-50%);
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(18px, 3vh, 34px) clamp(20px, 6.2vw, 92px) clamp(30px, 6vh, 72px);
   display: grid;
-  place-items: center;
-  width: clamp(30px, 3.4vh, 40px);
-  height: clamp(30px, 3.4vh, 40px);
-  padding: 0;
-  border: 1px solid rgba(217, 178, 106, .34);
-  border-radius: 50%;
-  background: rgba(8, 22, 40, .74);
-  color: rgba(233, 205, 149, .86);
-  cursor: pointer;
-  backdrop-filter: blur(3px);
-  transition: opacity .6s ease, border-color .6s ease, transform .6s var(--ease-soft);
+  gap: clamp(34px, 7vh, 84px);
 }
 
-.tl-arrow svg { width: 52%; height: 52%; }
-
-.tl-arrow:hover,
-.tl-arrow:focus-visible {
-  border-color: rgba(247, 230, 194, .8);
-  transform: translateY(-50%) translateX(2px);
+.page__main {
+  display: grid;
+  gap: clamp(46px, 9vh, 104px);
 }
 
-.tl-arrow[data-done="1"] {
-  opacity: 0;
-  pointer-events: none;
-}
-
-@keyframes arrowNudge {
-  0%, 100% { transform: translateY(-50%) translateX(0); }
-  50%      { transform: translateY(-50%) translateX(5px); }
-}
-
-.tl-arrow { animation: arrowNudge 3.4s ease-in-out infinite; }
-
-/* ==========================================================================
-   6. 枫叶形节点卡片（浮层）
-   ========================================================================== */
-.card-layer {
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  pointer-events: none;
-}
-
-.maple {
-  /* 浅锯齿的叶缘：峰低而密，读起来像叶边而不是城墙垛口 */
-  --leaf: polygon(
-    0 12%, 8% 6%, 16% 11%, 26% 4%, 36% 10%, 46% 3%, 56% 10%,
-    68% 4%, 78% 11%, 88% 6%, 100% 12%,
-    100% 100%, 0 100%);
-
-  position: absolute;
-  width: clamp(230px, 24vw, 300px);
-  pointer-events: auto;
-  filter: drop-shadow(0 18px 38px rgba(2, 8, 18, .68));
-  opacity: 0;
-  transform: translateY(10px) scale(.96);
-  transition: opacity .34s var(--ease-soft), transform .44s var(--ease-soft);
-}
-
-.maple[data-open="1"] {
-  opacity: 1;
-  transform: none;
-}
-
-/* 金银色细边：外层金框 + 内层暗红，两层共用同一个枫叶裁形 */
-.maple-rim {
-  padding: 1.5px;
-  clip-path: var(--leaf);
-  background: linear-gradient(158deg, var(--gold-hi) 0%, var(--gold-mid) 42%, var(--gold-low) 72%, var(--gold-hi) 100%);
-}
-
-.maple-fill {
-  position: relative;
-  clip-path: var(--leaf);
-  padding: clamp(22px, 2.8vh, 30px) clamp(16px, 1.6vw, 22px) clamp(12px, 1.8vh, 16px);
-  background:
-    radial-gradient(130% 96% at 50% 112%, #7e2a22 0%, #5d1e19 52%, #3f1310 100%);
-  color: var(--silver-100);
-}
-
-/* 叶脉：从叶柄一侧放射的极淡金线 */
-.maple-fill::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: repeating-conic-gradient(from 188deg at 50% 112%,
-    rgba(233, 205, 149, .16) 0deg 1.1deg,
-    rgba(233, 205, 149, 0) 1.1deg 9deg);
-  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, .12) 0%, rgba(0, 0, 0, .9) 100%);
-  mask-image: linear-gradient(180deg, rgba(0, 0, 0, .12) 0%, rgba(0, 0, 0, .9) 100%);
-  opacity: .55;
-}
-
-.maple-fill > * { position: relative; z-index: 1; }
-
-.m-kicker {
-  margin: 0 0 .5em;
-  font-family: var(--font-hei);
-  font-size: clamp(9px, 1.1vh, 11px);
+/* ---------- 2. 返回链接 ----------
+   原稿在本文件里自带一条简版顶栏（.topbar / .topbar__brand）。
+   本项目已由 chrome.css 提供全站统一顶栏，同名选择器会互相覆盖，
+   故此处只保留页脚复用的 .back，不再定义 .topbar 系列。 */
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-sans);
+  font-size: calc(clamp(11px, 1.4vh, 13px) * var(--type-scale));
   letter-spacing: .2em;
-  color: rgba(233, 205, 149, .78);
+  color: var(--silver-200);
+  text-decoration: none;
+  text-shadow: 0 1px 10px rgba(3, 10, 20, .95), 0 0 22px rgba(3, 10, 20, .8);
+  transition: color .5s ease;
 }
 
-.m-title {
-  margin: 0 0 .5em;
-  font-family: var(--font-brush);
-  font-weight: 400;
-  font-size: clamp(17px, 2.2vh, 22px);
-  line-height: 1.34;
-  letter-spacing: .06em;
-  color: #f6ecdb;
+.back__arrow {
+  flex: none;
+  opacity: .7;
+  transition: transform .5s var(--ease-soft), opacity .5s ease;
 }
 
-.m-desc {
-  margin: 0 0 .7em;
-  font-family: var(--font-serif);
-  font-size: clamp(11px, 1.35vh, 13px);
-  line-height: 1.82;
-  color: rgba(232, 226, 214, .84);
-}
+.back:hover,
+.back:focus-visible { color: var(--silver-50); }
+.back:hover .back__arrow,
+.back:focus-visible .back__arrow { transform: translateX(-4px); opacity: 1; }
 
-/* 占位卡片里的填写指引：写成中性提示，不当正文 */
-.maple[data-empty="1"] .m-desc {
-  color: rgba(233, 205, 149, .62);
-  padding-left: .8em;
-  border-left: 1px solid rgba(233, 205, 149, .3);
-}
-
-.m-kw {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .4em;
-  margin: 0 0 .8em;
-  padding: 0;
-  list-style: none;
-}
-
-.m-kw li {
-  font-family: var(--font-kai);
-  font-size: clamp(10px, 1.2vh, 12px);
-  padding: .18em .6em;
-  color: rgba(233, 205, 149, .9);
-  border: 1px solid rgba(233, 205, 149, .34);
+.back:focus-visible {
+  outline: 1px solid rgba(217, 178, 106, .8);
+  outline-offset: 6px;
   border-radius: 1px;
 }
 
-.m-link {
-  display: inline-block;
-  font-family: var(--font-hei);
-  font-size: clamp(10px, 1.2vh, 12px);
-  letter-spacing: .1em;
-  color: rgba(247, 230, 194, .95);
-  border-bottom: 1px solid rgba(247, 230, 194, .46);
-  padding-bottom: 2px;
-  cursor: pointer;
+/* ---------- 3. 章节头 ---------- */
+.chapter {
+  display: grid;
+  gap: clamp(14px, 2.4vh, 28px);
+  padding-top: clamp(24px, 6vh, 72px);
 }
 
-.m-link:hover { border-bottom-color: rgba(247, 230, 194, .95); }
+/* 「枫启长歌」四字：标题字体子集只含「银绣山河」，故本章用宋体大字距，
+   取志书/碑刻的调子，也避免全角楷体回退字在大字号下显得单薄。
+   四字标题横向余量比二字小，字号曲线单独标定。 */
+.chapter__title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: calc(clamp(46px, min(12vh, 8.6vw), 112px) * var(--type-scale));
+  line-height: 1.05;
+  letter-spacing: .14em;
+  text-indent: .14em;
+  background: linear-gradient(178deg, var(--silver-50) 6%, var(--silver-100) 46%, var(--silver-300) 88%, #9fb4cf 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 6px 26px rgba(120, 168, 224, .34));
+}
+
+.chapter__lede {
+  margin: 0;
+  max-width: 30em;
+  font-family: var(--font-sans);
+  font-size: clamp(16px, 1.32vw, 19px);
+  line-height: 1.85;
+  color: var(--silver-300);
+  text-wrap: pretty;
+}
 
 /* ==========================================================================
-   7. 页脚：银簪检索 + 返回首页
+   5. 枫脉谱系树：以「历史树」为形的金银根脉
+   一道地平线，金脉（传说）与银脉（历史）交缠成干、向下分叉蔓延成根；
+   条目仍按左传说 / 右历史分栏，压在根脉之上，点开详情在同侧展开。
    ========================================================================== */
-.page-foot {
-  display: grid;
-  justify-items: center;
-  gap: clamp(10px, 1.6vh, 16px);
-  padding-top: clamp(8px, 1.4vh, 16px);
-}
-
-.foot-rule {
-  width: min(560px, 82%);
-  height: 1px;
-  background: linear-gradient(90deg,
-    rgba(196, 216, 240, 0) 0%,
-    rgba(196, 216, 240, .34) 22%,
-    rgba(226, 238, 252, .58) 50%,
-    rgba(196, 216, 240, .34) 78%,
-    rgba(196, 216, 240, 0) 100%);
-}
-
-/* ---------- 银簪检索 ---------- */
-.pin {
-  --pin-shape: polygon(0 0, 93% 28%, 100% 50%, 93% 72%, 0 100%);
-
-  display: flex;
-  align-items: center;
-  width: min(420px, 88%);
-  height: clamp(40px, 5.4vh, 48px);
-}
-
-/* 簪头：同心银环 + 花心，像一枚压扁的苗银簪首 */
-.pin-head {
+.tree-wrap {
   position: relative;
-  flex: 0 0 auto;
-  width: clamp(38px, 5vh, 46px);
-  height: clamp(38px, 5vh, 46px);
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 36% 30%, #ffffff 0%, #eef4fc 26%, #d5e1f0 56%, #a9beda 100%);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, .95),
-    inset 0 -6px 12px rgba(94, 124, 162, .38),
-    0 4px 14px rgba(2, 10, 22, .5);
+}
+
+/* 点阵画布：严格按手绘草图的竖幅构图。突破 1180px 正文栏铺满视口，
+   12 个点位与 SVG 细线共用同一套百分比坐标；草图有效构图在纵向 4%~68%，
+   这里等比铺开到 6%~92%，下缘仍留出放射根与浮层的余量。 */
+.tree-stage {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  height: clamp(1180px, 96vw, 1700px);
+}
+
+/* 根脉层：突破 1180px 正文栏、铺满整个视口宽度，
+   让最外侧的枝梢真正触达页面左右两侧；节点文字仍留在正文栏内。
+   html 已有 overflow-x: clip，不会产生横向滚动条。 */
+.tree-ink {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* 地平线：对应原图顶部那道横线；银→金→银，让两脉在中央交汇 */
+.tree-ink__horizon {
+  position: absolute;
+  top: 2px;
+  left: 2%;
+  right: 2%;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg,
+    rgba(198, 219, 244, 0) 0%,
+    rgba(198, 219, 244, .55) 14%,
+    rgba(217, 178, 106, .85) 50%,
+    rgba(198, 219, 244, .55) 86%,
+    rgba(198, 219, 244, 0) 100%);
+  box-shadow: 0 0 16px rgba(198, 219, 244, .28), 0 0 26px rgba(217, 178, 106, .16);
+}
+
+/* 根脉：保留原图明暗光影的金银树，横向铺满视口、纵向随内容拉长。
+   渐隐推迟到 68% 以后，让下半段最宽展的根系也能触达两侧而不被淡掉。 */
+.tree-ink__art {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  opacity: .7;
+  filter: drop-shadow(0 0 12px rgba(198, 204, 210, .16))
+          drop-shadow(0 0 22px rgba(217, 178, 106, .10));
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 74%, rgba(0, 0, 0, .86) 90%, rgba(0, 0, 0, .40) 100%);
+          mask-image: linear-gradient(180deg, #000 0%, #000 74%, rgba(0, 0, 0, .86) 90%, rgba(0, 0, 0, .40) 100%);
+}
+
+/* ---------- 点位细线：严格按手绘草图 ---------- */
+.tree-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  overflow: visible;
+}
+/* 画布是竖幅，viewBox 被非等比拉伸，锁住线宽避免横竖粗细不一。
+   树保持 70% 不透明，细线靠两层深色描边从金箔／灰枝上「抠」出来，
+   再叠一层同色柔光；不加整片遮罩，树的光影一点不挡。 */
+.tree-lines path { vector-effect: non-scaling-stroke; stroke-linecap: round; }
+.tree-lines g { stroke-width: 1.8; }
+.tree-lines__gold {
+  color: #f7dc9b;
+  filter: drop-shadow(0 0 2px rgba(3, 10, 20, 1))
+          drop-shadow(0 0 4px rgba(3, 10, 20, .92))
+          drop-shadow(0 0 9px rgba(240, 206, 132, .75));
+}
+.tree-lines__silver {
+  color: #e8eff7;
+  filter: drop-shadow(0 0 2px rgba(3, 10, 20, 1))
+          drop-shadow(0 0 4px rgba(3, 10, 20, .92))
+          drop-shadow(0 0 9px rgba(214, 224, 234, .5));
+}
+
+/* ---------- 点阵：节点严格落在草图点位上 ---------- */
+.tree-cols {
+  position: absolute;
+  inset: 0;
   z-index: 2;
 }
+.tree {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
 
-/* 一圈小花瓣，用锥形渐变切出来 */
-.pin-head::before {
+/* 每个 <li> 是零尺寸锚点，--x / --y 与 SVG 路径坐标一一对应 */
+.tnode {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 0;
+  height: 0;
+  padding: 0;
+  z-index: 2;
+}
+.tnode.is-open { z-index: 12; }
+
+/* 点：金 / 银实心小圆，正好压在细线端点上 */
+.tnode::before {
   content: "";
   position: absolute;
-  inset: 18%;
+  left: -6px;
+  top: -6px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: repeating-conic-gradient(from 0deg,
-    rgba(94, 124, 162, .5) 0deg 3deg,
-    rgba(255, 255, 255, .1) 3deg 30deg);
-  -webkit-mask-image: radial-gradient(circle, transparent 52%, #000 54%, #000 76%, transparent 78%);
-  mask-image: radial-gradient(circle, transparent 52%, #000 54%, #000 76%, transparent 78%);
+  background: var(--silver-200);
+  box-shadow: 0 0 0 5px rgba(198, 219, 244, .10), 0 0 16px rgba(198, 219, 244, .6);
+  z-index: 3;
+  pointer-events: none;
+  transition: transform .35s var(--ease-soft);
 }
+.tnode--myth::before {
+  background: var(--gold);
+  box-shadow: 0 0 0 5px rgba(217, 178, 106, .12), 0 0 16px rgba(217, 178, 106, .65);
+}
+.tnode.is-open::before { transform: scale(1.35); }
 
-.pin-head::after {
-  content: "";
+/* 卡片：从点位向外挂出，宽度固定，不占据画布空间 */
+.tnode__card {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 30%;
-  height: 30%;
-  transform: translate(-50%, -50%) rotate(45deg);
-  background: linear-gradient(140deg, #ffffff, #b9cbe1);
-  box-shadow: 0 0 10px rgba(255, 255, 255, .55), inset 0 0 0 1px rgba(94, 124, 162, .3);
+  top: calc(14px + var(--dy, 0px));
+  width: clamp(190px, 16.5vw, 232px);
+  padding: 8px 11px 10px;
+  background: linear-gradient(180deg, rgba(9, 22, 40, .92), rgba(7, 18, 34, .88));
+  border: 1px solid rgba(198, 219, 244, .16);
+  border-radius: 3px;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  transition: transform .5s var(--ease-soft), box-shadow .5s var(--ease-soft);
+}
+.tnode--east .tnode__card { left: 14px; }
+.tnode--west .tnode__card { right: 14px; }
+.tnode--myth .tnode__card { border-color: rgba(217, 178, 106, .24); }
+
+/* 悬浮漂浮：鼠标放上整行文字，卡片轻轻上浮、浮起一层柔光，
+   让人一眼看出这是可点击的入口。金/银两类各配一档同色柔光。
+   用 .tnode__card:hover 触发（卡片包着标题/概要/文字热区）。 */
+@media (hover: hover) {
+  html.js-tree .tnode__card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px -14px rgba(120, 168, 224, .5), 0 2px 10px -2px rgba(120, 168, 224, .3);
+  }
+  html.js-tree .tnode--myth .tnode__card:hover {
+    box-shadow: 0 12px 28px -14px rgba(217, 178, 106, .45), 0 2px 10px -2px rgba(217, 178, 106, .3);
+  }
 }
 
-/* 簪身：银色渐窄到尖 */
-.pin-body {
-  position: relative;
-  flex: 1 1 auto;
-  height: clamp(32px, 4.2vh, 38px);
-  margin-left: -14px;
-  padding-left: 16px;
-  clip-path: var(--pin-shape);
-  background: linear-gradient(180deg, #f4f8fe 0%, #d8e4f2 38%, #b3c6dd 100%);
-  filter: drop-shadow(0 3px 10px rgba(2, 10, 22, .45));
+/* 当前节点：点开在读的那一节，用一条刺绣色竖线作标记（全页唯一强调点） */
+.tnode.is-current .tnode__card {
+  box-shadow: inset 3px 0 0 var(--embroidery-red);
 }
 
-.pin-face {
-  position: absolute;
-  inset: 1.5px;
-  clip-path: var(--pin-shape);
-  background: rgba(7, 20, 36, .94);
+/* 点开某一节时，其余卡片退到背景，避免被详情浮层压出半截「残影」 */
+.tree:has(.tnode.is-open) .tnode:not(.is-open) .tnode__card { opacity: .34; }
+.tree:has(.tnode.is-open) .tnode:not(.is-open) .tnode__card:hover { opacity: .78; }
+
+.tnode__head {
+  margin: 0;
+  font: inherit;
+  font-weight: inherit;
+}
+
+/* 折叠开关：整行文字都是热区，点文字查看详情 */
+.tnode__toggle {
   display: flex;
   align-items: center;
-  padding-left: clamp(14px, 2vw, 26px);
-  padding-right: clamp(26px, 4vw, 44px);
-}
-
-.pin-input {
+  gap: 6px;
+  flex-wrap: wrap;
   width: 100%;
+  margin: 0;
+  padding: 0;
+  background: none;
   border: 0;
-  background: transparent;
-  color: var(--silver-100);
-  font-family: var(--font-hei);
-  font-size: clamp(11px, 1.35vh, 13px);
-  letter-spacing: .08em;
-  outline: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.pin-input::placeholder {
-  color: rgba(179, 197, 221, .52);
-  letter-spacing: .08em;
+.tnode__toggle:focus-visible {
+  outline: 1px solid rgba(217, 178, 106, .8);
+  outline-offset: 6px;
+  border-radius: 2px;
 }
 
-/* 簪身上一道极细的阴刻线，让它更像一根银条而不是一块牌子 */
-.pin-face::after {
+/* 小圆点已由 .tnode::before 落在锚点上，按钮内不再重复画点 */
+.tnode__toggle::before { display: none; }
+
+/* 根脉会穿过文字区，给标签 / 标题 / 概要加一层深色投影保证可读 */
+.tnode__type,
+.tnode__name,
+.tnode__brief {
+  text-shadow:
+    0 0 3px rgba(3, 10, 20, 1),
+    0 0 7px rgba(3, 10, 20, 1),
+    0 0 14px rgba(3, 10, 20, .98),
+    0 0 26px rgba(3, 10, 20, .92),
+    0 1px 2px rgba(3, 10, 20, 1);
+}
+
+/* 类型标注：历史银、传说金 */
+.tnode__type {
+  flex: none;
+  font-size: 10px;
+  letter-spacing: .16em;
+  color: #a7b8c9;
+}
+.tnode--myth .tnode__type { color: var(--gold); }
+.tnode--hist .tnode__type { color: var(--silver-300); }
+
+/* 节点名称 */
+.tnode__name {
+  margin: 0;
+  flex: 0 0 100%;
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: clamp(13px, 1.04vw, 15px);
+  line-height: 1.42;
+  letter-spacing: .03em;
+  color: var(--silver-50);
+  transition: color .45s ease;
+}
+.tnode--myth .tnode__name { color: #e2c58e; }
+html.js-tree .tnode__toggle:hover .tnode__name { color: #fff; }
+html.js-tree .tnode--myth .tnode__toggle:hover .tnode__name { color: #f0d9a8; }
+
+/* 悬浮时名称与类型标注一并提亮，强化"可点击"暗示 */
+html.js-tree .tnode__toggle:hover .tnode__type { color: var(--silver-200); }
+html.js-tree .tnode--myth .tnode__toggle:hover .tnode__type { color: #e9cf96; }
+
+/* 概要已移入展开面板作导语：默认态卡片只留「类型 + 标题」，
+   点构图才够干净；一句话概括在点开详情里完整可见。 */
+.tnode__brief {
+  margin: 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(217, 178, 106, .18);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.75;
+  color: #dbe6f2;
+  text-wrap: pretty;
+}
+
+/* ============================================================
+   详情：同侧展开（条目下方），用 grid 0fr→1fr 平滑过渡。
+   .tnode__body-in 只负责折叠裁剪（overflow + min-height），
+   视觉样式（背景/边框/padding）放在内层 .tnode__panel 上，
+   避免 padding 撑破 0fr 折叠导致内容泄漏。
+   ============================================================ */
+.tnode__body {
+  position: absolute;
+  top: calc(100% + 8px);
+  width: min(360px, 78vw);
+  z-index: 40;
+  display: grid;
+  grid-template-rows: 1fr;
+}
+.tnode--east .tnode__body { left: 0; }
+.tnode--west .tnode__body { right: 0; }
+/* 画布下缘的三个点：详情向上弹，避免越出画布 */
+.tnode--flip .tnode__body { top: auto; bottom: calc(100% + 8px); }
+.tnode__body-in {
+  overflow: hidden;
+  min-height: 0;
+  display: grid;
+}
+html.js-tree .tnode__body {
+  grid-template-rows: 0fr;
+  transition: grid-template-rows .55s var(--ease-soft);
+}
+html.js-tree .tnode.is-open .tnode__body { grid-template-rows: 1fr; }
+
+/* 详情内容面板：视觉样式集中在此，不影响折叠 */
+.tnode__panel {
+  padding: clamp(16px, 2.2vw, 24px);
+  background:
+    linear-gradient(180deg, rgba(10, 24, 42, .97), rgba(7, 18, 34, .96));
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(217, 178, 106, .18);
+  border-radius: 3px;
+  display: grid;
+  gap: 12px;
+  max-height: min(46vh, 420px);
+  overflow-y: auto;
+  box-shadow: 0 18px 42px -14px rgba(2, 8, 18, .9);
+}
+
+.tnode__panel > :first-child { margin-top: 0; }
+
+.tnode__text,
+.tnode__caveat { text-wrap: pretty; }
+
+.tnode__text {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--silver-300);
+}
+
+/* 脉络限定标注：加竖线区分"这是限定条件，不是正文" */
+.tnode__caveat {
+  margin: 0;
+  padding: 2px 0 2px 14px;
+  border-left: 1px solid rgba(217, 226, 233, .26);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.7;
+  color: #a7b8c9;
+}
+
+/* ---------- 7. 呼吸位：土布底浅色段 ---------- */
+.breathe {
+  position: relative;
+  width: 100vw;
+  margin-inline: calc(50% - 50vw);
+  padding: clamp(56px, 13vh, 148px) clamp(28px, 9vw, 140px);
+  background-color: var(--hemp);
+  background-image:
+    repeating-linear-gradient(90deg, rgba(108, 94, 68, .055) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(0deg, rgba(108, 94, 68, .04) 0 1px, transparent 1px 4px);
+  color: #12293f;
+  text-align: center;
+}
+.breathe::before,
+.breathe::after {
   content: "";
   position: absolute;
   left: 0;
-  right: 8%;
-  top: 50%;
+  right: 0;
   height: 1px;
-  background: linear-gradient(90deg,
-    rgba(179, 197, 221, 0),
-    rgba(179, 197, 221, .22) 18%,
-    rgba(226, 238, 252, .30) 60%,
-    rgba(179, 197, 221, 0));
-  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(18, 41, 63, .26) 50%, transparent);
+}
+.breathe::before { top: 0; }
+.breathe::after { bottom: 0; }
+
+.breathe__quote {
+  margin: 0 auto;
+  max-width: 32em;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(19px, 2.4vw, 30px);
+  line-height: 2;
+  letter-spacing: .1em;
+  color: #10273c;
+}
+.breathe__cite {
+  display: block;
+  margin-top: .9em;
+  font-family: var(--font-sans);
+  font-style: normal;
+  font-size: 12px;
+  letter-spacing: .34em;
+  text-indent: .34em;
+  color: rgba(16, 39, 60, .78);
 }
 
-.pin-input::-webkit-search-cancel-button {
-  filter: invert(.7);
-  cursor: pointer;
-}
-
-.pin:focus-within .pin-body {
-  background: linear-gradient(180deg, #ffffff 0%, #e4eefb 42%, #bccfe4 100%);
-}
-
-.foot-meta {
+/* ---------- 8. 页脚 ----------
+   .page-foot 本体由 chrome.css 提供（grid + justify-items:center），
+   这里补一句 width:100% 让 __row 撑满，space-between 的两端对齐才生效。 */
+.page-foot__row {
   display: flex;
   align-items: center;
-  gap: clamp(10px, 1.6vw, 20px);
-  font-family: var(--font-hei);
-  font-size: clamp(10px, 1.2vh, 12px);
-  letter-spacing: .08em;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.page-foot__note {
+  font-family: var(--font-serif);
+  font-size: calc(clamp(10px, 1.25vh, 12px) * var(--type-scale));
+  letter-spacing: .24em;
   color: var(--silver-400);
+  opacity: .8;
 }
 
-.foot-meta a {
-  color: var(--silver-300);
-  text-decoration: none;
-  border-bottom: 1px solid rgba(179, 197, 221, .3);
-  padding-bottom: 2px;
-  transition: color .5s ease, border-color .5s ease;
-}
-
-.foot-meta a:hover,
-.foot-meta a:focus-visible {
-  color: var(--silver-50);
-  border-bottom-color: rgba(217, 178, 106, .8);
-}
-
-.foot-meta .sep {
-  width: 1px;
-  height: 10px;
-  background: rgba(179, 197, 221, .26);
-}
-
-/* 检索结果提示 */
-.search-status {
-  min-height: 1.2em;
-  font-family: var(--font-hei);
-  font-size: clamp(10px, 1.2vh, 12px);
-  letter-spacing: .06em;
-  color: rgba(233, 205, 149, .78);
-  text-align: center;
-}
-
-.search-status[data-tone="none"] { color: rgba(216, 154, 146, .86); }
-
-/* ==========================================================================
-   8. 轻提示
-   ========================================================================== */
-.toast {
-  position: fixed;
-  left: 50%;
-  bottom: clamp(24px, 5vh, 48px);
-  transform: translate(-50%, 12px);
-  z-index: 90;
-  max-width: min(440px, 88vw);
-  padding: 12px 20px;
-  border: 1px solid rgba(217, 178, 106, .42);
-  border-radius: 2px;
-  background: rgba(7, 20, 36, .94);
-  color: var(--silver-100);
-  font-family: var(--font-hei);
-  font-size: clamp(11px, 1.3vh, 13px);
-  letter-spacing: .06em;
-  line-height: 1.6;
-  text-align: center;
+/* ---------- 9. 动效 ---------- */
+html.anim .chapter__title,
+html.anim .chapter__lede,
+html.anim .breathe__quote {
   opacity: 0;
-  pointer-events: none;
-  transition: opacity .4s ease, transform .5s var(--ease-soft);
-  backdrop-filter: blur(4px);
+  animation: riseIn 1.6s var(--ease-soft) both;
+}
+html.anim .chapter__title   { animation-delay: .22s; }
+html.anim .chapter__lede    { animation-delay: .46s; }
+html.anim .page-foot { opacity: 0; animation: riseIn 1.6s var(--ease-soft) .3s both; }
+
+/* 树节点卡片：随滚动淡入（由 history.js 加 .is-in） */
+.js-anim .tnode__card {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity .95s var(--ease-soft), transform .95s var(--ease-soft);
+}
+.js-anim .tnode.is-in .tnode__card { opacity: 1; transform: none; }
+
+/* ---------- 10. 自适应 ---------- */
+@media (max-width: 1024px) {
+  .page { max-width: 100%; }
 }
 
-.toast[data-show="1"] {
-  opacity: 1;
-  transform: translate(-50%, 0);
+@media (max-width: 820px) {
+  .page__main { gap: clamp(38px, 7vh, 64px); }
+
+  .stage--page .orn--tl,
+  .stage--page .orn--tr { opacity: .16; }
+  html.anim .stage--page .orn--tl,
+  html.anim .stage--page .orn--tr { animation: none; }
+
+  .chapter__title { font-size: calc(clamp(40px, 13vw, 80px) * var(--type-scale)); }
+  .chapter__lede { max-width: 100%; }
+
+  /* 窄屏：点阵画布回退为单栏文档流，点位 / 细线让位 */
+  .tree-stage { width: 100%; margin-left: 0; height: auto; }
+  .tree-lines { display: none; }
+  .tree-cols, .tree { position: relative; inset: auto; }
+  .tnode {
+    position: relative;
+    left: auto; top: auto;
+    width: auto; height: auto;
+    padding: clamp(20px, 4vh, 34px) clamp(4px, 2vw, 16px);
+  }
+  .tnode::before { display: none; }
+  .tnode__toggle::before { display: block; }
+  .tnode__card {
+    position: relative;
+    top: auto; left: auto; right: auto;
+    width: 100%; padding: 0;
+    background: none; border: 0; border-radius: 0;
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+    box-shadow: none !important;
+  }
+  .tnode__body { position: static; width: auto; }
+  .tnode--flip .tnode__body { bottom: auto; }
+  .tnode__panel { max-height: none; overflow: visible; box-shadow: none; }
+
+  .tnode__name { font-size: clamp(16px, 4.4vw, 20px); }
+  .tnode__text { font-size: 14.5px; line-height: 1.8; }
+  .tnode__brief { font-size: 12.5px; }
+
+  .breathe { padding-inline: clamp(24px, 7vw, 48px); }
+  .breathe__quote { font-size: clamp(18px, 4.4vw, 22px); letter-spacing: .06em; }
+
+  .page-foot__row { justify-content: flex-start; }
 }
 
-/* ==========================================================================
-   9. 自适应
-   ========================================================================== */
-
-/* 中等屏幕：目录变窄，节点间距收紧 */
-@media (max-width: 1080px) {
-  :root {
-    --node-gap: clamp(40px, 5.4vw, 68px);
-    --row-h: clamp(96px, 14vh, 120px);
-  }
+@media (max-width: 480px) {
+  .tnode__type { font-size: 10px; letter-spacing: .1em; }
+  .tnode__name { font-size: 15px; }
+  .tnode__brief { font-size: 12px; }
 }
 
-/* 竖屏 / 平板：改成上下结构，时间轴转为竖向 */
-@media (max-width: 900px) {
-  .page {
-    grid-template-rows: auto auto auto auto;
-    padding: clamp(12px, 1.8vh, 20px) clamp(14px, 4vw, 28px) clamp(16px, 2.4vh, 26px);
-  }
-
-  .page-title { font-size: clamp(38px, 9.6vw, 68px); }
-  .tagline { letter-spacing: .3em; text-indent: .3em; }
-
-  .body {
-    grid-template-columns: minmax(0, 1fr);
-    align-items: start;
-    gap: clamp(12px, 2.6vh, 22px);
-    margin-top: clamp(8px, 2vh, 18px);
-  }
-
-  /* 两本书页并排横放 */
-  .scroll-nav {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: clamp(8px, 2vw, 14px);
-  }
-
-  .book, .book:nth-child(2) { transform: none; }
-
-  .b-title { font-size: clamp(16px, 4.4vw, 21px); }
-
-  /* 时间轴改为纵向：不再横向滚动 */
-  .tl-scroll {
-    overflow: visible;
-    padding-block: 0;
-  }
-
-  .track {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto;
-    row-gap: clamp(20px, 3.4vh, 30px);
-    width: 100%;
-    min-width: 0;
-  }
-
-  .roots { display: none; }
-
-  .branch {
-    grid-column: 1;
-    height: auto;
-    display: block;
-    padding-left: clamp(30px, 7vw, 44px);
-  }
-
-  .branch--legend { grid-row: 1; }
-  .branch--history { grid-row: 2; }
-
-  /* 竖向主干：上暗下亮 */
-  .branch::before {
-    left: clamp(9px, 2.2vw, 13px);
-    right: auto;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    height: auto;
-  }
-
-  .branch--legend::before {
-    background: linear-gradient(180deg, rgba(217, 178, 106, .18), rgba(247, 230, 194, .9));
-  }
-
-  .branch--history::before {
-    background: linear-gradient(180deg, rgba(179, 197, 221, .16), rgba(242, 248, 255, .9));
-  }
-
-  /* 线标签回到横排，落成一个小签，顶在主干上端 */
-  .b-tag {
-    position: static;
-    transform: none;
-    display: inline-block;
-    writing-mode: horizontal-tb;
-    text-orientation: mixed;
-    margin-bottom: .9em;
-    padding: .3em .72em;
-    letter-spacing: .24em;
-    border-left-width: 2px;
-    font-size: clamp(12px, 3.4vw, 15px);
-  }
-
-  .nodes {
-    flex-direction: column;
-    align-items: stretch;
-    gap: clamp(10px, 2.2vh, 16px);
-    padding: 0;
-  }
-
-  .node { justify-content: flex-start; }
-
-  .branch--legend .node-btn { margin: 0; }
-  .branch--history .node-btn { margin: 0; }
-
-  .node-btn {
-    text-align: left;
-    white-space: normal;
-    padding: 6px 0;
-    font-size: clamp(13px, 3.6vw, 15px);
-  }
-
-  /* 点移到左侧主干上 */
-  .dot {
-    left: calc(-1 * clamp(30px, 7vw, 44px) + clamp(9px, 2.2vw, 13px));
-    top: 50%;
-  }
-
-  .node::before { display: none; }
-
-  .tl-arrow { display: none; }
-
-  /* 竖向时卡片贴在节点下方，由 JS 定位 */
-  .page-foot { padding-top: clamp(14px, 2.4vh, 22px); }
-  .pin { width: 100%; }
+/* 脚本缺席时（head 兜底撤掉 js-tree）回退单栏静态全文，避免 12 个浮层叠在一起 */
+html:not(.js-tree) .tree-stage { width: 100%; margin-left: 0; height: auto; }
+html:not(.js-tree) .tree-lines { display: none; }
+html:not(.js-tree) .tree-cols,
+html:not(.js-tree) .tree { position: relative; inset: auto; }
+html:not(.js-tree) .tnode {
+  position: relative; left: auto; top: auto;
+  width: auto; height: auto; padding: 18px 8px;
 }
-
-/* 矮屏笔记本：收紧纵向留白 */
-@media (max-height: 640px) and (min-width: 901px) {
-  .page-title { font-size: clamp(36px, 9vh, 84px); }
-  :root {
-    --row-h: clamp(84px, 13vh, 104px);
-    --row-gap: clamp(20px, 3.4vh, 34px);
-  }
-  .head { padding-block: 2px; }
+html:not(.js-tree) .tnode::before { display: none; }
+html:not(.js-tree) .tnode__toggle::before { display: block; }
+html:not(.js-tree) .tnode__card {
+  position: relative; top: auto; left: auto; right: auto;
+  width: 100%; padding: 0;
+  background: none; border: 0; box-shadow: none;
+  backdrop-filter: none; -webkit-backdrop-filter: none;
 }
+html:not(.js-tree) .tnode__body { position: static; width: auto; }
+html:not(.js-tree) .tnode__panel { max-height: none; overflow: visible; box-shadow: none; }
 
-/* 尊重系统的「减少动态效果」 */
+/* 尊重系统的"减少动态效果" */
 @media (prefers-reduced-motion: reduce) {
-  .tl-arrow { animation: none !important; }
-  .maple { transition: none !important; }
   *, *::before, *::after {
     animation-duration: .001ms !important;
     animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
   }
+  .js-anim .tnode__card { opacity: 1; transform: none; }
+}
+
+/* --------------------------------------------------------------------------
+   根脉图 · 小屏收敛：细枝退到背景，避免与窄栏文字打架
+   -------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  /* 单栏排版下根脉只作开场水印：限定高度避免被超长 stage 拉成细线，
+     以接近原图的比例出现，向下自然淡出，后半段长文留白 */
+  .tree-ink { bottom: auto; height: 1500px; }
+  .tree-ink__art { width: 180%; left: -40%; opacity: .42; filter: none; }
+  .tree-ink__horizon { left: 0; right: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tree-ink__art { filter: none; }
 }

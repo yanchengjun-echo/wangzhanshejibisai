@@ -1,301 +1,162 @@
 /* ==========================================================================
-   枫启长歌 — 交互脚本
-   职责：
-   1. 时间轴：滚轮上下 = 内容左右（仅指针在时间轴内生效），右侧箭头提示
-   2. 节点：悬停 / 键盘聚焦时展开枫叶卡片，内容取自节点数据
-   3. 检索：按节点名称与年代过滤，覆盖输入 / 有结果 / 无结果三种状态
-   4. 未制作的页面：给出简短提示，不留无响应的控件
-   所有内容均来自 HTML 里的节点数据，本文件不写死任何史实文案。
+   银绣山河 — 枫启长歌页交互
+   1) 谱系节点：12 个点严格落在手绘草图的点位上，细线连接，文字挂在点旁
+   2) 点击条目：详情以浮层挂在该点卡片下方（底部三点向上弹），不撑开点阵
+   3) 当前节点标记：朱红竖线跟着"你点开的那一节"，全页唯一一处刺绣色
+   4) 深链：#node-xxx 直达并自动展开，URL 跟着"打开的那个节点"走
+   5) 点阵随页面自然向下滚动，节点卡片随页面滚动依次渐显
+
+   原则：
+   · 脚本不承重。折叠由 html.js-tree 控制，类不加就是全展开的静态页；
+     2.5 秒内本文件没执行，head 里的兜底会把 js-tree 撤掉。
+   · 单开（手风琴）：同时只展开一个节点，视觉焦点唯一。
+   · 点标题文字（.tnode__toggle 按钮）即可展开，无加减号图标；点位的金/银小圆由 CSS 绘制，不参与交互。
    ========================================================================== */
 (function () {
   'use strict';
 
-  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var root = document.documentElement;
+  window.__treeReady = true;
 
-  var tlScroll = document.getElementById('tlScroll');
-  var tlArrow = document.getElementById('tlArrow');
-  var nodes = Array.prototype.slice.call(document.querySelectorAll('.node'));
-  var maple = document.getElementById('maple');
-  var cardLayer = document.getElementById('cardLayer');
-  var mKicker = document.getElementById('mKicker');
-  var mTitle = document.getElementById('mTitle');
-  var mDesc = document.getElementById('mDesc');
-  var mKw = document.getElementById('mKw');
-  var toastEl = document.getElementById('toast');
-  var pinForm = document.getElementById('pinSearch');
-  var pinInput = document.getElementById('pinInput');
-  var searchStatus = document.getElementById('searchStatus');
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var motionOK = !reduceMotion.matches;
 
-  /* ---------------------------------------------------------------------
-     轻提示
-     --------------------------------------------------------------------- */
-  var toastTimer = null;
-  function toast(msg) {
-    toastEl.textContent = msg;
-    toastEl.setAttribute('data-show', '1');
-    window.clearTimeout(toastTimer);
-    toastTimer = window.setTimeout(function () {
-      toastEl.removeAttribute('data-show');
-    }, 2600);
-  }
+  var nodes = Array.prototype.slice.call(document.querySelectorAll('.tnode'));
+  if (!nodes.length) return;
 
-  /* ---------------------------------------------------------------------
-     1. 时间轴滚轮横向浏览
-     --------------------------------------------------------------------- */
-  function maxScroll() {
-    return Math.max(0, tlScroll.scrollWidth - tlScroll.clientWidth);
-  }
+  if (!root.classList.contains('js-tree')) root.classList.add('js-tree');
+  if (motionOK) root.classList.add('js-anim');
 
-  function syncArrow() {
-    if (!tlArrow) return;
-    tlArrow.setAttribute('data-done', tlScroll.scrollLeft >= maxScroll() - 2 ? '1' : '0');
-  }
-
-  if (tlScroll) {
-    // 只有指针位于时间轴区域时才拦截滚轮；页面本身仍然可以正常上下滚动
-    tlScroll.addEventListener('wheel', function (e) {
-      if (maxScroll() <= 0) return;
-      // 触控板的横向手势交给浏览器原生处理
-      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
-
-      var before = tlScroll.scrollLeft;
-      var next = before + e.deltaY;
-      tlScroll.scrollLeft = next;
-
-      // 已经滚到头，就把滚动权交回页面
-      if (tlScroll.scrollLeft !== before) {
-        e.preventDefault();
-        syncArrow();
-      }
-    }, { passive: false });
-
-    tlScroll.addEventListener('scroll', function () {
-      syncArrow();
-      if (openNode) positionCard(openNode);
-    }, { passive: true });
-
-    // 方向键 / Home / End 也能驱动横向浏览
-    tlScroll.addEventListener('keydown', function (e) {
-      var step = tlScroll.clientWidth * 0.7;
-      if (e.key === 'ArrowRight') { tlScroll.scrollBy({ left: step, behavior: reduceMotion ? 'auto' : 'smooth' }); e.preventDefault(); }
-      if (e.key === 'ArrowLeft') { tlScroll.scrollBy({ left: -step, behavior: reduceMotion ? 'auto' : 'smooth' }); e.preventDefault(); }
-      if (e.key === 'Home') { tlScroll.scrollTo({ left: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); e.preventDefault(); }
-      if (e.key === 'End') { tlScroll.scrollTo({ left: maxScroll(), behavior: reduceMotion ? 'auto' : 'smooth' }); e.preventDefault(); }
-    });
-  }
-
-  if (tlArrow) {
-    tlArrow.addEventListener('click', function () {
-      tlScroll.scrollBy({
-        left: tlScroll.clientWidth * 0.7,
-        behavior: reduceMotion ? 'auto' : 'smooth'
-      });
-    });
-  }
-
-  /* ---------------------------------------------------------------------
-     2. 枫叶卡片
-     --------------------------------------------------------------------- */
-  var openNode = null;
-  var closeTimer = null;
-
-  function readData(node) {
-    var btn = node.querySelector('.node-btn');
-    var nm = btn.querySelector('.nm');
-    var era = btn.querySelector('.era');
+  /* ---------- 节点开关 ---------- */
+  var items = nodes.map(function (li) {
     return {
-      line: node.getAttribute('data-line') === 'legend' ? '传说线' : '信史线',
-      name: (nm && nm.textContent.trim()) || '事件名称待补',
-      era: (era && era.textContent.trim()) || '年代待补',
-      summary: node.getAttribute('data-summary') || '',
-      keywords: (node.getAttribute('data-keywords') || '').split(/[、,，]/).filter(Boolean),
-      href: node.getAttribute('data-href') || '',
-      empty: node.classList.contains('is-empty')
+      li: li,
+      btn: li.querySelector('.tnode__toggle'),
+      body: li.querySelector('.tnode__body'),
+      isMyth: li.classList.contains('tnode--myth')
     };
+  }).filter(function (it) { return it.btn && it.body; });
+
+  function setOpen(item, open) {
+    open = !!open;
+    if (open === item.li.classList.contains('is-open')) return;
+    item.li.classList.toggle('is-open', open);
+    item.btn.setAttribute('aria-expanded', open ? 'true' : 'false');
   }
 
-  function fillCard(node) {
-    var d = readData(node);
-    var index = Array.prototype.indexOf.call(node.parentNode.children, node) + 1;
-
-    mKicker.textContent = d.line + ' · 第 ' + index + ' 节';
-    mTitle.textContent = d.empty ? '事件名称待补' : d.name;
-
-    if (d.empty) {
-      // 占位态给出填写指引，读起来是提示而不是正文
-      mDesc.textContent = '此处填写：事件名称、起止年代、起因经过结果、对后世的影响。';
-      maple.setAttribute('data-empty', '1');
-    } else {
-      mDesc.textContent = d.summary || (d.era + '　' + d.name);
-      maple.removeAttribute('data-empty');
+  function setHash(id) {
+    try {
+      var url = window.location.pathname + window.location.search + (id ? '#' + id : '');
+      window.history.replaceState(null, '', url);
+    } catch (e) {
+      /* file:// 下部分浏览器禁止 replaceState，深链降级为不可分享，不影响阅读 */
     }
-
-    mKw.innerHTML = '';
-    var kws = d.keywords.length ? d.keywords : ['人物', '非遗', '习俗'];
-    kws.forEach(function (k) {
-      var li = document.createElement('li');
-      li.textContent = k;
-      mKw.appendChild(li);
-    });
-
-    document.getElementById('mLink').textContent = d.href ? '查看详情 →' : '详情页待制作 →';
   }
 
-  function cardSize() {
-    // 先显示出来再量，否则拿到的是 0
-    return { w: maple.offsetWidth, h: maple.offsetHeight };
-  }
-
-  function positionCard(node) {
-    var r = node.getBoundingClientRect();
-    var size = cardSize();
-    var gap = 18;
-    var isLegend = node.getAttribute('data-line') === 'legend';
-    var vw = window.innerWidth;
-    var vh = window.innerHeight;
-
-    // 页头（标题 + 标语）底部，卡片不许盖到它
-    var head = document.querySelector('.head');
-    var safeTop = head ? head.getBoundingClientRect().bottom + 6 : 12;
-
-    // 默认：传说线卡片向上、信史线向下
-    var above = isLegend;
-    var top = above ? r.top - size.h - gap : r.bottom + gap;
-
-    // 上方放不下（会压到标题）就翻到节点下方；下方也放不下就翻回上方
-    if (above && top < safeTop) {
-      var belowTop = r.bottom + gap;
-      if (belowTop + size.h < vh - 10) {
-        top = belowTop;
+  items.forEach(function (item) {
+    item.btn.addEventListener('click', function () {
+      var willOpen = !item.li.classList.contains('is-open');
+      items.forEach(function (other) {
+        if (other !== item) setOpen(other, false);
+      });
+      setOpen(item, willOpen);
+      if (willOpen) {
+        mark(item.li);
+        lastOpened = item.btn;
+        setHash(item.li.id);
       } else {
-        top = Math.max(safeTop, r.top - size.h - gap);
-      }
-    } else if (!above && top + size.h > vh - 10) {
-      top = r.top - size.h - gap;
-    }
-
-    var left = r.left + r.width / 2 - size.w / 2;
-    left = Math.max(10, Math.min(left, vw - size.w - 10));
-    top = Math.max(safeTop, Math.min(top, vh - size.h - 10));
-
-    maple.style.left = Math.round(left) + 'px';
-    maple.style.top = Math.round(top) + 'px';
-  }
-
-  function openCard(node) {
-    window.clearTimeout(closeTimer);
-    if (openNode && openNode !== node) openNode.classList.remove('is-active');
-
-    openNode = node;
-    node.classList.add('is-active');
-    fillCard(node);
-    positionCard(node);
-    maple.setAttribute('data-open', '1');
-  }
-
-  function closeCard() {
-    if (openNode) openNode.classList.remove('is-active');
-    openNode = null;
-    maple.setAttribute('data-open', '0');
-  }
-
-  function scheduleClose() {
-    window.clearTimeout(closeTimer);
-    closeTimer = window.setTimeout(closeCard, 180);
-  }
-
-  nodes.forEach(function (node) {
-    var btn = node.querySelector('.node-btn');
-
-    node.addEventListener('mouseenter', function () { openCard(node); });
-    node.addEventListener('mouseleave', scheduleClose);
-
-    // 键盘聚焦同样能展开卡片
-    btn.addEventListener('focus', function () { openCard(node); });
-    btn.addEventListener('blur', function () { scheduleClose(); });
-
-    // 回车 = 打开详情；详情页未制作时给出提示而不是无响应
-    btn.addEventListener('click', function () {
-      var d = readData(node);
-      if (d.href) {
-        window.location.href = d.href;
-      } else {
-        toast('「' + (d.empty ? '该节点' : d.name) + '」详情页尚未制作，等待内容补充');
+        mark(null);
+        setHash('');
       }
     });
   });
 
-  if (maple) {
-    maple.addEventListener('mouseenter', function () { window.clearTimeout(closeTimer); });
-    maple.addEventListener('mouseleave', scheduleClose);
-  }
-
+  /* Esc 收回全部，焦点还给最后打开的那个开关 */
+  var lastOpened = null;
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && openNode) closeCard();
-  });
-
-  window.addEventListener('resize', function () {
-    if (openNode) positionCard(openNode);
-    syncArrow();
-  });
-
-  /* ---------------------------------------------------------------------
-     3. 检索
-     --------------------------------------------------------------------- */
-  function runSearch(query) {
-    var q = query.trim().toLowerCase();
-
-    if (!q) {
-      nodes.forEach(function (n) { n.classList.remove('is-hidden'); });
-      searchStatus.textContent = '';
-      searchStatus.removeAttribute('data-tone');
-      closeCard();
-      return;
-    }
-
-    var hits = 0;
-    nodes.forEach(function (node) {
-      var btn = node.querySelector('.node-btn');
-      var text = btn.textContent.toLowerCase() + ' ' +
-                 (node.getAttribute('data-keywords') || '').toLowerCase() + ' ' +
-                 (node.getAttribute('data-summary') || '').toLowerCase();
-      var hit = text.indexOf(q) !== -1;
-      node.classList.toggle('is-hidden', !hit);
-      if (hit) hits++;
+    if (e.key !== 'Escape') return;
+    var any = false;
+    items.forEach(function (it) {
+      if (it.li.classList.contains('is-open')) { setOpen(it, false); any = true; }
     });
-
-    if (hits > 0) {
-      searchStatus.textContent = '检索「' + query.trim() + '」· 命中 ' + hits + ' 个节点';
-      searchStatus.removeAttribute('data-tone');
-    } else {
-      searchStatus.textContent = '暂未匹配到「' + query.trim() + '」· 内容尚在补充，可先沿时间轴浏览';
-      searchStatus.setAttribute('data-tone', 'none');
+    if (any) {
+      mark(null);
+      setHash('');
+      if (lastOpened) lastOpened.focus();
     }
-    syncArrow();
+  });
+
+  /* ---------- 当前节点：你点开在读的那一节 ---------- */
+  var current = null;
+
+  function mark(el) {
+    if (el === current) return;
+    if (current) current.classList.remove('is-current');
+    current = el;
+    if (el) el.classList.add('is-current');
   }
 
-  if (pinForm) {
-    pinForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-      runSearch(pinInput.value);
-    });
-    pinInput.addEventListener('input', function () {
-      // 输入即筛选；清空时恢复全部节点
-      if (pinInput.value === '') runSearch('');
-    });
-    pinInput.addEventListener('search', function () { runSearch(pinInput.value); });
+  /* ---------- 卡片渐显：随页面滚动 ---------- */
+  var raf = 0;
+
+  function frame() {
+    raf = 0;
+    var vh = window.innerHeight;
+    var revealLine = vh * 0.92;
+
+    for (var i = 0; i < nodes.length; i++) {
+      var card = nodes[i].querySelector('.tnode__card');
+      if (!card) continue;
+      var top = card.getBoundingClientRect().top;
+      if (top < revealLine && !nodes[i].classList.contains('is-in')) {
+        nodes[i].classList.add('is-in');
+      }
+    }
   }
 
-  /* ---------------------------------------------------------------------
-     4. 未制作页面 / 目录的占位响应
-     --------------------------------------------------------------------- */
-  Array.prototype.forEach.call(document.querySelectorAll('[data-todo]'), function (el) {
-    el.addEventListener('click', function (e) {
-      e.preventDefault();
-      toast('「' + el.getAttribute('data-todo') + '」页面尚未制作，将在内容补齐后开放');
-    });
-  });
+  function schedule() {
+    if (raf) return;
+    raf = window.requestAnimationFrame(frame);
+  }
 
-  // 首屏同步一次箭头状态
-  syncArrow();
+  window.addEventListener('scroll', schedule, { passive: true });
+  window.addEventListener('resize', schedule, { passive: true });
+
+  /* ---------- 首屏与深链 ---------- */
+  var hash = window.location.hash.slice(1);
+  var target = hash ? document.getElementById(hash) : null;
+  var deep = null;
+
+  if (target) {
+    items.forEach(function (it) { if (it.li === target) deep = it; });
+  }
+
+  if (deep) {
+    setOpen(deep, true);
+    mark(deep.li);
+    lastOpened = deep.btn;
+    window.setTimeout(function () {
+      /* 点阵是一整张构图：深链不再把单个点拉到视口顶端（那会推出大片空白），
+         而是滚到画布上缘，让读者先看见整张点线关系，再看展开的浮层。 */
+      var stage = document.getElementById('tree-stage');
+      if (stage) {
+        var y = stage.getBoundingClientRect().top + window.pageYOffset - 24;
+        if (motionOK) window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+        else window.scrollTo(0, Math.max(0, y));
+      }
+      frame();
+    }, 120);
+  } else {
+    frame();
+  }
+
+  /* 用户中途把系统动效关掉时，别把内容锁在隐藏态 */
+  if (reduceMotion.addEventListener) {
+    reduceMotion.addEventListener('change', function (evt) {
+      if (evt.matches) {
+        root.classList.remove('js-anim');
+        nodes.forEach(function (n) { n.classList.add('is-in'); });
+      }
+    });
+  }
 })();
