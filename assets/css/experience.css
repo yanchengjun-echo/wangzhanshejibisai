@@ -927,3 +927,210 @@ body.exp-root::before {
   .intro__hint i { animation: none; }
   html { scroll-behavior: auto; }
 }
+
+/* ==========================================================================
+   14. 蜡染画布 + 苗绣绣绷
+   ========================================================================== */
+
+/* hidden 在 flex/grid 容器里会被 display 覆盖，统一兜底 */
+[hidden] { display: none !important; }
+
+/* 14.1 画布容器 */
+.canvas-wrap {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 蜡染双层 canvas 叠放 */
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;   /* 触屏画蜡时不滚动页面 */
+}
+.canvas--fabric { border-radius: inherit; }
+.canvas--blue { pointer-events: none; }
+
+.canvas-hint {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(14px, 2.4vh, 26px);
+  transform: translateX(-50%);
+  margin: 0;
+  padding: .5em 1em;
+  border-radius: 999px;
+  background: rgba(10, 18, 25, .55);
+  border: 1px solid var(--exp-line-soft);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  font-size: 11.5px;
+  letter-spacing: .1em;
+  color: var(--exp-text-dim);
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity .5s var(--exp-ease);
+  white-space: nowrap;
+}
+.canvas-hint.is-gone { opacity: 0; }
+
+/* 14.2 虚拟绣绷
+   木圈和布面都画在 SVG 里（见 experience.html），
+   preserveAspectRatio 保证任何容器比例下都是正圆，不会像 CSS 圆环那样被拉成椭圆 */
+.hoop {
+  position: absolute;
+  inset: clamp(12px, 1.8vw, 30px);
+  display: grid;
+  place-items: center;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cline x1='7' y1='25' x2='24' y2='7' stroke='%23454F5C' stroke-width='2.4' stroke-linecap='round'/%3E%3Cellipse cx='22.4' cy='8.6' rx='1.5' ry='2.6' transform='rotate(45 22.4 8.6)' fill='%23F5F5F0' stroke='%23454F5C' stroke-width='1.1'/%3E%3Cline x1='7' y1='25' x2='3' y2='29' stroke='%23C23B22' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E") 7 25, crosshair;
+  touch-action: none;
+}
+
+/* 尺寸由 embroidery.js 的 fitHoop() 按容器短边精确设定（正方形），
+   SVG 的 aspect-ratio 在替换元素上不可靠，容易把圆拉成椭圆 */
+.hoop-svg {
+  display: block;
+  overflow: visible;
+  filter: drop-shadow(0 18px 40px rgba(0, 0, 0, .48));
+}
+
+/* 木绷圈 */
+.hoop-wood {
+  fill: #6B4A2E;
+}
+.hoop-wood-inner {
+  fill: none;
+  stroke: rgba(255, 226, 186, .28);
+  stroke-width: 2.5;
+}
+
+/* 绷紧的坯布 */
+.hoop-cloth {
+  stroke: rgba(107, 74, 46, .35);
+  stroke-width: 1.5;
+}
+
+/* 底样引导线 */
+.hoop-guide {
+  fill: none;
+  stroke: rgba(107, 74, 46, .26);
+  stroke-width: 1.4;
+  stroke-dasharray: 3 5;
+}
+.hoop-guide circle { stroke-dasharray: none; opacity: .5; }
+
+/* 背扇外轮廓 */
+.hoop-outline {
+  fill: none;
+  stroke: rgba(107, 74, 46, .5);
+  stroke-width: 2;
+}
+
+/* 14.3 针法演示小图 */
+.stitch-demo {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border-radius: var(--exp-radius-sm);
+  background: rgba(20, 33, 46, .5);
+  border: 1px solid var(--exp-line-soft);
+}
+.stitch-demo__row {
+  display: grid;
+  grid-template-columns: 46px 1fr;
+  align-items: center;
+  gap: 8px;
+}
+.stitch-demo__name {
+  font-size: 11px;
+  letter-spacing: .06em;
+  color: var(--exp-text-mute);
+}
+.stitch-demo svg { width: 100%; height: 34px; display: block; }
+.stitch-demo .demo-cloth {
+  fill: #F7F3E7;
+  stroke: rgba(107, 74, 46, .18);
+  stroke-width: 1;
+  rx: 3;
+}
+.stitch-demo .demo-stitch {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.stitch-demo .demo-seed { stroke: none; }
+
+/* 平绣演示：斜针依次亮起，像一根针从右往左走 */
+.stitch-demo .demo-flat line {
+  stroke: var(--exp-red);
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  opacity: .2;
+  animation: demoFlatStitch 3.8s var(--exp-ease) infinite;
+  animation-delay: var(--d, 0s);
+}
+@keyframes demoFlatStitch {
+  0%, 10%   { opacity: .18; }
+  18%, 70%  { opacity: 1; }
+  84%, 100% { opacity: .18; }
+}
+
+/* 打籽绣演示：籽一粒粒鼓起 */
+.stitch-demo .demo-seed circle {
+  fill: var(--exp-purple-soft);
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: demoSeedStitch 3.8s var(--exp-ease) infinite;
+  animation-delay: var(--d, 0s);
+}
+@keyframes demoSeedStitch {
+  0%, 8%    { transform: scale(.15); opacity: 0; }
+  20%, 72%  { transform: scale(1); opacity: 1; }
+  86%, 100% { transform: scale(.15); opacity: 0; }
+}
+
+/* 14.4 面板说明文字 */
+.panel__note {
+  margin: .85em 0 0;
+  font-size: 11.5px;
+  line-height: 1.7;
+  letter-spacing: .04em;
+  color: var(--exp-text-mute);
+  min-height: 1.7em;
+}
+.panel__note.is-warn { color: #E8A08C; }
+.panel__note.is-ok { color: #9FC9A8; }
+
+/* 14.5 预览框里的缩略画布 */
+.preview-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.preview-label {
+  position: absolute;
+  left: 50%;
+  bottom: 6px;
+  transform: translateX(-50%);
+  font-size: 10px;
+  letter-spacing: .18em;
+  text-indent: .18em;
+  color: rgba(107, 74, 46, .7);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* 14.6 窄屏：绣绷高度自适应 */
+@media (max-width: 860px) {
+  .hoop { inset: 6px; }
+  .hoop::before { border-width: 7px; }
+  .hoop::after { inset: 7px; }
+  .canvas-hint { font-size: 10.5px; padding: .45em .85em; }
+}

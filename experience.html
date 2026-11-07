@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#0A1219">
 <meta name="color-scheme" content="dark">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a1f38'/%3E%3Ccircle cx='16' cy='16' r='9.5' fill='none' stroke='%23dce6f3' stroke-width='1.5' stroke-dasharray='1.6 2.4'/%3E%3Cpath d='M10.5 18.5c3-4.6 8.4-4.2 11-1.2-2.2-4.6-7.6-4.4-9.2-2.4' fill='%23dce6f3'/%3E%3C/svg%3E">
-<link rel="canonical" href="https://example.com/experience.html">
+<link rel="canonical" href="https://yinxue-shanhe.app.workbuddy.host/experience.html">
 
 <!-- Open Graph -->
 <meta property="og:type" content="website">
@@ -126,7 +126,7 @@
 </section>
 
 <!-- ======================================================================
-     工作台（第 3-5 步接入蜡染 / 苗绣 Canvas）
+     工作台：蜡染（画蜡 → 浸染 → 冰裂）与苗绣（虚拟绣绷）
      ====================================================================== -->
 <div class="exp-page" id="workbench">
 
@@ -141,47 +141,148 @@
 
     <!-- 左：工具面板 -->
     <aside class="exp-side exp-side--left" aria-label="创作工具">
+
       <section class="panel">
         <h2 class="panel__title">体验模式</h2>
         <div class="seg" role="group" aria-label="选择体验模式">
-          <button class="seg__item" type="button" aria-pressed="true">蜡染</button>
-          <button class="seg__item" type="button" aria-pressed="false">苗绣</button>
+          <button class="seg__item" type="button" data-mode="dye" aria-pressed="true">蜡染</button>
+          <button class="seg__item" type="button" data-mode="embroidery" aria-pressed="false">苗绣</button>
+        </div>
+      </section>
+
+      <!-- 蜡染工具 -->
+      <section class="panel" data-panel="dye">
+        <h2 class="panel__title">笔触粗细</h2>
+        <div class="seg" role="group" aria-label="笔触粗细">
+          <button class="seg__item" type="button" data-wax-width="4" aria-pressed="false">细</button>
+          <button class="seg__item" type="button" data-wax-width="6" aria-pressed="true">中</button>
+          <button class="seg__item" type="button" data-wax-width="10" aria-pressed="false">粗</button>
         </div>
         <hr class="panel__rule">
         <h2 class="panel__title">工序</h2>
-        <ol class="steps" aria-label="蜡染工序进度">
-          <li class="step is-active"><span class="step__dot"></span>画蜡</li>
-          <li class="step"><span class="step__dot"></span>浸染</li>
-          <li class="step"><span class="step__dot"></span>冰裂</li>
+        <ol class="steps" id="dyeSteps" aria-label="蜡染工序进度">
+          <li class="step is-active" data-step="waxing"><span class="step__dot"></span>画蜡</li>
+          <li class="step" data-step="dyeing"><span class="step__dot"></span>浸染</li>
+          <li class="step" data-step="cracking"><span class="step__dot"></span>冰裂</li>
         </ol>
       </section>
+
+      <!-- 苗绣工具 -->
+      <section class="panel" data-panel="embroidery" hidden>
+        <h2 class="panel__title">针法</h2>
+        <div class="seg" role="group" aria-label="选择针法">
+          <button class="seg__item" type="button" data-stitch="flat" aria-pressed="true">平绣</button>
+          <button class="seg__item" type="button" data-stitch="seed" aria-pressed="false">打籽绣</button>
+        </div>
+        <hr class="panel__rule">
+        <h2 class="panel__title">丝线颜色</h2>
+        <div class="swatches" id="threadSwatches" role="group" aria-label="丝线颜色">
+          <button class="swatch" type="button" style="--c:#C23B22" data-color="#C23B22" aria-pressed="true"  aria-label="苗绣红"></button>
+          <button class="swatch" type="button" style="--c:#5B2C6F" data-color="#5B2C6F" aria-pressed="false" aria-label="苗绣紫"></button>
+          <button class="swatch" type="button" style="--c:#D9A03C" data-color="#D9A03C" aria-pressed="false" aria-label="姜黄"></button>
+          <button class="swatch" type="button" style="--c:#2E7D6B" data-color="#2E7D6B" aria-pressed="false" aria-label="松绿"></button>
+          <button class="swatch" type="button" style="--c:#1F4E79" data-color="#1F4E79" aria-pressed="false" aria-label="靛蓝"></button>
+          <button class="swatch" type="button" style="--c:#E8E4D8" data-color="#E8E4D8" aria-pressed="false" aria-label="素白"></button>
+        </div>
+        <hr class="panel__rule">
+        <h2 class="panel__title">针法演示</h2>
+        <div class="stitch-demo" id="stitchDemo" aria-hidden="true"></div>
+      </section>
+
     </aside>
 
     <!-- 中：画布舞台 -->
-    <section class="exp-stage" aria-label="创作画布">
-      <div style="flex:1;display:grid;place-items:center;color:var(--exp-text-mute);font-size:13px;letter-spacing:.08em;">
-        画布区域（第 3 步接入 Canvas）
+    <section class="exp-stage" id="expStage" aria-label="创作画布">
+
+      <!-- 蜡染：双层 canvas（底层素布+蜡迹 / 上层靛蓝遮罩） -->
+      <div class="canvas-wrap" data-canvas="dye">
+        <canvas id="dyeFabric" class="canvas canvas--fabric"></canvas>
+        <canvas id="dyeBlue" class="canvas canvas--blue"></canvas>
+        <p class="canvas-hint" id="dyeHint">按住并拖动，在素布上画一笔蜡</p>
       </div>
+
+      <!-- 苗绣：虚拟绣绷 -->
+      <div class="canvas-wrap" data-canvas="embroidery" hidden>
+        <div class="hoop" id="embroideryHoop">
+          <svg class="hoop-svg" id="hoopSvg" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <!-- 布面质感：径向渐变模拟绷紧的坯布受光 -->
+              <radialGradient id="hoopClothGrad" cx="34%" cy="27%" r="78%">
+                <stop offset="0" stop-color="#FCFAF2" />
+                <stop offset=".55" stop-color="#F0EADA" />
+                <stop offset="1" stop-color="#DCD2BA" />
+              </radialGradient>
+
+              <!-- 可绣区域：背扇轮廓，超出部分被裁掉 -->
+              <clipPath id="hoopClip">
+                <path d="M300 96 C 402 96 478 156 478 252 C 478 362 400 452 300 508
+                         C 200 452 122 362 122 252 C 122 156 198 96 300 96 Z" />
+              </clipPath>
+            </defs>
+
+            <!-- 木绷圈：外圈木色 + 内侧高光，整体 600×600 等比缩放，永远是正圆 -->
+            <circle class="hoop-wood" cx="300" cy="300" r="292" />
+            <circle class="hoop-wood-inner" cx="300" cy="300" r="279" />
+
+            <!-- 绷紧的坯布 -->
+            <circle class="hoop-cloth" cx="300" cy="300" r="279" fill="url(#hoopClothGrad)" />
+
+            <!-- 底样引导线 -->
+            <g class="hoop-guide">
+              <path d="M300 152 C 356 206 356 320 300 398 C 244 320 244 206 300 152 Z" />
+              <circle cx="300" cy="276" r="58" />
+              <path d="M300 208 L 300 344" />
+              <path d="M232 276 L 368 276" />
+            </g>
+
+            <!-- 背扇外轮廓 -->
+            <path class="hoop-outline"
+                  d="M300 96 C 402 96 478 156 478 252 C 478 362 400 452 300 508
+                     C 200 452 122 362 122 252 C 122 156 198 96 300 96 Z" />
+
+            <!-- 针迹层：clip 到背扇轮廓内 -->
+            <g id="stitchLayer" clip-path="url(#hoopClip)"></g>
+          </svg>
+        </div>
+        <p class="canvas-hint" id="hoopHint">在绣绷上移动鼠标，一针一针走线</p>
+      </div>
+
     </section>
 
     <!-- 右：预览与操作 -->
     <aside class="exp-side exp-side--right" aria-label="实时预览与操作">
+
       <section class="panel">
         <h2 class="panel__title">实时预览</h2>
-        <div class="preview-box"></div>
+        <div class="preview-box">
+          <canvas id="previewCanvas" class="preview-canvas"></canvas>
+          <span class="preview-label" id="previewLabel">素坯</span>
+        </div>
       </section>
-      <section class="panel">
+
+      <section class="panel" data-panel="dye">
         <h2 class="panel__title">操作</h2>
-        <button class="btn btn--primary btn--block" type="button">浸入染缸</button>
+        <button class="btn btn--primary btn--block" type="button" id="btnDye">浸入染缸</button>
         <hr class="panel__rule">
-        <button class="btn btn--block" type="button">重新开始</button>
+        <button class="btn btn--block" type="button" id="btnReset">重新开始</button>
+        <p class="panel__note" id="dyeNote" role="status" aria-live="polite"></p>
       </section>
+
+      <section class="panel" data-panel="embroidery" hidden>
+        <h2 class="panel__title">操作</h2>
+        <button class="btn btn--primary btn--block" type="button" id="btnStitchClear">清空针迹</button>
+        <p class="panel__note" id="stitchCount" role="status" aria-live="polite">已绣 0 针</p>
+      </section>
+
     </aside>
 
   </div>
 </div>
 
 <script src="assets/js/intro.js"></script>
+<script src="assets/js/studio.js"></script>
+<script src="assets/js/dye.js"></script>
+<script src="assets/js/embroidery.js"></script>
 <script src="assets/js/bgm.js"></script>
 </body>
 </html>
