@@ -22,6 +22,13 @@
 <link rel="stylesheet" href="assets/css/experience.css">
 <link rel="stylesheet" href="assets/css/bgm.css">
 <link rel="stylesheet" href="assets/css/chrome.css">
+
+<!-- 入口屏入场动画开关：脚本确认能跑才挂，动画没跑起来时内容也完整可见 -->
+<script>
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.documentElement.classList.add('intro-anim');
+  }
+</script>
 </head>
 <body class="exp-root">
 
@@ -45,104 +52,311 @@
 </header>
 
 <!-- ======================================================================
-     入口屏：滚动联动
-     左 素布 —— 朱红丝线随滚动游走，针尖由 intro.js 用 getPointAtLength 贴住线头
-     中 标题 —— 「巧手成纹」+ 两个入口按钮
-     右 染缸 —— 靛蓝染液上涨，同心涟漪渐起
+     入口屏：双分屏门户
+     左 数字蜡染（靛蓝布）  右 数字苗绣（朱红布）
+     中央银环徽章压在分缝上，苗纹线稿在布面上缓慢漂移
+     整块门户可点，点击后广播 exp:enter 并滚到工作台
      ====================================================================== -->
+
+<!-- 纹样库：只定义 symbol，不参与渲染 -->
+<svg class="motif-defs" width="0" height="0" aria-hidden="true" focusable="false">
+  <defs>
+    <!-- 蜡染凤鸟（长飘带尾，仿参考图 241 的排线风格） -->
+    <symbol id="miao-phoenix" viewBox="0 0 560 300">
+      <g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+        <!-- 三条长飘带尾：平行带 + 横格排线 -->
+        <g stroke-width="1.7">
+          <path d="M250 150 C 170 138, 90 140, 14 158"/>
+          <path d="M250 158 C 170 150, 92 154, 16 174"/>
+          <path d="M250 166 C 172 162, 96 168, 22 190"/>
+        </g>
+        <g stroke-width="1.2">
+          <path d="M232 144 l 2 20"/><path d="M212 143 l 2 21"/><path d="M192 142 l 2 22"/>
+          <path d="M172 142 l 2 22"/><path d="M152 142 l 2 23"/><path d="M132 143 l 2 23"/>
+          <path d="M112 145 l 2 23"/><path d="M92 147 l 2 23"/><path d="M72 150 l 2 22"/>
+          <path d="M52 153 l 2 22"/><path d="M34 157 l 1 20"/>
+        </g>
+        <!-- 上扬尾羽 -->
+        <g stroke-width="1.5">
+          <path d="M258 138 C 220 84, 170 52, 108 44"/>
+          <path d="M264 134 C 230 76, 184 42, 126 30"/>
+          <path d="M270 130 C 242 70, 202 34, 148 18"/>
+          <path d="M252 146 C 226 104, 188 78, 140 68"/>
+        </g>
+        <!-- 下垂尾羽 -->
+        <g stroke-width="1.5">
+          <path d="M254 172 C 216 216, 168 240, 112 246"/>
+          <path d="M258 178 C 226 228, 184 254, 132 262"/>
+          <path d="M250 180 C 210 212, 168 230, 122 232"/>
+        </g>
+        <!-- 身体 -->
+        <path d="M252 142 C 296 110, 360 104, 404 130 C 436 150, 442 188, 416 210 C 382 238, 306 234, 268 208 C 240 188, 236 162, 252 142 Z"/>
+        <!-- 鳞片羽 -->
+        <g stroke-width="1.4">
+          <path d="M292 150 q 15 -13 30 0 q -15 13 -30 0 Z"/>
+          <path d="M330 146 q 15 -13 30 0 q -15 13 -30 0 Z"/>
+          <path d="M368 150 q 15 -13 30 0 q -15 13 -30 0 Z"/>
+          <path d="M302 176 q 15 -13 30 0 q -15 13 -30 0 Z"/>
+          <path d="M342 176 q 15 -13 30 0 q -15 13 -30 0 Z"/>
+          <path d="M380 178 q 14 -12 28 0 q -14 12 -28 0 Z"/>
+          <path d="M320 200 q 14 -12 28 0 q -14 12 -28 0 Z"/>
+          <path d="M358 200 q 14 -12 28 0 q -14 12 -28 0 Z"/>
+        </g>
+        <!-- 翅膀 -->
+        <path d="M330 134 C 352 86, 408 58, 466 54 C 430 82, 408 112, 398 148"/>
+        <g stroke-width="1.4">
+          <path d="M344 128 C 366 96, 406 74, 444 66"/>
+          <path d="M356 136 C 378 106, 414 86, 448 78"/>
+          <path d="M366 144 C 386 118, 416 100, 446 92"/>
+        </g>
+        <!-- 头与冠 -->
+        <path d="M404 130 C 416 108, 440 100, 460 110 C 474 118, 476 136, 464 146 C 452 156, 430 154, 418 144"/>
+        <circle cx="452" cy="124" r="3.2"/>
+        <path d="M464 116 C 476 100, 492 94, 508 98"/>
+        <path d="M458 108 C 466 90, 478 80, 494 76"/>
+        <path d="M450 104 C 452 86, 462 74, 476 66"/>
+        <path d="M468 140 L 494 146 L 468 151"/>
+        <!-- 涡卷 -->
+        <path d="M212 108 c -14 -4 -22 6 -18 16 c 3 8 14 10 19 4 c 4 -5 1 -13 -6 -13" stroke-width="1.8"/>
+        <path d="M186 84 c -10 -3 -16 4 -13 11 c 2 6 10 7 14 3" stroke-width="1.6"/>
+      </g>
+    </symbol>
+
+    <!-- 蜡染小鸟 -->
+    <symbol id="miao-bird" viewBox="0 0 400 300">
+      <g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+        <g stroke-width="1.6">
+          <path d="M150 190 C 90 230, 40 250, 8 252"/>
+          <path d="M150 196 C 95 240, 50 262, 16 268"/>
+          <path d="M152 202 C 104 250, 66 272, 34 282"/>
+          <path d="M155 188 C 100 216, 55 232, 22 234"/>
+        </g>
+        <g stroke-width="1.6">
+          <path d="M170 150 C 130 90, 90 55, 40 40"/>
+          <path d="M176 146 C 140 82, 104 46, 58 28"/>
+          <path d="M182 142 C 152 76, 120 38, 78 18"/>
+        </g>
+        <path d="M160 150 C 200 118, 260 112, 300 136 C 330 154, 336 190, 312 210 C 280 236, 210 232, 176 208 C 150 190, 146 168, 160 150 Z"/>
+        <g stroke-width="1.4">
+          <path d="M196 158 q 14 -12 28 0 q -14 12 -28 0 Z"/>
+          <path d="M232 154 q 14 -12 28 0 q -14 12 -28 0 Z"/>
+          <path d="M268 158 q 14 -12 28 0 q -14 12 -28 0 Z"/>
+          <path d="M206 182 q 14 -12 28 0 q -14 12 -28 0 Z"/>
+          <path d="M244 182 q 14 -12 28 0 q -14 12 -28 0 Z"/>
+          <path d="M222 204 q 13 -11 26 0 q -13 11 -26 0 Z"/>
+        </g>
+        <path d="M230 140 C 250 96, 300 70, 352 66 C 320 92, 300 120, 292 152"/>
+        <g stroke-width="1.4">
+          <path d="M244 134 C 264 104, 300 84, 334 76"/>
+          <path d="M254 142 C 274 114, 306 96, 336 88"/>
+        </g>
+        <path d="M300 136 C 312 116, 334 108, 352 116 C 366 123, 368 140, 356 150 C 344 160, 324 158, 312 148"/>
+        <circle cx="346" cy="130" r="3.2"/>
+        <path d="M356 122 C 366 108, 380 102, 394 104"/>
+        <path d="M352 116 C 358 100, 368 90, 382 86"/>
+        <path d="M360 138 L 384 144 L 360 148"/>
+        <path d="M120 120 c -14 -4 -22 6 -18 16 c 3 8 14 10 19 4 c 4 -5 1 -13 -6 -13" stroke-width="1.8"/>
+      </g>
+    </symbol>
+
+    <!-- 蜡染蝴蝶（仿参考图 219 的胖蝶） -->
+    <symbol id="miao-butterfly" viewBox="0 0 220 200">
+      <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M110 66 C 72 22, 24 26, 24 72 C 24 104, 58 116, 100 102"/>
+        <path d="M110 66 C 148 22, 196 26, 196 72 C 196 104, 162 116, 120 102"/>
+        <path d="M100 106 C 68 114, 50 138, 62 160 C 72 178, 96 170, 104 146"/>
+        <path d="M120 106 C 152 114, 170 138, 158 160 C 148 178, 124 170, 116 146"/>
+        <ellipse cx="110" cy="106" rx="8" ry="38"/>
+        <path d="M104 66 C 94 44, 78 34, 62 34"/>
+        <path d="M116 66 C 126 44, 142 34, 158 34"/>
+        <g stroke-width="1.3">
+          <path d="M52 66 q 22 -10 38 6"/><path d="M168 66 q -22 -10 -38 6"/>
+          <path d="M44 84 q 24 -6 44 8"/><path d="M176 84 q -24 -6 -44 8"/>
+          <path d="M70 154 q 16 -18 32 -16"/><path d="M150 154 q -16 -18 -32 -16"/>
+        </g>
+        <circle cx="62" cy="34" r="3"/><circle cx="158" cy="34" r="3"/>
+        <circle cx="110" cy="86" r="2.4" fill="currentColor"/>
+        <circle cx="110" cy="126" r="2.4" fill="currentColor"/>
+      </g>
+    </symbol>
+
+    <!-- 太阳纹 -->
+    <symbol id="miao-sun" viewBox="0 0 200 200">
+      <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="100" cy="100" r="14"/>
+        <circle cx="100" cy="100" r="26" stroke-width="1.4"/>
+        <g stroke-width="1.6">
+          <path d="M100 62 L 100 34"/><path d="M100 138 L 100 166"/>
+          <path d="M62 100 L 34 100"/><path d="M138 100 L 166 100"/>
+          <path d="M73 73 L 53 53"/><path d="M127 127 L 147 147"/>
+          <path d="M127 73 L 147 53"/><path d="M73 127 L 53 147"/>
+        </g>
+        <g stroke-width="1.3">
+          <path d="M100 46 L 94 58 L 106 58 Z"/><path d="M100 154 L 94 142 L 106 142 Z"/>
+          <path d="M46 100 L 58 94 L 58 106 Z"/><path d="M154 100 L 142 94 L 142 106 Z"/>
+          <path d="M62 62 L 74 68 L 68 74 Z"/><path d="M138 138 L 126 132 L 132 126 Z"/>
+          <path d="M138 62 L 132 74 L 126 68 Z"/><path d="M62 138 L 68 126 L 74 132 Z"/>
+        </g>
+        <circle cx="100" cy="100" r="44" stroke-width="1.2" stroke-dasharray="3 5"/>
+      </g>
+    </symbol>
+
+    <!-- 中央徽章圆纹 -->
+    <symbol id="miao-medallion" viewBox="0 0 240 240">
+      <g fill="none" stroke="currentColor" stroke-linecap="round">
+        <circle cx="120" cy="120" r="112" stroke-width="2.2"/>
+        <circle cx="120" cy="120" r="104" stroke-width="1" stroke-dasharray="2 6"/>
+        <circle cx="120" cy="120" r="88" stroke-width="1.6"/>
+        <circle cx="120" cy="120" r="30" stroke-width="2"/>
+        <circle cx="120" cy="120" r="18" stroke-width="1.3"/>
+        <g stroke-width="1.4">
+          <path d="M120 32 L 120 22"/><path d="M120 208 L 120 218"/>
+          <path d="M32 120 L 22 120"/><path d="M208 120 L 218 120"/>
+        </g>
+        <g stroke-width="1.8">
+          <path d="M120 96 c -8 -10 -4 -22 6 -26 c 8 -3 16 2 17 10 c 1 7 -5 12 -11 11"/>
+          <path d="M144 120 c 10 -8 22 -4 26 6 c 3 8 -2 16 -10 17 c -7 1 -12 -5 -11 -11"/>
+          <path d="M120 144 c 8 10 4 22 -6 26 c -8 3 -16 -2 -17 -10 c -1 -7 5 -12 11 -11"/>
+          <path d="M96 120 c -10 8 -22 4 -26 -6 c -3 -8 2 -16 10 -17 c 7 -1 12 5 11 11"/>
+        </g>
+        <g stroke-width="1.5">
+          <path d="M120 62 q 10 12 0 24 q -10 -12 0 -24 Z"/>
+          <path d="M178 120 q -12 10 -24 0 q 12 -10 24 0 Z"/>
+          <path d="M120 178 q -10 -12 0 -24 q 10 12 0 24 Z"/>
+          <path d="M62 120 q 12 -10 24 0 q -12 10 -24 0 Z"/>
+        </g>
+        <g stroke-width="1.1">
+          <path d="M158 82 q 6 16 -6 26"/><path d="M158 158 q -16 6 -26 -6"/>
+          <path d="M82 158 q -6 -16 6 -26"/><path d="M82 82 q 16 -6 26 6"/>
+        </g>
+      </g>
+    </symbol>
+
+    <!-- 苗绣团花（朱红底，四色绣线：中心花 + 菱形框 + 四角花） -->
+    <symbol id="miao-emb" viewBox="0 0 400 400">
+      <g stroke-linecap="round">
+        <!-- 菱形框：卡其锁绣 + 米白细线 -->
+        <path d="M200 26 L 374 200 L 200 374 L 26 200 Z" fill="none" stroke="#B1A281" stroke-width="3.4" stroke-dasharray="9 6"/>
+        <path d="M200 44 L 356 200 L 200 356 L 44 200 Z" fill="none" stroke="#F2EAD8" stroke-width="1.4" stroke-dasharray="3 5"/>
+
+        <!-- 中心团花：八瓣米白缎面 + 绛红针脚 -->
+        <g fill="#F2EAD8" stroke="#643845" stroke-width="2" stroke-dasharray="5 4">
+          <path id="emb-petal" d="M200 200 C 184 168, 184 140, 200 120 C 216 140, 216 168, 200 200 Z"/>
+          <use href="#emb-petal" transform="rotate(45 200 200)"/>
+          <use href="#emb-petal" transform="rotate(90 200 200)"/>
+          <use href="#emb-petal" transform="rotate(135 200 200)"/>
+          <use href="#emb-petal" transform="rotate(180 200 200)"/>
+          <use href="#emb-petal" transform="rotate(225 200 200)"/>
+          <use href="#emb-petal" transform="rotate(270 200 200)"/>
+          <use href="#emb-petal" transform="rotate(315 200 200)"/>
+        </g>
+        <circle cx="200" cy="200" r="26" fill="#1A2640" stroke="#B1A281" stroke-width="2.6" stroke-dasharray="5 4"/>
+        <circle cx="200" cy="200" r="12" fill="#643845" stroke="#F2EAD8" stroke-width="1.8" stroke-dasharray="3 3"/>
+        <circle cx="200" cy="200" r="4" fill="#F2EAD8"/>
+
+        <!-- 中环八朵小花：卡其 / 靛蓝相间 -->
+        <g id="emb-floret-ring">
+          <g fill="#B1A281" stroke="#F2EAD8" stroke-width="1.6" stroke-dasharray="4 3">
+            <path id="emb-floret" d="M200 84 c 8 -12 20 -12 24 -2 c 3 8 -4 16 -12 16 c 8 0 15 8 12 16 c -4 10 -16 10 -24 -2 c -8 12 -20 12 -24 2 c -3 -8 4 -16 12 -16 c -8 0 -15 -8 -12 -16 c 4 -10 16 -10 24 2 Z"/>
+          </g>
+          <use href="#emb-floret" transform="rotate(45 200 200)"/>
+          <g fill="#1A2640" stroke="#F2EAD8" stroke-width="1.6" stroke-dasharray="4 3">
+            <use href="#emb-floret" transform="rotate(90 200 200)"/>
+            <use href="#emb-floret" transform="rotate(270 200 200)"/>
+          </g>
+          <g fill="#B1A281" stroke="#F2EAD8" stroke-width="1.6" stroke-dasharray="4 3">
+            <use href="#emb-floret" transform="rotate(135 200 200)"/>
+            <use href="#emb-floret" transform="rotate(225 200 200)"/>
+            <use href="#emb-floret" transform="rotate(315 200 200)"/>
+          </g>
+          <g fill="#1A2640" stroke="#F2EAD8" stroke-width="1.6" stroke-dasharray="4 3">
+            <use href="#emb-floret" transform="rotate(180 200 200)"/>
+          </g>
+        </g>
+
+        <!-- 菱形四边中点的卷草：绛红 + 卡其 -->
+        <g fill="none" stroke-width="2.4">
+          <path d="M200 52 c 14 -18 36 -20 48 -8 c -14 2 -22 10 -24 22" stroke="#643845"/>
+          <path d="M200 52 c -14 -18 -36 -20 -48 -8 c 14 2 22 10 24 22" stroke="#B1A281"/>
+          <path d="M200 348 c 14 18 36 20 48 8 c -14 -2 -22 -10 -24 -22" stroke="#B1A281"/>
+          <path d="M200 348 c -14 18 -36 20 -48 8 c 14 -2 22 -10 24 -22" stroke="#643845"/>
+          <path d="M52 200 c -18 -14 -20 -36 -8 -48 c 2 14 10 22 22 24" stroke="#643845"/>
+          <path d="M52 200 c -18 14 -20 36 -8 48 c 2 -14 10 -22 22 -24" stroke="#B1A281"/>
+          <path d="M348 200 c 18 -14 20 -36 8 -48 c -2 14 -10 22 -22 24" stroke="#B1A281"/>
+          <path d="M348 200 c 18 14 20 36 8 48 c -2 -14 -10 -22 -22 -24" stroke="#643845"/>
+        </g>
+
+        <!-- 四角大花：米白瓣 + 绛红心 + 靛蓝叶 -->
+        <g id="emb-corner">
+          <g fill="#F2EAD8" stroke="#643845" stroke-width="2" stroke-dasharray="5 4">
+            <path d="M200 18 C 214 34, 214 52, 200 64 C 186 52, 186 34, 200 18 Z"/>
+            <path d="M200 18 C 214 34, 214 52, 200 64 C 186 52, 186 34, 200 18 Z" transform="rotate(72 200 46)"/>
+            <path d="M200 18 C 214 34, 214 52, 200 64 C 186 52, 186 34, 200 18 Z" transform="rotate(144 200 46)"/>
+            <path d="M200 18 C 214 34, 214 52, 200 64 C 186 52, 186 34, 200 18 Z" transform="rotate(216 200 46)"/>
+            <path d="M200 18 C 214 34, 214 52, 200 64 C 186 52, 186 34, 200 18 Z" transform="rotate(288 200 46)"/>
+          </g>
+          <circle cx="200" cy="46" r="11" fill="#643845" stroke="#B1A281" stroke-width="2" stroke-dasharray="3 3"/>
+          <circle cx="200" cy="46" r="4" fill="#F2EAD8"/>
+          <path d="M172 78 c -10 12 -26 14 -36 6 c 12 -2 18 -10 20 -20" fill="#1A2640" stroke="#F2EAD8" stroke-width="1.4"/>
+          <path d="M228 78 c 10 12 26 14 36 6 c -12 -2 -18 -10 -20 -20" fill="#1A2640" stroke="#F2EAD8" stroke-width="1.4"/>
+        </g>
+        <use href="#emb-corner" transform="rotate(90 200 200)"/>
+        <use href="#emb-corner" transform="rotate(180 200 200)"/>
+        <use href="#emb-corner" transform="rotate(270 200 200)"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
 <section class="intro" id="intro" aria-label="线上体验入口">
 
-  <div class="intro__scene">
+  <!-- ===== 左：数字蜡染 ===== -->
+  <a class="portal portal-batik" href="#workbench" data-enter="dye"
+     aria-label="进入数字蜡染体验：画蜡 · 浸染 · 去蜡">
+    <span class="portal__bg" aria-hidden="true"></span>
+    <span class="batik-motifs" aria-hidden="true">
+      <svg class="m-phoenix" viewBox="0 0 560 300"><use href="#miao-phoenix"/></svg>
+      <svg class="m-bird-2" viewBox="0 0 400 300"><use href="#miao-bird"/></svg>
+      <svg class="m-bird-3" viewBox="0 0 400 300"><use href="#miao-bird"/></svg>
+      <svg class="m-butterfly" viewBox="0 0 220 200"><use href="#miao-butterfly"/></svg>
+      <svg class="m-sun" viewBox="0 0 200 200"><use href="#miao-sun"/></svg>
+    </span>
+    <span class="portal-inner">
+      <span class="portal-kicker">画蜡 · 浸染 · 去蜡</span>
+      <span class="portal-title">数字蜡染</span>
+      <span class="btn-silver" aria-hidden="true">进入体验<i class="arrow-ico">→</i></span>
+    </span>
+  </a>
 
-    <!-- 左：素布 -->
-    <div class="cloth" aria-hidden="true">
-      <span class="cloth__frame"></span>
-      <svg class="cloth__svg" viewBox="0 0 320 620" preserveAspectRatio="xMidYMid meet">
-        <!-- 底纹：随滚动渐显的苗绣纹样轮廓 -->
-        <g class="cloth__pattern">
-          <path d="M44 92 q22 -26 44 0 t44 0" />
-          <path d="M44 512 q22 -26 44 0 t44 0" />
-          <path d="M212 296 q26 20 0 44 t0 44" />
-          <circle cx="250" cy="84" r="15" />
-          <circle cx="70" cy="404" r="19" />
-        </g>
+  <!-- ===== 右：数字苗绣 ===== -->
+  <a class="portal portal-emb" href="#workbench" data-enter="embroidery"
+     aria-label="进入数字苗绣体验：引线 · 锁绣 · 成章">
+    <span class="portal__bg" aria-hidden="true"></span>
+    <span class="stitch-motifs" aria-hidden="true">
+      <svg class="s-flower-1" viewBox="0 0 400 400"><use href="#miao-emb"/></svg>
+      <svg class="s-flower-2" viewBox="0 0 400 400"><use href="#miao-emb"/></svg>
+      <svg class="s-flower-3" viewBox="0 0 400 400"><use href="#miao-emb"/></svg>
+    </span>
+    <span class="portal-inner">
+      <span class="portal-kicker">引线 · 锁绣 · 成章</span>
+      <span class="portal-title">数字苗绣</span>
+      <span class="btn-silver" aria-hidden="true">进入体验<i class="arrow-ico">→</i></span>
+    </span>
+  </a>
 
-        <!-- 游走的朱红丝线（长度由 JS 读取后做 dashoffset 动画）。
-             注：不用 vector-effect="non-scaling-stroke"——它会把 dasharray
-             一起换算到设备空间，和 dashoffset 动画冲突；窄屏改用媒体查询加粗 -->
-        <path class="cloth__thread" id="threadPath" d="M160 52
-          C 96 52 74 104 108 132
-          C 146 164 214 128 226 172
-          C 240 224 168 236 118 258
-          C 66 281 62 338 112 356
-          C 166 375 226 344 232 392
-          C 238 442 172 462 126 486
-          C 82 509 92 556 148 566" />
+  <!-- ===== 分缝银线与中央银环徽章 ===== -->
+  <div class="spine" aria-hidden="true"></div>
 
-        <!-- 针：针尖在原点，针身朝上；JS 按路径切向旋转 -->
-        <g class="cloth__needle" id="threadNeedle">
-          <line class="needle-body" x1="0" y1="0" x2="0" y2="-34" />
-          <ellipse class="needle-eye" cx="0" cy="-28.5" rx="1.2" ry="2.8" />
-        </g>
-      </svg>
+  <div class="intro-badge" aria-hidden="true">
+    <div class="intro-badge__ring"></div>
+    <div class="intro-badge__core">
+      <div class="intro-badge__spin"><svg viewBox="0 0 240 240"><use href="#miao-medallion"/></svg></div>
     </div>
-
-    <!-- 中：标题与两个入口 -->
-    <div class="intro__content">
-      <p class="intro__kicker">03 · 互动创作</p>
-      <h1 class="intro__title">巧手成纹</h1>
-      <p class="intro__lede">
-        画一笔蜡，浸一次染缸，看冰裂纹在靛蓝布上慢慢蔓延；<br>
-        再穿一根针，把苗绣的纹样一针一针走完。
-      </p>
-
-      <div class="intro__enter" role="group" aria-label="选择体验线路">
-        <a class="enter-btn" href="#workbench" data-enter="dye">
-          <span class="enter-btn__tag">蜡染</span>
-          <span class="enter-btn__body">
-            <span class="enter-btn__name">走进染缸</span>
-            <span class="enter-btn__note">画蜡 · 浸染 · 冰裂　三幕</span>
-          </span>
-          <svg class="enter-btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor"
-                  stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </a>
-
-        <a class="enter-btn enter-btn--embroidery" href="#workbench" data-enter="embroidery">
-          <span class="enter-btn__tag">苗绣</span>
-          <span class="enter-btn__body">
-            <span class="enter-btn__name">坐上绣绷</span>
-            <span class="enter-btn__note">平绣 · 打籽绣　两种针法</span>
-          </span>
-          <svg class="enter-btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor"
-                  stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </a>
-      </div>
-    </div>
-
-    <!-- 右：染缸 -->
-    <div class="vat" aria-hidden="true">
-      <div class="vat__liquid"></div>
-      <div class="vat__rings">
-        <span class="vat__ring" style="--d:0s"></span>
-        <span class="vat__ring" style="--d:1.4s"></span>
-        <span class="vat__ring" style="--d:2.8s"></span>
-        <span class="vat__ring" style="--d:4.2s"></span>
-        <span class="vat__ring" style="--d:5.6s"></span>
-      </div>
-    </div>
-
-    <!-- 滚动提示 + 底部进度线 -->
-    <div class="intro__hint" aria-hidden="true">
-      <span>向下滚动</span>
-      <i></i>
-    </div>
-    <div class="intro__progress" aria-hidden="true"></div>
-
   </div>
+
+  <!-- 布料颗粒：压在入口屏最上层，只在本屏生效，不外溢到工作台 -->
+  <div class="intro__grain" aria-hidden="true"></div>
+
 </section>
 
 <!-- ======================================================================

@@ -510,17 +510,17 @@
 }
 
 /* ==========================================================================
-   13. 入口屏「巧手成纹」——滚动联动的开场
+   13. 入口屏「巧手成纹」——双分屏门户
    --------------------------------------------------------------------------
-   左：素布上的朱红丝线随滚动游走，针尖由 JS 用 getPointAtLength 实时贴住线头
-   右：染缸靛蓝液面上涨，同心涟漪渐起
-   中：标题 + 两个入口按钮
-   进度变量：--exp-p ∈ [0,1]，由 assets/js/intro.js 写入 <html>
+   左：数字蜡染（靛蓝布）　右：数字苗绣（朱红布）
+   中央银环徽章压在分缝上，苗纹线稿在布面上缓慢漂移
+   整块门户可点，点击后广播 exp:enter 并滚到工作台
+   尺寸与全站一致：顶栏在文档流顶部，入口屏高度 = 100dvh − --nav-h
    ========================================================================== */
 
 html { scroll-behavior: smooth; }
 
-/* 13.1 页面根背景：铺满入口屏 + 工作台，用固定伪元素避免滚动重绘 */
+/* ---------- 13.1 页面根背景：入口屏与工作台共用 ---------- */
 body.exp-root {
   color: var(--exp-text);
   font-family: var(--exp-font-body);
@@ -542,382 +542,415 @@ body.exp-root::before {
 /* 背景统一由 body.exp-root 承担，工作台自身不再铺底 */
 .exp-page { background: none; }
 
-/* 13.2 滚动行程与粘性舞台 */
+/* 锚点跳到工作台时，让出粘性顶栏的高度 */
+#workbench { scroll-margin-top: var(--nav-h, 64px); }
+
+.motif-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* ---------- 13.2 入口屏版式 ---------- */
 .intro {
+  /* 色卡取自苗族服饰实拍；只在本屏内生效，不外溢到工作台 */
+  --in-indigo:      #1A2640;
+  --in-indigo-deep: #0F1930;
+  --in-cinnabar:    #541714;
+  --in-cinnabar-deep:#32090A;
+  --in-khaki:       #B1A281;
+  --in-wine:        #643845;
+  --in-cream:       #F2EAD8;
+  --in-hi:          #F4F6F8;
+  --in-mid:         #C6CDD6;
+  --in-lo:          #8B95A3;
+  --in-dark:        #5D6673;
+
   position: relative;
-  height: 172dvh;
-}
-
-.intro__scene {
-  position: sticky;
-  top: 0;
-  height: 100dvh;
-  display: grid;
-  grid-template-columns: minmax(0, .88fr) minmax(0, 1.2fr) minmax(0, .88fr);
-  align-items: center;
-  gap: clamp(8px, 1.8vw, 36px);
-  padding: clamp(18px, 3.4vh, 46px) clamp(16px, 3vw, 54px) clamp(34px, 5.4vh, 66px);
+  display: flex;
+  /* 顶栏是 sticky 且占文档流，入口屏正好填满顶栏以下的整屏 */
+  height: calc(100dvh - var(--nav-h, 64px));
   overflow: hidden;
-}
-
-/* ---------- 13.3 左：素布 ---------- */
-.cloth {
-  position: relative;
-  justify-self: end;
-  height: min(70dvh, 580px);
-  aspect-ratio: 5 / 9;
-  width: auto;
-  max-width: 100%;
-  transform: rotate(-1.8deg);
-  border-radius: 3px;
-  overflow: hidden;
-  /* 经纬织纹 + 微暖米白，模拟未染坯布（细密，避免出现方格纸感） */
-  background:
-    repeating-linear-gradient(90deg, rgba(120, 104, 74, .035) 0 .5px, transparent .5px 2.5px),
-    repeating-linear-gradient(0deg, rgba(120, 104, 74, .04) 0 .5px, transparent .5px 2.5px),
-    radial-gradient(130% 100% at 26% 12%, #FBF8EE 0%, #F1EBDC 52%, #E1D8C2 100%);
-  box-shadow:
-    0 30px 64px rgba(0, 0, 0, .52),
-    0 1px 0 rgba(255, 255, 255, .5) inset,
-    -14px 0 34px rgba(0, 0, 0, .16) inset;
-}
-
-/* 布边暗角 */
-.cloth::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(120% 90% at 50% 46%, transparent 58%, rgba(90, 74, 48, .16) 100%);
-}
-
-/* 绣绷内框 */
-.cloth__frame {
-  position: absolute;
-  inset: 5.5% 7%;
-  border: 1px dashed rgba(194, 59, 34, .2);
-  border-radius: 2px;
-  pointer-events: none;
-  z-index: 2;
-}
-
-.cloth__svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  overflow: visible;
-}
-
-/* 底纹：随滚动渐显的苗绣纹样 */
-.cloth__pattern {
-  fill: none;
-  stroke: rgba(194, 59, 34, .55);
-  stroke-width: 1.1;
-  stroke-linecap: round;
-  opacity: calc(var(--exp-p, 0) * .3);
-}
-
-/* 游走的朱红丝线 */
-.cloth__thread {
-  fill: none;
-  stroke: var(--exp-red);
-  stroke-width: 3.2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  filter: drop-shadow(0 1px 2px rgba(143, 42, 23, .45));
-}
-/* 针：针尖在原点，针身朝上；JS 按路径切向旋转。
-   素布是米白的，所以针身用深钢灰（白针在坯布上几乎看不见） */
-.cloth__needle {
-  filter: drop-shadow(0 1.5px 2.5px rgba(40, 30, 16, .38));
-}
-.cloth__needle .needle-body {
-  stroke: #454F5C;
-  stroke-width: 3.6;
-  stroke-linecap: round;
-}
-.cloth__needle .needle-eye {
-  fill: #FBF8EE;
-  stroke: #454F5C;
-  stroke-width: 1;
-}
-
-/* ---------- 13.4 右：染缸 ---------- */
-.vat {
-  position: relative;
-  justify-self: start;
-  height: min(50dvh, 430px);
-  aspect-ratio: 1;
-  width: auto;
-  max-width: 100%;
-  border-radius: 50%;
-  overflow: hidden;
+  /* 让 mix-blend-mode 只与本屏合成，不和工作台串味 */
   isolation: isolate;
-  background:
-    radial-gradient(circle at 36% 26%, rgba(122, 66, 145, .2), transparent 52%),
-    radial-gradient(circle at 50% 50%, #1F3853 0%, #16273A 46%, #0C1725 80%, #060C14 100%);
-  box-shadow:
-    0 0 0 1px rgba(233, 237, 242, .12),
-    0 0 0 10px rgba(16, 27, 38, .7),
-    0 0 0 11px rgba(233, 237, 242, .07),
-    0 34px 74px rgba(0, 0, 0, .55),
-    inset 0 0 70px rgba(0, 0, 0, .55);
+  font-family: var(--exp-font-title);
+  color: var(--in-cream);
+  background: var(--in-indigo-deep);
 }
 
-/* 染液：随滚动从缸底涌起。液面用大纵向圆角做缓弧，
-   避免正圆的缸出现「半杯水」那种水平直切 */
-.vat__liquid {
-  position: absolute;
-  left: -8%;
-  right: -8%;
-  bottom: 0;
-  height: calc(8% + 72% * var(--exp-p, 0));
-  border-radius: 50% 50% 0 0 / 17% 17% 0 0;
-  background: linear-gradient(180deg,
-    rgba(40, 76, 112, .94) 0%,
-    rgba(22, 48, 76, .96) 38%,
-    rgba(10, 22, 36, .99) 100%);
-  box-shadow: 0 -16px 34px rgba(74, 128, 178, .3) inset;
+/* ---------- 13.3 左右两块门户 ---------- */
+.portal {
+  position: relative;
+  flex: 1 1 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  outline: none;
+  cursor: pointer;
+  transition: flex 1s var(--exp-ease);
 }
 
-/* 液面高光 */
-.vat__liquid::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 1.5px;
-  background: linear-gradient(90deg, transparent, rgba(158, 206, 248, .8), transparent);
-  opacity: calc(.25 + .75 * var(--exp-p, 0));
+/* 只在能真悬停的设备上做扩张，免得触屏上状态被粘住 */
+@media (hover: hover) and (pointer: fine) {
+  .portal:hover,
+  .portal:focus-visible { flex: 1.55 1 50%; }
 }
 
-/* 涟漪层：整体透明度由滚动进度控制。
-   上半部用渐隐遮罩，让圆环不硬穿到液面上方的深色区域，又能从液面附近自然浮出 */
-.vat__rings {
+/* 键盘焦点：金色内描边，与全站焦点样式一致（放在 overflow 内不会被裁掉） */
+.portal:focus-visible {
+  outline: 2px solid rgba(217, 178, 106, .85);
+  outline-offset: -8px;
+}
+
+.portal__bg {
   position: absolute;
   inset: 0;
-  opacity: calc(var(--exp-p, 0) * .95);
-  -webkit-mask-image: linear-gradient(180deg,
-    transparent 10%, rgba(0, 0, 0, .3) 40%, #000 64%);
-  mask-image: linear-gradient(180deg,
-    transparent 10%, rgba(0, 0, 0, .3) 40%, #000 64%);
-  transition: opacity .4s linear;
+  display: block;
 }
 
-.vat__ring {
+.portal-batik .portal__bg {
+  background: radial-gradient(120% 90% at 30% 18%,
+    #2A3A5E 0%, var(--in-indigo) 46%, var(--in-indigo-deep) 100%);
+}
+
+.portal-emb .portal__bg {
+  background: radial-gradient(120% 90% at 70% 18%,
+    #6B1F1C 0%, var(--in-cinnabar) 52%, var(--in-cinnabar-deep) 100%);
+}
+
+/* 布纹：粗一层给织感，细一层给毛感 */
+.portal__bg::before,
+.portal__bg::after {
+  content: "";
   position: absolute;
+  inset: 0;
+  background-image: url("../linen.jpg");
+}
+
+.portal__bg::before {
+  background-size: 480px;
+  mix-blend-mode: overlay;
+  opacity: .5;
+}
+
+.portal__bg::after {
+  background-size: 190px;
+  mix-blend-mode: soft-light;
+  opacity: .45;
+}
+
+/* ---------- 13.4 蜡染侧纹样层 ---------- */
+.batik-motifs {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+}
+
+.batik-motifs svg {
+  position: absolute;
+  color: var(--in-cream);
+}
+
+.m-phoenix   { width: min(40vw, 560px); left: -5%;  top: 9%;    opacity: .52; animation: drift1 26s ease-in-out infinite; }
+.m-bird-2    { width: min(23vw, 320px); right: 1%;  bottom: 5%; opacity: .44; animation: drift2m 32s ease-in-out infinite; }
+.m-bird-3    { width: min(14vw, 200px); left: 9%;   bottom: 9%; opacity: .36; animation: drift1 38s ease-in-out infinite reverse; }
+.m-butterfly { width: min(10vw, 144px); right: 11%; top: 9%;    opacity: .48; animation: drift2 24s ease-in-out infinite; }
+.m-sun       { width: min(12vw, 172px); left: 40%;  top: 1%;    opacity: .33; animation: spinSlow 90s linear infinite; }
+
+@keyframes drift1 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50%      { transform: translate(2.5%, 3%) rotate(2deg); }
+}
+
+@keyframes drift2 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50%      { transform: translate(-3%, -2%) rotate(-2.5deg); }
+}
+
+/* 镜像的那只鸟：翻转要写进关键帧，否则 transform 会把 scaleX(-1) 覆盖掉 */
+@keyframes drift2m {
+  0%, 100% { transform: scaleX(-1) translate(0, 0) rotate(0deg); }
+  50%      { transform: scaleX(-1) translate(-3%, -2%) rotate(-2.5deg); }
+}
+
+@keyframes spinSlow { to { transform: rotate(360deg); } }
+
+/* ---------- 13.5 苗绣侧纹样层 ---------- */
+.stitch-motifs {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+}
+
+.stitch-motifs svg { position: absolute; }
+
+/* 主团花放右下角：苗绣侧的标题居中，纹样必须避开标题行 */
+.s-flower-1 { width: min(30vw, 430px); right: -10%; top: auto; bottom: -10%; opacity: .9; animation: drift2 30s ease-in-out infinite; }
+.s-flower-2 { width: min(17vw, 240px); left: 3%;  top: 6%;    opacity: .78; animation: drift1 34s ease-in-out infinite; }
+.s-flower-3 { width: min(12vw, 168px); left: 14%; bottom: 4%; opacity: .66; animation: drift1 40s ease-in-out infinite reverse; }
+
+/* ---------- 13.6 中央银环徽章 + 分缝银线 ---------- */
+.spine {
+  position: absolute;
+  z-index: 15;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  pointer-events: none;
+}
+
+.spine::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg,
+    transparent, var(--in-mid) 18%, var(--in-hi) 50%, var(--in-mid) 82%, transparent);
+  opacity: .8;
+}
+
+.intro-badge {
+  position: absolute;
+  z-index: 20;
   left: 50%;
   top: 50%;
-  width: 26%;
-  height: 26%;
-  margin: -13% 0 0 -13%;
-  border-radius: 50%;
-  border: 1px solid rgba(168, 214, 252, .9);
-  box-shadow: 0 0 8px rgba(120, 190, 250, .4);
-  opacity: 0;
-  animation: expRipple 7s cubic-bezier(.16, 1, .3, 1) infinite;
-  animation-delay: var(--d, 0s);
-  will-change: transform, opacity;
-}
-
-@keyframes expRipple {
-  0%   { transform: scale(.22); opacity: 0; }
-  12%  { opacity: .85; }
-  55%  { opacity: .34; }
-  100% { transform: scale(3.05); opacity: 0; }
-}
-
-/* ---------- 13.5 中：标题与入口 ---------- */
-.intro__content {
-  justify-self: center;
-  width: min(100%, 430px);
-  text-align: center;
-  padding-bottom: 2dvh;
-}
-
-.intro__kicker {
-  margin: 0 0 1.15em;
-  display: inline-flex;
-  align-items: center;
-  gap: .75em;
-  font-family: var(--exp-font-num);
-  font-size: 11.5px;
-  letter-spacing: .26em;
-  text-indent: .26em;
-  color: var(--exp-red-soft);
-}
-.intro__kicker::before,
-.intro__kicker::after {
-  content: "";
-  width: 22px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(194, 59, 34, .7));
-}
-.intro__kicker::after {
-  background: linear-gradient(90deg, rgba(194, 59, 34, .7), transparent);
-}
-
-.intro__title {
-  margin: 0;
-  font-family: var(--exp-font-title);
-  font-weight: 500;
-  font-size: clamp(32px, 4.6vw, 58px);
-  line-height: 1.16;
-  letter-spacing: .16em;
-  text-indent: .16em;
-  color: var(--exp-paper);
-  text-shadow: 0 4px 34px rgba(194, 59, 34, .24);
-}
-
-.intro__lede {
-  margin: 1.25em auto 0;
-  max-width: 32em;
-  font-size: clamp(12.5px, 1.5vw, 14.5px);
-  line-height: 1.95;
-  letter-spacing: .04em;
-  color: var(--exp-text-dim);
-}
-
-.intro__enter {
-  margin-top: clamp(20px, 3.4vh, 34px);
-  display: grid;
-  gap: 10px;
-  width: 100%;
-}
-
-/* 入口按钮 */
-.enter-btn {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 13px;
-  padding: 11px 14px;
-  border-radius: 10px;
-  border: 1px solid var(--exp-line);
-  background: rgba(20, 33, 46, .5);
-  backdrop-filter: blur(7px);
-  -webkit-backdrop-filter: blur(7px);
-  color: var(--exp-text);
-  text-decoration: none;
-  text-align: left;
-  transition: transform .4s var(--exp-ease), border-color .4s var(--exp-ease),
-              background .4s var(--exp-ease), box-shadow .4s var(--exp-ease);
-}
-.enter-btn:hover {
-  transform: translateX(4px);
-  border-color: rgba(194, 59, 34, .45);
-  background: rgba(36, 56, 76, .76);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, .34);
-}
-.enter-btn:focus-visible {
-  outline: 2px solid var(--exp-wax);
-  outline-offset: 3px;
-}
-
-.enter-btn__tag {
-  display: grid;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 8px;
-  background: linear-gradient(155deg, var(--exp-red-soft), var(--exp-red-deep));
-  color: #FFF6F2;
-  font-family: var(--exp-font-title);
-  font-size: 12.5px;
-  line-height: 1;
-  letter-spacing: .1em;
-  writing-mode: vertical-rl;
-  box-shadow: 0 3px 12px rgba(143, 42, 23, .4);
-}
-.enter-btn--embroidery .enter-btn__tag {
-  background: linear-gradient(155deg, var(--exp-purple-soft), var(--exp-purple));
-  box-shadow: 0 3px 12px rgba(91, 44, 111, .45);
-}
-
-.enter-btn__body {
-  display: grid;
-  gap: 3px;
-  min-width: 0;
-}
-
-.enter-btn__name {
-  font-family: var(--exp-font-title);
-  font-size: 15px;
-  letter-spacing: .12em;
-  color: var(--exp-paper);
-}
-
-.enter-btn__note {
-  font-size: 11.5px;
-  letter-spacing: .05em;
-  color: var(--exp-text-mute);
-}
-
-.enter-btn__arrow {
-  width: 15px;
-  height: 15px;
-  color: var(--exp-text-mute);
-  transition: transform .4s var(--exp-ease), color .4s var(--exp-ease);
-}
-.enter-btn:hover .enter-btn__arrow {
-  transform: translateX(3px);
-  color: var(--exp-red-soft);
-}
-
-/* ---------- 13.6 滚动提示与进度线 ---------- */
-.intro__hint {
-  position: absolute;
-  left: 50%;
-  bottom: clamp(16px, 2.8vh, 30px);
-  transform: translateX(-50%);
-  display: grid;
-  justify-items: center;
-  gap: 7px;
-  font-size: 10.5px;
-  letter-spacing: .3em;
-  text-indent: .3em;
-  color: var(--exp-text-mute);
-  opacity: clamp(0, calc(1 - var(--exp-p, 0) * 2.2), 1);
+  transform: translate(-50%, -50%);
+  width: clamp(132px, 15vw, 220px);
+  aspect-ratio: 1;
   pointer-events: none;
 }
-.intro__hint i {
-  display: block;
-  width: 1px;
-  height: 26px;
-  background: linear-gradient(180deg, rgba(194, 59, 34, .9), transparent);
-  animation: expHintDrop 2.2s var(--exp-ease-out) infinite;
-}
-@keyframes expHintDrop {
-  0%   { transform: scaleY(.15); transform-origin: top; opacity: 0; }
-  40%  { opacity: 1; }
-  100% { transform: scaleY(1); transform-origin: top; opacity: 0; }
-}
 
-.intro__progress {
+.intro-badge__ring {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 2px;
-  background: rgba(233, 237, 242, .06);
-  overflow: hidden;
-}
-.intro__progress::after {
-  content: "";
-  display: block;
-  height: 100%;
-  width: calc(var(--exp-p, 0) * 100%);
-  background: linear-gradient(90deg, var(--exp-purple), var(--exp-red), var(--exp-wax));
-  box-shadow: 0 0 14px rgba(194, 59, 34, .55);
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 210deg,
+    var(--in-lo), var(--in-hi) 12%, var(--in-mid) 26%, var(--in-dark) 40%,
+    var(--in-hi) 55%, var(--in-lo) 68%, var(--in-hi) 82%, var(--in-mid) 100%);
+  box-shadow:
+    0 10px 34px rgba(0, 0, 0, .55),
+    inset 0 2px 4px rgba(255, 255, 255, .7),
+    inset 0 -3px 6px rgba(0, 0, 0, .45);
 }
 
-/* ---------- 13.7 工作台与入口屏的衔接 ---------- */
+.intro-badge__ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background-image: url("../linen.jpg");
+  background-size: 300px;
+  mix-blend-mode: overlay;
+  opacity: .35;
+}
+
+.intro-badge__core {
+  position: absolute;
+  inset: 7.5%;
+  border-radius: 50%;
+  overflow: hidden;
+  background: radial-gradient(circle at 38% 32%, #C9BC96, var(--in-khaki) 60%, #96855F);
+  box-shadow: inset 0 3px 10px rgba(60, 48, 28, .45);
+}
+
+.intro-badge__core::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("../linen.jpg");
+  background-size: 240px;
+  mix-blend-mode: overlay;
+  opacity: .5;
+}
+
+.intro-badge__spin {
+  position: absolute;
+  inset: 6%;
+  animation: spinSlow 60s linear infinite;
+}
+
+.intro-badge__spin svg {
+  width: 100%;
+  height: 100%;
+  color: var(--in-indigo);
+}
+
+/* ---------- 13.7 门户文字 ---------- */
+.portal-inner {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 clamp(18px, 4vw, 60px);
+  transition: transform .9s var(--exp-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .portal:hover .portal-inner { transform: translateY(-8px); }
+}
+
+.portal-kicker {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 clamp(12px, 2.4vh, 22px);
+  font-family: var(--exp-font-title);
+  font-size: clamp(11px, 1vw, 14px);
+  letter-spacing: .9em;
+  /* letter-spacing 会在末字右侧留白，用 text-indent 补回来才真正居中 */
+  text-indent: .9em;
+  color: var(--in-mid);
+}
+
+.portal-kicker::before,
+.portal-kicker::after {
+  content: "";
+  flex: 0 0 auto;
+  width: 34px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--in-lo));
+}
+
+.portal-kicker::after {
+  background: linear-gradient(90deg, var(--in-lo), transparent);
+}
+
+/* 银色金属标题：和展馆 / 历史 / 工作台同一套「银器折光」质感 */
+.portal-title {
+  font-family: var(--exp-font-title);
+  font-weight: 700;
+  font-size: clamp(40px, min(7.6vh, 5vw), 84px);
+  line-height: 1.1;
+  letter-spacing: .16em;
+  text-indent: .16em;
+  background: linear-gradient(168deg,
+    var(--in-hi) 6%, var(--in-mid) 30%, var(--in-lo) 47%,
+    #EDF0F4 60%, var(--in-mid) 78%, var(--in-dark) 96%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, .55));
+}
+
+/* ---------- 13.8 银色金属按钮 ---------- */
+.btn-silver {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: clamp(26px, 4.4vh, 42px);
+  padding: 14px 44px;
+  border-radius: 999px;
+  overflow: hidden;
+  font-family: var(--exp-font-title);
+  font-size: clamp(15px, 1.2vw, 18px);
+  font-weight: 600;
+  letter-spacing: .5em;
+  text-indent: .5em;
+  color: #2A3140;
+  background: linear-gradient(165deg,
+    var(--in-hi) 0%, var(--in-mid) 30%, var(--in-lo) 48%,
+    #E8ECF1 62%, var(--in-mid) 82%, var(--in-lo) 100%);
+  border: 1px solid rgba(244, 246, 248, .6);
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, .5),
+    inset 0 2px 3px rgba(255, 255, 255, .85),
+    inset 0 -3px 5px rgba(70, 80, 95, .5);
+  transition: transform .45s var(--exp-ease), box-shadow .45s var(--exp-ease);
+}
+
+.btn-silver::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("../linen.jpg");
+  background-size: 200px;
+  mix-blend-mode: overlay;
+  opacity: .3;
+}
+
+/* 掠光：扫过一遍的斜向高光 */
+.btn-silver::after {
+  content: "";
+  position: absolute;
+  top: -40%;
+  bottom: -40%;
+  left: -60%;
+  width: 34%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .75), transparent);
+  transform: skewX(-18deg);
+  transition: left .8s var(--exp-ease);
+}
+
+.portal:hover .btn-silver::after { left: 130%; }
+
+.portal:hover .btn-silver {
+  transform: translateY(-3px);
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, .55),
+    inset 0 2px 3px rgba(255, 255, 255, .9),
+    inset 0 -3px 5px rgba(70, 80, 95, .5);
+}
+
+.btn-silver .arrow-ico {
+  font-style: normal;
+  font-size: 15px;
+  letter-spacing: 0;
+  text-indent: 0;
+}
+
+/* ---------- 13.9 布料颗粒：压在入口屏最上层 ---------- */
+.intro__grain {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  background-image: url("../linen.jpg");
+  background-size: 520px;
+  mix-blend-mode: overlay;
+  opacity: .45;
+}
+
+.intro__grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("../linen.jpg");
+  background-size: 260px;
+  mix-blend-mode: soft-light;
+  opacity: .55;
+}
+
+/* ---------- 13.10 入场：门户内容分层升起 ---------- */
+.intro-anim .portal-inner > * {
+  animation: introRise .9s var(--exp-ease) both;
+}
+
+.intro-anim .portal-inner > *:nth-child(1) { animation-delay: .15s; }
+.intro-anim .portal-inner > *:nth-child(2) { animation-delay: .30s; }
+.intro-anim .portal-inner > *:nth-child(3) { animation-delay: .50s; }
+
+@keyframes introRise {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- 13.11 工作台与入口屏的衔接 ---------- */
 .exp-page {
   position: relative;
 }
+
 .exp-page::before {
   content: "";
   position: absolute;
@@ -929,74 +962,106 @@ body.exp-root::before {
   background: linear-gradient(90deg, transparent, rgba(233, 237, 242, .14), transparent);
 }
 
-/* ---------- 13.8 入口屏响应式 ---------- */
-/* 移动端：标题在上，素布与染缸缩小并排在下，滚动行程缩短 */
+/* ---------- 13.12 响应式 ---------- */
+/* 窄屏：上下分屏，分缝线转横 */
 @media (max-width: 860px) {
-  .intro { height: 150dvh; }
+  .intro { flex-direction: column; }
 
-  .intro__scene {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
-    align-content: center;
-    gap: 20px 14px;
-    padding: 22px 18px 52px;
+  .portal { flex: 1 1 50%; }
+
+  .spine { left: 0; right: 0; top: 50%; bottom: auto; width: auto; height: 0; }
+
+  .spine::before {
+    left: 0;
+    right: 0;
+    top: -1px;
+    width: auto;
+    height: 2px;
+    background: linear-gradient(90deg,
+      transparent, var(--in-mid) 18%, var(--in-hi) 50%, var(--in-mid) 82%, transparent);
   }
 
-  .intro__content {
-    grid-column: 1 / -1;
-    grid-row: 1;
-    padding-bottom: 0;
+  .intro-badge { width: clamp(92px, 22vw, 124px); }
+
+  .portal-kicker {
+    margin-bottom: 12px;
+    font-size: 10.5px;
+    letter-spacing: .6em;
+    text-indent: .6em;
+    gap: 10px;
   }
 
-  .cloth {
-    grid-column: 1;
-    grid-row: 2;
-    justify-self: end;
-    height: min(28dvh, 200px);
+  .portal-kicker::before,
+  .portal-kicker::after { width: 22px; }
+
+  .portal-title {
+    font-size: clamp(30px, 8.4vw, 46px);
+    letter-spacing: .14em;
+    text-indent: .14em;
   }
 
-  /* 窄屏布面小、SVG 缩放比大，线宽要按比例补回来才不会细成发丝
-     （针由 intro.js 用 scale 单独补偿，见 needleScale） */
-  .cloth__thread { stroke-width: 6; }
-
-  /* 小染缸里的涟漪要描粗一点才看得见 */
-  .vat__ring {
-    border-width: 1.5px;
-    box-shadow: 0 0 6px rgba(120, 190, 250, .5);
+  .btn-silver {
+    margin-top: 20px;
+    padding: 11px 30px;
+    font-size: 14px;
+    letter-spacing: .34em;
+    text-indent: .34em;
   }
 
-  .vat {
-    grid-column: 2;
-    grid-row: 2;
-    justify-self: start;
-    height: min(24dvh, 180px);
+  .m-phoenix   { width: min(62vw, 300px); left: -14%; top: 4%; opacity: .38; }
+  .m-bird-2    { width: min(30vw, 150px); right: -4%; bottom: 4%; opacity: .34; }
+  .m-bird-3    { width: min(20vw, 100px); left: 4%; bottom: 6%; opacity: .28; }
+  .m-butterfly { width: min(16vw, 82px); right: 12%; top: 7%; opacity: .38; }
+  .m-sun       { width: min(18vw, 92px); left: 42%; top: 0; opacity: .26; }
+
+  /* 窄屏空间小，团花退到角上，别压住标题、按钮和右下角的音乐开关 */
+  .s-flower-1 {
+    width: min(40vw, 180px);
+    right: -22%;
+    top: auto;
+    bottom: -14%;
+    transform: none;
+    opacity: .78;
   }
-
-  .intro__lede {
-    font-size: 12.5px;
-    line-height: 1.85;
-  }
-
-  .intro__enter { margin-top: 20px; }
-
-  .intro__kicker { font-size: 10.5px; }
+  .s-flower-2 { width: min(26vw, 118px); left: -10%; top: 2%; opacity: .62; }
+  .s-flower-3 { width: min(17vw, 78px); left: 6%; bottom: 2%; opacity: .55; }
 }
 
-/* 矮屏：压缩两侧图形，避免标题被挤压 */
-@media (min-width: 861px) and (max-height: 680px) {
-  .cloth { height: min(64dvh, 400px); }
-  .vat { height: min(44dvh, 310px); }
-  .intro__lede {
-    margin-top: .9em;
-    font-size: 12.5px;
-    line-height: 1.8;
+/* 横屏手机：上下堆叠会把两块压扁，改回左右分屏并收小字号 */
+@media (max-width: 900px) and (orientation: landscape) and (max-height: 520px) {
+  .intro { flex-direction: row; }
+
+  .spine { left: 50%; right: auto; top: 0; bottom: 0; width: 0; height: auto; }
+
+  .spine::before {
+    left: -1px;
+    right: auto;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    height: auto;
+    background: linear-gradient(180deg,
+      transparent, var(--in-mid) 18%, var(--in-hi) 50%, var(--in-mid) 82%, transparent);
   }
+
+  .intro-badge { width: clamp(78px, 16vh, 110px); }
+  .portal-kicker { margin-bottom: 8px; font-size: 9.5px; }
+  .portal-title { font-size: clamp(24px, 5.6vh, 40px); }
+  .btn-silver { margin-top: 14px; padding: 9px 24px; font-size: 12.5px; }
 }
 
-/* 减少动效：涟漪与滚动提示都静止 */
+/* 减少动效：纹样与掠光全部静止 */
 @media (prefers-reduced-motion: reduce) {
-  .vat__ring { animation: none; opacity: .25; }
-  .intro__hint i { animation: none; }
+  .batik-motifs svg,
+  .stitch-motifs svg,
+  .intro-badge__spin,
+  .btn-silver::after { animation: none !important; }
+
+  .portal-inner > * { animation: none; }
+  .portal,
+  .portal-inner,
+  .btn-silver { transition: none; }
+
   html { scroll-behavior: auto; }
 }
 
