@@ -250,11 +250,11 @@
 .map-sec #leader-lines g.is-active circle { fill: var(--map-brick-lit); }
 
 /* ---------- 6. 海南附图说明 / 来源注记 ---------- */
-/* 右下角除了本按钮还有全站的音乐悬浮键（46px 圆钮，贴 right 14~26px），
+/* 右下角除了本按钮还有全站的音乐悬浮键（56px 银盘钮，贴 right 14~26px），
    这里整体左移一个按钮位，两者才不会叠在一起 */
 .map-sec .hainan-note {
   position: absolute;
-  right: calc(clamp(14px, 2.4vw, 26px) + 58px);
+  right: calc(clamp(14px, 2.4vw, 26px) + 68px);
   bottom: 2.6%;
   z-index: 5;
   padding: 6px 12px;

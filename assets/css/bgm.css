@@ -1,94 +1,173 @@
 /* ==========================================================================
    银绣山河 · 背景音乐开关（全站复用）
-   位置：右下角悬浮；静音态半透明银灰，播放态亮银 + 律动
+   造型：苗族银饰的圆形银盘
+     · 外圈   —— 12 颗银泡，银饰上成圈排列的小银点
+     · 中层   —— 铜鼓太阳纹的 12 道芒，播放时缓慢旋转
+     · 内芯   —— 深靛蓝底 + 双八分音符，缩到 56px 也一眼认得出
+     · 关闭态 —— 朱红斜线压在音符上
+   位置：默认右下角，可用鼠标 / 手指拖到任意位置，位置记在 localStorage
    ========================================================================== */
+
+#bgm-audio {
+  display: none;
+}
 
 .bgm-toggle {
   position: fixed;
   right: clamp(14px, 2.4vw, 26px);
-  bottom: clamp(14px, 2.4vh, 26px);
+  bottom: clamp(14px, 2.4vw, 26px);
   z-index: 90;
-  width: 46px;
-  height: 46px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 56px;
+  height: 56px;
   padding: 0;
-  border: 1px solid rgba(214, 228, 246, .22);
+  border: 0;
   border-radius: 50%;
-  background: rgba(10, 31, 56, .72);
-  color: var(--silver-300, #b3c5dd);
-  cursor: pointer;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  box-shadow: 0 4px 18px rgba(2, 8, 18, .4);
-  transition: color .5s ease, border-color .5s ease, background .5s ease, transform .5s var(--ease-soft, cubic-bezier(.19,1,.22,1));
+  background: none;
+  cursor: grab;
+  touch-action: none;                 /* 拖动按钮时不要滚动页面 */
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  /* 两层投影：近的一层勾轮廓，远的一层给体积。
+     展馆页的文物图、体验页的团花底色都很浅，只靠远投影分不开 */
+  filter: drop-shadow(0 1px 2px rgba(2, 8, 18, .55))
+          drop-shadow(0 4px 12px rgba(2, 8, 18, .45));
+  transition: transform .35s cubic-bezier(.19, 1, .22, 1),
+              filter .45s ease,
+              opacity .35s ease;
 }
 
-.bgm-toggle:hover,
-.bgm-toggle:focus-visible {
-  color: var(--silver-50, #f6faff);
-  border-color: rgba(217, 178, 106, .5);
-  transform: translateY(-2px);
+.bgm-disc {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
-.bgm-toggle:focus-visible {
-  outline: 1px solid var(--gold, #d9b26a);
-  outline-offset: 3px;
+.bgm-disc svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
-.bgm-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.bgm-icon svg { display: block; }
+/* ---------------- 关闭态：稍稍退到背景里 ---------------- */
 
-/* 静音斜线：默认（关）显示，播放（on）隐藏 */
-.bgm-toggle .i-mute {
+.bgm-toggle.is-off {
+  opacity: .82;
+}
+.bgm-toggle.is-off:hover,
+.bgm-toggle.is-off:focus-visible {
   opacity: 1;
-  transition: opacity .4s ease;
 }
-.bgm-toggle.is-on .i-mute {
+
+/* 关闭态的音符压暗一档，斜线才显眼 */
+.bgm-toggle.is-off .bgm-note {
+  fill: #a3b6cb;
+}
+.bgm-toggle.is-off .bgm-filigree {
+  stroke: #8ba1bb;
+}
+
+/* ---------------- 交互反馈 ---------------- */
+
+@media (hover: hover) and (pointer: fine) {
+  .bgm-toggle:hover {
+    transform: scale(1.06);
+  }
+}
+
+.bgm-toggle:focus-visible {
+  outline: 2px solid var(--gold, #d9b26a);
+  outline-offset: 4px;
+  opacity: 1;
+}
+
+/* 按住 / 拖动：放大一点，且不再走过渡，跟手 */
+.bgm-toggle.is-holding {
+  cursor: grabbing;
+}
+.bgm-toggle.is-dragging {
+  cursor: grabbing;
+  transform: scale(1.1);
+  transition: none;
+}
+
+/* ---------------- 播放态 ---------------- */
+
+.bgm-toggle.is-on {
+  opacity: 1;
+  filter: drop-shadow(0 1px 2px rgba(2, 8, 18, .55))
+          drop-shadow(0 4px 12px rgba(2, 8, 18, .45))
+          drop-shadow(0 0 9px rgba(217, 178, 106, .4));
+}
+
+/* 花丝环缓慢自转：24 秒一圈，不抢注意力 */
+.bgm-toggle.is-on .bgm-filigree {
+  transform-box: view-box;
+  transform-origin: 28px 28px;
+  animation: bgm-spin 24s linear infinite;
+}
+@keyframes bgm-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 音符轻轻起伏，像在打拍子 */
+.bgm-toggle.is-on .bgm-note {
+  transform-box: view-box;
+  transform-origin: 28px 28px;
+  animation: bgm-bob 1.15s ease-in-out infinite;
+}
+@keyframes bgm-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-0.8px); }
+}
+
+/* 外圈淡金光环，播放时一圈圈散开 */
+.bgm-glow {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(217, 178, 106, 0);
+  pointer-events: none;
+}
+.bgm-toggle.is-on .bgm-glow {
+  animation: bgm-pulse 3s ease-out infinite;
+}
+@keyframes bgm-pulse {
+  0%   { transform: scale(1);   opacity: .8; border-color: rgba(217, 178, 106, .55); }
+  70%  { transform: scale(1.5); opacity: 0;  border-color: rgba(217, 178, 106, 0); }
+  100% { transform: scale(1.5); opacity: 0;  border-color: rgba(217, 178, 106, 0); }
+}
+
+/* ---------------- 静音斜线：开 → 隐，关 → 显 ---------------- */
+
+.bgm-toggle .bgm-mute {
+  opacity: 1;
+  transition: opacity .3s ease;
+}
+.bgm-toggle.is-on .bgm-mute {
   opacity: 0;
 }
 
-/* 播放态：亮银 + 淡金光圈 + 音符轻微律动 */
-.bgm-toggle.is-on {
-  color: var(--silver-100, #e6eefa);
-  border-color: rgba(217, 178, 106, .55);
-  background: rgba(15, 44, 76, .82);
+/* ---------------- 小屏 ---------------- */
+
+@media (max-width: 560px) {
+  .bgm-toggle {
+    width: 52px;
+    height: 52px;
+  }
 }
 
-.bgm-toggle.is-on .i-note {
-  animation: bgm-note .9s ease-in-out infinite;
-  transform-origin: center;
-}
-.bgm-toggle.is-on .i-note:nth-of-type(2) { animation-delay: .2s; }
+/* ---------------- 弱动效降级 ---------------- */
 
-@keyframes bgm-note {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
-}
-
-/* 律动光圈：播放态一圈扩散的淡金环 */
-.bgm-ring {
-  position: absolute;
-  inset: -1px;
-  border-radius: 50%;
-  border: 1px solid rgba(217, 178, 106, 0);
-  pointer-events: none;
-}
-.bgm-toggle.is-on .bgm-ring {
-  animation: bgm-pulse 2.4s ease-out infinite;
-}
-@keyframes bgm-pulse {
-  0%   { transform: scale(1);    opacity: .7; border-color: rgba(217, 178, 106, .5); }
-  70%  { transform: scale(1.55); opacity: 0;   border-color: rgba(217, 178, 106, 0); }
-  100% { transform: scale(1.55); opacity: 0;   border-color: rgba(217, 178, 106, 0); }
-}
-
-/* 无 JS / 弱动效降级 */
 @media (prefers-reduced-motion: reduce) {
-  .bgm-toggle.is-on .i-note,
-  .bgm-toggle.is-on .bgm-ring { animation: none; }
+  .bgm-toggle,
+  .bgm-toggle:hover,
+  .bgm-toggle.is-dragging {
+    transition: none;
+    transform: none;
+  }
+  .bgm-toggle.is-on .bgm-filigree,
+  .bgm-toggle.is-on .bgm-note,
+  .bgm-toggle.is-on .bgm-glow {
+    animation: none;
+  }
 }
