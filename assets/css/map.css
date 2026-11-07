@@ -1,0 +1,636 @@
+/* ==========================================================================
+   银绣山河 — 首页第二屏「苗疆万里」苗族非遗分布地图
+   --------------------------------------------------------------------------
+   本文件只服务 index.html 里 .map-sec 这一屏，不改动任何既有页面样式。
+
+   设计要点
+   1. 高度 = 视口 − 顶栏，紧接第一屏（.stage 也是这个高度），
+      滚到底时地图屏正好铺满顶栏以下的区域，不留缝、不压顶栏。
+   2. isolation:isolate 把这一屏内部的高 z-index（详情浮层）圈住，
+      否则浮层会盖到全站 sticky 顶栏上面去。
+   3. 原稿的 fixed 质感层改为 absolute 只贴本屏，滚动时不动。
+   4. 色板不另起一套：全部映射到 main.css 的靛蓝 / 银白 / 朱红 / 金色令牌。
+   ========================================================================== */
+
+/* ---------- 1. 屏容器 ---------- */
+.map-sec {
+  /* 本屏色板（值全部来自站点令牌，改令牌即全站同步） */
+  --map-deep:       var(--indigo-900, #061527);
+  --map-base:       var(--indigo-800, #0a1f38);
+  --map-lift:       var(--indigo-700, #0f2c4c);
+  --map-brick:      var(--cinnabar, #b03a2e);
+  --map-brick-lit:  #c8503a;
+  --map-gold:       var(--gold, #d9b26a);
+  --map-silver:     var(--silver-100, #e6eefa);
+  --map-silver-dim: var(--silver-300, #b3c5dd);
+  --map-wine:       #6a2e3c;
+
+  position: relative;
+  isolation: isolate;
+  height: calc(100dvh - var(--nav-h, 64px));
+  min-height: 400px;
+  overflow: hidden;
+  background: var(--map-deep);
+  font-family: var(--font-serif);
+  color: var(--map-silver);
+  /* 与第一屏之间一道金线，代替生硬的分界 */
+  border-top: 1px solid rgba(217, 178, 106, .2);
+}
+
+/* 顶部一道压深，让顶栏和地图之间过渡更柔 */
+.map-sec::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 72px;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(6, 21, 39, .82), rgba(6, 21, 39, 0));
+}
+
+/* ---------- 2. 蜡染布料质感（原稿的 fixed 层，改为本屏内绝对定位） ---------- */
+.map-cloth {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* 靛蓝晕染：左上偏亮、右下偏酒红 */
+.map-cloth--dye {
+  z-index: 1;
+  mix-blend-mode: soft-light;
+  background:
+    radial-gradient(1100px 700px at 28% 18%, rgba(31, 48, 84, .5), transparent 65%),
+    radial-gradient(900px 620px at 82% 88%, rgba(106, 46, 60, .28), transparent 60%);
+}
+
+/* 经纬织纹：压在地图之上，做「印在布上」的效果 */
+.map-cloth--weave {
+  z-index: 6;
+  opacity: .34;
+  mix-blend-mode: overlay;
+  background-image:
+    repeating-linear-gradient(0deg,  rgba(232, 221, 187, .055) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(90deg, rgba(232, 221, 187, .04)  0 1px, transparent 1px 4px);
+}
+
+/* 冰裂纹：极淡的噪点分形 */
+.map-cloth--crackle {
+  z-index: 7;
+  opacity: .07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='b'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.014' numOctaves='4' seed='7'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.91 0 0 0 0 0.87 0 0 0 0 0.73 0.9 0.9 0.9 0 -1.45'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23b)'/%3E%3C/svg%3E");
+  background-size: 640px 640px;
+}
+
+/* ---------- 3. 舞台 ---------- */
+.map-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.map-sec #map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* 引线层：铺满，不接收鼠标事件（点击穿透到地图） */
+.map-sec #leader-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 4;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.map-sec #callout-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;   /* 只有标注本身可点 */
+}
+
+/* ---------- 4. 顶部题头（轻量，不占地图空间） ---------- */
+.map-head {
+  position: absolute;
+  top: clamp(10px, 1.8vh, 22px);
+  left: 0;
+  right: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: .1em .7em;
+  padding: 0 var(--page-pad);
+  pointer-events: none;
+  text-align: center;
+  text-shadow: 0 2px 14px rgba(6, 21, 39, .92), 0 0 32px rgba(6, 21, 39, .7);
+}
+
+.map-head__no {
+  font-family: var(--font-brush, serif);
+  font-size: clamp(12px, 1.5vh, 14px);
+  letter-spacing: .18em;
+  color: var(--map-gold);
+  opacity: 1;
+  padding-right: .2em;
+  border-right: 1px solid rgba(217, 178, 106, .4);
+}
+
+.map-head__title {
+  margin: 0;
+  font-family: var(--font-brush, serif);
+  font-weight: 400;
+  font-size: clamp(19px, 2.6vh, 27px);
+  letter-spacing: .2em;
+  text-indent: .2em;
+  line-height: 1.1;
+  background: linear-gradient(180deg, #f6faff 8%, #dce6f3 52%, #a9bfd8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.map-head__sub {
+  font-family: var(--font-ui, sans-serif);
+  font-size: clamp(11px, 1.4vh, 12.5px);
+  letter-spacing: .16em;
+  color: var(--map-silver-dim);
+  opacity: .82;
+}
+
+/* ---------- 5. 引线标注 ---------- */
+/* 用 <button> 而不是 <div>：键盘可聚焦、屏幕阅读器能读，
+   外观由这里重置成「一块字」 */
+.map-sec .callout {
+  position: absolute;
+  z-index: 5;
+  width: 252px;
+  padding: 6px 12px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  pointer-events: auto;
+  transform: translateY(-50%);
+  transition: background .25s ease, box-shadow .25s ease;
+}
+
+.map-sec .callout:hover,
+.map-sec .callout:focus-visible,
+.map-sec .callout.is-active {
+  background: rgba(176, 58, 46, .16);
+  box-shadow: inset 0 0 0 1px rgba(200, 80, 58, .35);
+}
+
+.map-sec .callout:focus-visible {
+  outline: 1px solid rgba(217, 178, 106, .75);
+  outline-offset: 2px;
+}
+
+.map-sec .callout .co-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-serif);
+  font-size: 14.5px;
+  letter-spacing: .1em;
+  white-space: nowrap;
+  color: var(--map-silver);
+}
+
+/* 菱形小点：朱红底 + 银边 */
+.map-sec .callout .co-name .dm {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  background: var(--map-brick);
+  transform: rotate(45deg);
+}
+
+/* 标注内部用 span（button 里不能放 div），靠 display 还原块级排版 */
+.map-sec .callout .co-items {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-ui, sans-serif);
+  font-size: 11px;
+  line-height: 1.85;
+  letter-spacing: .04em;
+  color: var(--map-gold);
+  opacity: .78;
+}
+
+/* 左列标注右对齐，菱形点反手走到文字右边 */
+.map-sec .callout.co-L { text-align: right; }
+.map-sec .callout.co-L .co-name { flex-direction: row-reverse; }
+
+.map-sec #leader-lines path {
+  fill: none;
+  stroke: rgba(217, 178, 106, .52);
+  stroke-width: 1;
+  transition: stroke .25s ease;
+}
+
+.map-sec #leader-lines circle {
+  fill: var(--map-brick);
+  stroke: rgba(232, 238, 248, .8);
+  stroke-width: 1;
+  transition: fill .2s ease;
+}
+
+.map-sec #leader-lines g.is-active path { stroke: var(--map-brick-lit); stroke-width: 1.6; }
+.map-sec #leader-lines g.is-active circle { fill: var(--map-brick-lit); }
+
+/* ---------- 6. 海南附图说明 / 来源注记 ---------- */
+/* 右下角除了本按钮还有全站的音乐悬浮键（46px 圆钮，贴 right 14~26px），
+   这里整体左移一个按钮位，两者才不会叠在一起 */
+.map-sec .hainan-note {
+  position: absolute;
+  right: calc(clamp(14px, 2.4vw, 26px) + 58px);
+  bottom: 2.6%;
+  z-index: 5;
+  padding: 6px 12px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  text-align: center;
+  cursor: pointer;
+  transition: background .25s ease;
+}
+
+.map-sec .hainan-note:hover,
+.map-sec .hainan-note:focus-visible {
+  background: rgba(176, 58, 46, .16);
+}
+
+.map-sec .hainan-note:focus-visible {
+  outline: 1px solid rgba(217, 178, 106, .75);
+  outline-offset: 2px;
+}
+
+.map-sec .hainan-note b {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .18em;
+  color: var(--map-silver);
+}
+
+.map-sec .hainan-note span {
+  font-family: var(--font-ui, sans-serif);
+  font-size: 10px;
+  letter-spacing: .08em;
+  color: var(--map-gold);
+  opacity: .72;
+}
+
+/* 来源注记：单行贴底，透明度压到最低，不抢地图 */
+.map-sec .footnote {
+  position: absolute;
+  left: max(14px, 2.2vw);
+  bottom: 11px;
+  z-index: 5;
+  margin: 0;
+  font-family: var(--font-ui, sans-serif);
+  font-size: 10px;
+  line-height: 1.6;
+  letter-spacing: .05em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100% - 340px);
+  color: var(--map-gold);
+  opacity: .42;
+  pointer-events: none;
+}
+
+/* ---------- 7. 加载 / 失败 ---------- */
+.map-sec .map-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  font-family: var(--font-ui, sans-serif);
+  font-size: 13px;
+  letter-spacing: .3em;
+  color: var(--map-gold);
+  background: var(--map-deep);
+}
+
+.map-sec .map-spinner {
+  width: 32px;
+  height: 32px;
+  border: 2px solid rgba(217, 178, 106, .22);
+  border-top-color: var(--map-brick-lit);
+  border-radius: 50%;
+  animation: mapSpin 1s linear infinite;
+}
+
+.map-sec .map-error {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 24px;
+  font-family: var(--font-ui, sans-serif);
+  font-size: 14px;
+  line-height: 2;
+  letter-spacing: .12em;
+  text-align: center;
+  color: var(--map-silver-dim);
+  background: var(--map-deep);
+}
+
+/* display:none / flex 由 JS 切换，这里只声明「显示时的样子」 */
+.map-sec .map-error.is-open { display: flex; }
+
+.map-sec .map-retry {
+  padding: 8px 26px;
+  border: 1px solid rgba(217, 178, 106, .6);
+  background: var(--map-brick);
+  font-family: var(--font-ui, sans-serif);
+  font-size: 13px;
+  letter-spacing: .22em;
+  color: var(--map-silver);
+  cursor: pointer;
+  transition: background .25s ease, border-color .25s ease;
+}
+
+.map-sec .map-retry:hover { background: var(--map-brick-lit); border-color: var(--map-gold); }
+
+.map-sec .map-retry:focus-visible {
+  outline: 2px solid var(--map-gold);
+  outline-offset: 3px;
+}
+
+/* ---------- 8. 地区详情（覆盖本屏，不盖顶栏） ---------- */
+.map-sec #detail {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  display: none;
+  flex-direction: column;
+  background: var(--map-base);
+  border-top: 1px solid rgba(217, 178, 106, .2);
+}
+
+.map-sec #detail.is-open {
+  display: flex;
+}
+
+/* 入场动画只做位移，不做透明度 —— 万一动画没推进（低端机、无头浏览器、
+   系统开了减少动效），浮层也只是位置差几像素，背景永远是实色，不会透出地图 */
+.map-sec #detail.is-open > * {
+  animation: mapSlideIn .42s var(--ease-soft, cubic-bezier(.19, 1, .22, 1)) both;
+}
+
+.map-sec .detail__top {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2.2vw, 26px);
+  padding: clamp(14px, 2.2vh, 24px) var(--page-pad) clamp(10px, 1.6vh, 18px);
+  border-bottom: 1px solid rgba(217, 178, 106, .26);
+}
+
+.map-sec .detail__back {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px 8px 15px;
+  border: 1px solid rgba(217, 178, 106, .55);
+  background: transparent;
+  font-family: var(--font-ui, sans-serif);
+  font-size: 13px;
+  letter-spacing: .2em;
+  color: var(--map-silver);
+  cursor: pointer;
+  transition: background .25s ease, border-color .25s ease;
+}
+
+.map-sec .detail__back:hover { background: var(--map-brick); border-color: var(--map-brick-lit); }
+
+.map-sec .detail__back:focus-visible {
+  outline: 2px solid var(--map-gold);
+  outline-offset: 3px;
+}
+
+.map-sec .detail__title {
+  margin: 0;
+  font-family: var(--font-brush, serif);
+  font-weight: 400;
+  font-size: clamp(21px, 3vw, 34px);
+  letter-spacing: .16em;
+  line-height: 1.15;
+  color: var(--map-silver);
+}
+
+.map-sec .detail__tag {
+  margin-top: 6px;
+  font-family: var(--font-ui, sans-serif);
+  font-size: 11.5px;
+  letter-spacing: .16em;
+  color: var(--map-gold);
+  opacity: .8;
+}
+
+.map-sec .detail__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: clamp(16px, 2.4vh, 26px) var(--page-pad) clamp(24px, 4vh, 44px);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(217, 178, 106, .4) transparent;
+}
+
+.map-sec .detail__body::-webkit-scrollbar { width: 6px; }
+.map-sec .detail__body::-webkit-scrollbar-track { background: transparent; }
+.map-sec .detail__body::-webkit-scrollbar-thumb {
+  background: rgba(217, 178, 106, .38);
+  border-radius: 3px;
+}
+
+.map-sec .detail__intro {
+  max-width: 940px;
+  margin: 0 0 clamp(18px, 2.6vh, 28px);
+  padding-left: 18px;
+  border-left: 3px solid var(--map-brick);
+  font-family: var(--font-serif);
+  font-size: clamp(14px, 1.9vh, 16px);
+  line-height: 2.05;
+  letter-spacing: .06em;
+  color: rgba(230, 238, 250, .92);
+  text-wrap: pretty;
+}
+
+/* ---------- 9. 条目卡片 ---------- */
+.map-sec .m-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: clamp(12px, 1.8vw, 20px);
+}
+
+.map-sec .m-card {
+  position: relative;
+  padding: 18px 20px 16px;
+  border: 1px solid rgba(217, 178, 106, .34);
+  background: linear-gradient(165deg, rgba(15, 44, 76, .72), rgba(6, 21, 39, .86));
+  transition: transform .3s var(--ease-soft, cubic-bezier(.19, 1, .22, 1)),
+              border-color .3s ease,
+              box-shadow .3s ease;
+}
+
+/* 左上角折角：朱红双线，和站点其他卡片的角饰同构 */
+.map-sec .m-card::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 30px;
+  height: 30px;
+  border-top: 2px solid var(--map-brick-lit);
+  border-left: 2px solid var(--map-brick-lit);
+  opacity: .85;
+}
+
+.map-sec .m-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(200, 80, 58, .8);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, .45), 0 0 22px rgba(176, 58, 46, .2);
+}
+
+.map-sec .m-card h4 {
+  margin: 0 0 10px;
+  font-family: var(--font-serif);
+  font-size: clamp(16px, 1.9vh, 18px);
+  font-weight: 600;
+  letter-spacing: .1em;
+  color: var(--map-silver);
+}
+
+.map-sec .m-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 11px;
+}
+
+.map-sec .m-tag {
+  padding: 2px 10px;
+  border: 1px solid rgba(217, 178, 106, .38);
+  font-family: var(--font-ui, sans-serif);
+  font-size: 10.5px;
+  letter-spacing: .12em;
+  color: var(--map-gold);
+}
+
+.map-sec .m-tag--level {
+  background: rgba(106, 46, 60, .5);
+  border-color: rgba(176, 58, 46, .55);
+  color: rgba(240, 226, 210, .95);
+}
+
+.map-sec .m-card p {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 13.5px;
+  line-height: 1.95;
+  letter-spacing: .03em;
+  color: rgba(179, 197, 221, .9);
+  text-wrap: pretty;
+}
+
+/* ---------- 10. 关键帧 ---------- */
+@keyframes mapSpin { to { transform: rotate(360deg); } }
+
+@keyframes mapSlideIn {
+  from { transform: translateY(12px); }
+  to   { transform: none; }
+}
+
+/* ---------- 11. 响应式 ---------- */
+/* 窄屏或矮屏（13 寸笔记本 1024×700 一类）：引线标注挤不下，
+   只保留地图本身与题头，右下的海南附图才不会被标注压住。
+   阈值要和 map.js 里 layoutCallouts 的判断保持一致 */
+@media (max-width: 900px), (max-height: 700px) {
+  .map-sec .callout,
+  .map-sec #leader-lines { display: none; }
+
+  .map-sec .footnote { display: none; }
+
+  /* 右下角是音乐按钮的地盘，这类尺寸把附图说明挪到左下，两边各占一角 */
+  .map-sec .hainan-note {
+    left: 10px;
+    right: auto;
+    bottom: 10px;
+    padding: 4px 8px;
+    text-align: left;
+  }
+  .map-sec .hainan-note b { font-size: 11.5px; letter-spacing: .1em; }
+  .map-sec .hainan-note span { font-size: 9px; }
+
+  .map-sec .detail__top {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}
+
+/* 手机竖屏地图受宽度限制会显得小，下方留白用一句操作提示填住。
+   基础态先写好，再由下面的 media query 打开显示 */
+.map-sec .map-hint {
+  display: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 16%;
+  z-index: 5;
+  margin: 0;
+  padding: 0 24px;
+  font-family: var(--font-ui, sans-serif);
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-align: center;
+  color: var(--map-gold);
+  opacity: .6;
+  pointer-events: none;
+}
+
+@media (max-width: 560px) {
+  .map-sec .map-hint { display: block; }
+  .map-head__sub { display: none; }
+
+  /* 手机竖屏：返回键独占一行，标题另起一行，两个大字号挤在一起会互相顶 */
+  .map-sec .detail__top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .map-sec .detail__back { padding: 7px 15px 7px 11px; font-size: 12px; letter-spacing: .14em; }
+  .map-sec .detail__title { font-size: 19px; letter-spacing: .1em; }
+  .map-sec .detail__intro { padding-left: 14px; }
+}
+
+/* 尊重系统的「减少动态效果」：本页只有淡入与小位移，直接关掉 */
+@media (prefers-reduced-motion: reduce) {
+  .map-sec .map-spinner { animation: none; }
+  .map-sec .m-card:hover { transform: none; }
+}

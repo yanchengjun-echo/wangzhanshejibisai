@@ -21,7 +21,11 @@
 <link rel="preload" href="assets/fonts/youran-xiaokai-title.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/css/main.css">
 <link rel="stylesheet" href="assets/css/bgm.css">
+<link rel="stylesheet" href="assets/css/map.css">
 <link rel="stylesheet" href="assets/css/chrome.css">
+
+<!-- 第二屏地图：滚动到附近才下载 echarts 与底图，这里只是登记脚本 -->
+<script defer src="assets/js/map.js"></script>
 
 <!-- 入场动画的开关：只有脚本确认能跑，才给 html 加 anim 类。
      这样即使脚本被拦截、动画失败，页面也是完整可见的，不会白屏。 -->
@@ -123,6 +127,79 @@
 
   </main>
 </div>
+
+<!-- ==================================================================
+     第二屏 · 苗疆万里：苗族非遗分布地图
+     往下滚动进入。底图与图表库都已放到本地，滚到附近才加载，
+     因此首屏（第一屏）的加载负担不变。
+     ================================================================== -->
+<section class="map-sec" id="map-sec" aria-labelledby="map-title">
+
+  <!-- 靛蓝晕染：只作用于本屏 -->
+  <div class="map-cloth map-cloth--dye" aria-hidden="true"></div>
+
+  <div class="map-stage">
+    <div id="map" role="img"
+         aria-label="苗族非物质文化遗产分布地图，可点击省份或聚居地查看代表性非遗条目"></div>
+    <svg id="leader-lines" aria-hidden="true" focusable="false"></svg>
+    <div id="callout-layer"></div>
+
+    <!-- 题头：轻量悬浮，不占地图空间 -->
+    <div class="map-head">
+      <span class="map-head__no" aria-hidden="true">贰</span>
+      <h2 class="map-head__title" id="map-title">苗疆万里</h2>
+      <span class="map-head__sub">苗族非物质文化遗产 · 分布图谱</span>
+    </div>
+
+    <!-- 手机竖屏的操作提示（宽屏由 CSS 隐藏） -->
+    <p class="map-hint">点按地图上的省份或自治州，查看代表性非遗条目</p>
+
+    <!-- 海南附图说明 -->
+    <button class="hainan-note" id="hainan-note" type="button">
+      <b>海南省 · 附图</b>
+      <span>盘皇舞 · 苗族民歌 · 三色饭</span>
+    </button>
+
+    <!-- 来源注记：压成一行贴底，避免和左下角的引线标注抢地方 -->
+    <p class="footnote">
+      条目为代表性示例，正式名录以国务院公布为准 · 底图 DataV.GeoAtlas 标准行政区划
+    </p>
+
+    <!-- 加载中 -->
+    <div class="map-loading" id="map-loading">
+      <div class="map-spinner"></div>
+      <div>地图加载中…</div>
+    </div>
+
+    <!-- 加载失败：给一个明确的重试出口，不让这一屏变成空白 -->
+    <div class="map-error" id="map-error" role="alert">
+      <div>地图数据未能载入<br>请检查网络后重试</div>
+      <button class="map-retry" id="retry-btn" type="button">重新加载</button>
+    </div>
+  </div>
+
+  <!-- 地区详情：覆盖本屏，不盖顶栏。
+       特意放在 .map-stage 外面 —— stage 是 z-index:2 的层叠上下文，
+       放里面会被上面那层织纹（z-index:6）盖住 -->
+  <div id="detail" role="dialog" aria-modal="true"
+       aria-labelledby="detail-title" aria-hidden="true">
+    <div class="detail__top">
+      <button class="detail__back" type="button" id="back-btn">‹ 返回地图</button>
+      <div>
+        <h2 class="detail__title" id="detail-title"></h2>
+        <div class="detail__tag" id="detail-tag"></div>
+      </div>
+    </div>
+    <div class="detail__body">
+      <p class="detail__intro" id="detail-intro"></p>
+      <div class="m-cards" id="detail-cards"></div>
+    </div>
+  </div>
+
+  <!-- 织纹与冰裂纹：压在地图之上，做「印在布上」的效果 -->
+  <div class="map-cloth map-cloth--weave" aria-hidden="true"></div>
+  <div class="map-cloth map-cloth--crackle" aria-hidden="true"></div>
+</section>
 
 <!-- 背景音乐：《天地开辟》苗族古歌（Suno AI 谱曲），点击右下角按钮播放/暂停 -->
 <script src="assets/js/bgm.js"></script>
