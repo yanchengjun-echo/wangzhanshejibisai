@@ -1,10 +1,10 @@
 /* ==========================================================================
    匠心传承 — 手艺人（04 板块）
    --------------------------------------------------------------------------
-   版式：三张并排的人物卡，圆形银盘托技艺纹样 → 姓名 → 朱红头衔 → 一段小传。
+   版式：三张并排的人物卡，圆形人物照 → 姓名 → 朱红头衔 → 一段小传。
    骨架（.page / .paper / .grain / .crumb / .head / .page-title / .tagline）
    与「银绣珍藏」「枫启长歌」同构，配色沿用全站靛蓝 + 银白，朱红只做头衔。
-   圆盘内的纹样取自体验页同款符号：银饰蝴蝶 / 苗绣团花 / 蜡染鸟纹。
+   照片外面套一圈银边和 12 颗银泡，呼应苗族银饰，和全站的银白高光接得上。
    ========================================================================== */
 
 /* 本页补充令牌 */
@@ -189,14 +189,15 @@ body { overflow-x: hidden; }
 }
 .person:hover::before { opacity: 1; left: 8%; right: 8%; }
 
-/* --- 圆形银盘托技艺纹样 --- */
+/* --- 圆形头像：照片外留一圈银边，像苗银相框 --- */
 .person__avatar {
   position: relative;
   flex: 0 0 auto;
   width: clamp(104px, 12.4vh, 128px);
   aspect-ratio: 1 / 1;
-  display: grid;
-  place-items: center;
+  display: block;
+  /* 3px 内边距就是那圈银边，底色外露 */
+  padding: 3px;
   border-radius: 50%;
   background:
     radial-gradient(circle at 36% 28%, #f8fbff 0%, #e9f1fb 34%, #d8e3f1 62%, #bfcfe2 86%, #a8bcd2 100%);
@@ -224,28 +225,28 @@ body { overflow-x: hidden; }
   pointer-events: none;
 }
 
-/* 更好看的一点：银盘边缘的细描边 */
 .person__avatar::after {
   content: "";
   position: absolute;
   inset: -1px;
   border-radius: 50%;
   border: 1px solid rgba(9, 28, 54, .34);
+  /* 往里压一圈暗角。三张原片背景亮度不一（木门 / 白墙 / 浅色布），
+     有了这层过渡，亮背景的照片也能坐进深色卡片里，不会像贴上去的 */
+  box-shadow: inset 0 0 16px rgba(6, 21, 39, .42);
   pointer-events: none;
 }
 
-.person__motif {
+/* 照片：源图已是 1:1，直接铺满；换成非正方形照片时 cover 会自动裁切，
+   object-position 让裁切保住头部而不是切在天灵盖上 */
+.person__avatar img {
   display: block;
-  width: 64%;
-  height: 64%;
-  color: var(--ink);
-  opacity: .86;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: 50% 26%;
 }
-/* 团花自带外圈，放大一点才不显得空 */
-.person__motif--round { width: 78%; height: 78%; opacity: .78; }
-/* 鸟纹是横幅：宽度铺开、高度按视口比例收窄，才对得上 300×218 的构图
-   （只写 height:auto 会让 SVG 盒退化成正方形，纹样被压缩到中间一小块） */
-.person__motif--wide { width: 80%; height: 58%; opacity: .9; }
 
 /* --- 文字 --- */
 .person__name {
@@ -303,14 +304,6 @@ html.anim .person {
 @keyframes personIn {
   from { opacity: 0; transform: translateY(18px); }
   to   { opacity: 1; transform: none; }
-}
-
-/* 纹样定义块本身不占位 */
-.motif-defs {
-  position: absolute;
-  width: 0;
-  height: 0;
-  overflow: hidden;
 }
 
 /* ==========================================================================
