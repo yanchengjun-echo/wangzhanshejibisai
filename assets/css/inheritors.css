@@ -460,16 +460,25 @@ body.no-scroll { overflow: hidden; }
 .activity__col--bl { grid-area: col-bl; }
 .activity__fan--br { grid-area: fan-br; }
 
-/* 扇形图：不占满整列，收窄到约七成宽，垂直方向也相应变矮，
-   让两行内容互相咬合，避免正方形图把对面两行资讯卡衬出一大块空白 */
+/* 活动图：普通矩形 + 适度圆角，简洁干净 */
 .activity__fan {
+  position: relative;
   margin: 0;
-  width: min(72%, 360px);
-  aspect-ratio: 1 / 1;
+  border-radius: 10px;
   overflow: hidden;
-  border-radius: 6px;
-  opacity: .92;
-  filter: drop-shadow(0 20px 50px -22px rgba(2, 10, 22, .85));
+  box-shadow: 0 20px 50px -22px rgba(2, 10, 22, .85);
+}
+
+/* 左上图：竖版 3:4 */
+.activity__fan--tl {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+}
+
+/* 右下图：横版 4:3 */
+.activity__fan--br {
+  width: 100%;
+  aspect-ratio: 4 / 3;
 }
 
 .activity__fan img {
@@ -479,7 +488,7 @@ body.no-scroll { overflow: hidden; }
   object-fit: cover;
 }
 
-/* 左上扇形贴向对角外侧、右下扇形贴向对角外侧，制造对角呼应 */
+/* 左上图贴左、右下图贴右，形成对角呼应 */
 .activity__fan--tl { align-self: center; justify-self: start; }
 .activity__fan--br { align-self: center; justify-self: end; }
 
@@ -753,8 +762,8 @@ body.no-scroll { overflow: hidden; }
     gap: clamp(18px, 3vh, 28px);
     max-width: 620px;
   }
-  /* 单列时扇形图恢复接近满宽居中，不用再缩到 72% */
-  .activity__fan { width: min(88%, 420px); max-width: 420px; margin: 0 auto; }
+  /* 单列时弧边图居中、适当收窄，弧边朝下（左上图）或朝上（右下图）仍然保留 */
+  .activity__fan { width: min(92%, 480px); margin: 0 auto; }
   .activity__fan--tl { align-self: center; justify-self: center; }
   .activity__fan--br { align-self: center; justify-self: center; }
   .activity__col--tr { padding-top: 0; }
