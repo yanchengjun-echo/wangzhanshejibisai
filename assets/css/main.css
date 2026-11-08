@@ -130,7 +130,7 @@ body {
   filter: drop-shadow(0 0 18px rgba(120, 165, 220, .22));
 }
 html.anim .orn {
-  opacity: 0;
+  opacity: .5;
   animation: softFade 3s var(--ease-soft) .55s both;
 }
 
@@ -145,8 +145,8 @@ html.anim .orn {
 /* 上下两排角花的最终透明度不同，用两组关键帧区分 */
 html.anim .orn--tl, html.anim .orn--tr { animation-name: fadeTop; }
 html.anim .orn--bl, html.anim .orn--br { animation-name: fadeLow; }
-@keyframes fadeTop { from { opacity: 0; } to { opacity: .82; } }
-@keyframes fadeLow { from { opacity: 0; } to { opacity: .46; } }
+@keyframes fadeTop { from { opacity: .5; } to { opacity: .82; } }
+@keyframes fadeLow { from { opacity: .5; } to { opacity: .46; } }
 
 /* ==========================================================================
    3. 主体栅格
@@ -197,7 +197,7 @@ html.anim .orn--bl, html.anim .orn--br { animation-name: fadeLow; }
 
 /* 入场动画只在脚本标记了 html.anim 时启用——万一动画没跑，页面也是完整的 */
 html.anim .title i {
-  opacity: 0;
+  opacity: .5;
   animation: riseIn 2s var(--ease-soft) var(--d, 0s) both;
 }
 
@@ -216,7 +216,7 @@ html.anim .title i {
   box-shadow: 0 2px 10px rgba(176, 58, 46, .45);
 }
 html.anim .title--left::after {
-  opacity: 0;
+  opacity: .5;
   animation: softFade 1.8s var(--ease-soft) 1.05s both;
 }
 
@@ -232,7 +232,7 @@ html.anim .title--left::after {
   justify-self: center;
 }
 html.anim .medallion {
-  opacity: 0;
+  opacity: .55;
   animation: scaleIn 2.6s var(--ease-soft) .15s both;
 }
 
@@ -345,7 +345,7 @@ html.anim .medallion {
   width: 100%;
 }
 html.anim .footer {
-  opacity: 0;
+  opacity: .5;
   animation: riseIn 2.2s var(--ease-soft) 1.15s both;
 }
 
@@ -446,17 +446,17 @@ html.anim .footer {
    6. 关键帧
    ========================================================================== */
 @keyframes riseIn {
-  from { opacity: 0; transform: translateY(16px); }
+  from { opacity: .5; transform: translateY(16px); }
   to   { opacity: 1; transform: none; }
 }
 
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(.94); }
+  from { opacity: .55; transform: scale(.96); }
   to   { opacity: 1; transform: scale(1); }
 }
 
 @keyframes softFade {
-  from { opacity: 0; }
+  from { opacity: .5; }
   to   { opacity: 1; }
 }
 

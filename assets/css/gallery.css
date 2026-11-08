@@ -544,9 +544,9 @@ body { overflow-x: hidden; }
 /* ==========================================================================
    6. 关键帧 + 入场动画（仅 html.anim 下生效）
    ========================================================================== */
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeIn { from { opacity: .5; } to { opacity: 1; } }
 @keyframes riseIn {
-  from { opacity: 0; transform: translateY(14px) scale(.98); }
+  from { opacity: .5; transform: translateY(14px) scale(.98); }
   to { opacity: 1; transform: none; }
 }
 

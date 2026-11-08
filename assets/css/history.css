@@ -66,7 +66,7 @@
 /* 上排角花会压住顶栏文字，这张页把它调淡（下排保持原样作压角） */
 .stage--page .orn--tl,
 .stage--page .orn--tr { opacity: .38; }
-@keyframes fadeTopPage { from { opacity: 0; } to { opacity: .38; } }
+@keyframes fadeTopPage { from { opacity: .5; } to { opacity: .38; } }
 html.anim .stage--page .orn--tl,
 html.anim .stage--page .orn--tr { animation-name: fadeTopPage; }
 
@@ -567,12 +567,12 @@ html.js-tree .tnode.is-open .tnode__body { grid-template-rows: 1fr; }
 html.anim .chapter__title,
 html.anim .chapter__lede,
 html.anim .breathe__quote {
-  opacity: 0;
+  opacity: .5;
   animation: riseIn .9s var(--ease-soft) both;
 }
 html.anim .chapter__title   { animation-delay: .1s; }
 html.anim .chapter__lede    { animation-delay: .18s; }
-html.anim .page-foot { opacity: 0; animation: riseIn .9s var(--ease-soft) .14s both; }
+html.anim .page-foot { opacity: .5; animation: riseIn .9s var(--ease-soft) .14s both; }
 
 /* 树节点卡片：随滚动淡入（由 history.js 加 .is-in） */
 .js-anim .tnode__card {

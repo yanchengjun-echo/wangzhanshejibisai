@@ -319,13 +319,13 @@ body { overflow-x: hidden; }
 /* --- 入场：脚本确认后才加 html.anim，动画失效也不影响可读 --- */
 html.anim .roster__stage,
 html.anim .person {
-  opacity: 0;
+  opacity: .5;
   animation: personIn .8s var(--ease-soft) both;
 }
 html.anim .person { animation-delay: calc(.1s + var(--i, 0) * .06s); }
 
 @keyframes personIn {
-  from { opacity: 0; transform: translateY(16px); }
+  from { opacity: .5; transform: translateY(16px); }
   to   { opacity: 1; transform: none; }
 }
 

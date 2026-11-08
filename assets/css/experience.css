@@ -942,7 +942,7 @@ body.exp-root::before {
 .intro-anim .portal-inner > *:nth-child(3) { animation-delay: .50s; }
 
 @keyframes introRise {
-  from { opacity: 0; transform: translateY(18px); }
+  from { opacity: .5; transform: translateY(18px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 

@@ -296,12 +296,6 @@
       用 transform/opacity 做动效（不触发重排），并在进入新页时给一个
       极短、渐进的可见过渡，抹平「深色底 → 完整内容」的那一下跳变。
    -------------------------------------------------------------------------- */
-html.anim .page,
-html.anim .head,
-html.anim .roster__stage {
-  will-change: opacity, transform;
-}
-
 /* 兜底：万一某页脚本异常、html.anim 没加上，内容也要立即可见 */
 html:not(.anim) .page,
 html:not(.anim) .head,
