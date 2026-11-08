@@ -143,6 +143,82 @@
     </ul>
   </main>
 
+  <!-- 活动资讯：对角交叉构图（左上图 + 右下字，左下字 + 右下图） -->
+  <section class="activity" aria-labelledby="activity-title">
+    <header class="activity__head">
+      <h2 class="activity__title" id="activity-title">近期动态</h2>
+      <p class="activity__sub">山间有盛会 · 一针一线皆回响</p>
+    </header>
+
+    <div class="activity__grid">
+      <!-- 左上：扇形活动图 -->
+      <figure class="activity__fan activity__fan--tl" aria-hidden="true">
+        <img src="assets/activity/fan-top-left.png" alt="" width="760" height="760" loading="lazy">
+      </figure>
+
+      <!-- 右上：资讯卡 -->
+      <div class="activity__col activity__col--tr">
+        <article class="news" data-index="0">
+          <button class="news__card" type="button" aria-haspopup="dialog">
+            <span class="news__date">2026 · 09</span>
+            <span class="news__title">第五届丹寨非遗周 · 苗乡秀非遗美</span>
+            <span class="news__lead">蜡染、银饰、香云纱与手工刺绣同台，古老手艺与潮流设计在苗年广场碰撞。</span>
+            <span class="news__more">查看详情</span>
+          </button>
+        </article>
+
+        <article class="news" data-index="1">
+          <button class="news__card" type="button" aria-haspopup="dialog">
+            <span class="news__date">2026 · 06</span>
+            <span class="news__title">苗族「四月八 · 英雄亚努节」</span>
+            <span class="news__lead">千人银冠盛装巡游、花鼓苗歌、上刀山下火海，非遗市集人气爆棚。</span>
+            <span class="news__more">查看详情</span>
+          </button>
+        </article>
+      </div>
+
+      <!-- 左下：资讯卡 -->
+      <div class="activity__col activity__col--bl">
+        <article class="news" data-index="2">
+          <button class="news__card" type="button" aria-haspopup="dialog">
+            <span class="news__date">2025 · 04</span>
+            <span class="news__title">台江苗族姊妹节 · 苗绣技能大赛</span>
+            <span class="news__lead">以针为笔、以线为墨，绣娘老幼同台，姊妹 T 台秀出千年苗绣新姿。</span>
+            <span class="news__more">查看详情</span>
+          </button>
+        </article>
+
+        <article class="news" data-index="3">
+          <button class="news__card" type="button" aria-haspopup="dialog">
+            <span class="news__date">2026 · 06</span>
+            <span class="news__title">融水「苗山美」民族服饰大赛</span>
+            <span class="news__lead">芦笙悠悠、霓裳流转，一针一线皆是匠心，非遗穿搭走近日常。</span>
+            <span class="news__more">查看详情</span>
+          </button>
+        </article>
+      </div>
+
+      <!-- 右下：扇形活动图 -->
+      <figure class="activity__fan activity__fan--br" aria-hidden="true">
+        <img src="assets/activity/fan-bottom-right.png" alt="" width="760" height="760" loading="lazy">
+      </figure>
+    </div>
+  </section>
+
+  <!-- 资讯详情弹层：点开后内部元素从四周滑入 -->
+  <div class="news-overlay" id="news-overlay" hidden></div>
+  <div class="news-dialog" id="news-dialog" role="dialog" aria-modal="true" aria-labelledby="news-dialog-title" hidden>
+    <button class="news-dialog__close" type="button" aria-label="关闭详情">×</button>
+    <div class="news-dialog__body">
+      <span class="news-dialog__date" id="news-dialog-date"></span>
+      <h3 class="news-dialog__title" id="news-dialog-title"></h3>
+      <div class="news-dialog__img"><img src="" alt="" id="news-dialog-img"></div>
+      <p class="news-dialog__lead" id="news-dialog-lead"></p>
+      <div class="news-dialog__text" id="news-dialog-text"></div>
+      <p class="news-dialog__note" id="news-dialog-note"></p>
+    </div>
+  </div>
+
   <!-- 页脚 -->
   <footer class="page-foot">
     <div class="foot-rule" aria-hidden="true"></div>
@@ -154,6 +230,7 @@
   </footer>
 </div>
 
+<script src="assets/js/activity.js"></script>
 <script src="assets/js/bgm.js"></script>
 </body>
 </html>
