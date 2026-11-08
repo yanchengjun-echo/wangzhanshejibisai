@@ -256,12 +256,29 @@
   .topbar__link { font-size: 12.5px; letter-spacing: .04em; }
 }
 
-/* 再窄（小屏 SE 一类）才把站名和分隔线一起收掉，只留方形徽标。
-   两者必须同进同退，否则会剩一条孤零零的竖线 */
-@media (max-width: 379px) {
+/* 再窄才把站名和分隔线一起收掉，只留方形徽标。
+   两者必须同进同退，否则会剩一条孤零零的竖线。
+   断点从 379px 提到 460px：导航加到五项后，宽度低于这个值时
+   站名会和「互动创作」抢空间，宁可先把站名让出来。 */
+@media (max-width: 460px) {
   .topbar__name,
   .topbar__divider { display: none; }
   .topbar__brand { gap: 0; }
+
+  /* 站名让出来之后右侧会空出一大块，改成让五项把剩余宽度均分，
+     否则会缩在右边、左边留一段突兀的空白 */
+  .topbar__nav {
+    flex: 1 1 auto;
+    justify-content: space-between;
+    margin-left: 12px;
+    gap: 0;
+  }
+}
+
+/* 极窄屏再压一档字距与间距，保证五项都能落在一行里 */
+@media (max-width: 359px) {
+  .topbar__nav { gap: 8px; }
+  .topbar__link { font-size: 12px; letter-spacing: .02em; }
 }
 
 @media (prefers-reduced-motion: reduce) {

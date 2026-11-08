@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>匠心传承 · 手艺人 | 银绣山河</title>
+<meta name="description" content="匠心传承——银绣山河的人物篇。走近苗族银饰锻制、苗绣、苗族蜡染的国家级非遗代表性传承人，看一门手艺如何在一双手上停留一生。">
+<meta name="theme-color" content="#08172c">
+<meta name="color-scheme" content="dark">
+<meta name="author" content="银绣山河">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a1f38'/%3E%3Ccircle cx='16' cy='16' r='9.5' fill='none' stroke='%23dce6f3' stroke-width='1.5' stroke-dasharray='1.6 2.4'/%3E%3Cpath d='M10.5 18.5c3-4.6 8.4-4.2 11-1.2-2.2-4.6-7.6-4.4-9.2-2.4' fill='%23dce6f3'/%3E%3C/svg%3E">
+<link rel="canonical" href="https://yinxue-shanhe.app.workbuddy.host/inheritors.html">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="匠心传承 · 手艺人">
+<meta property="og:description" content="银饰、苗绣、蜡染——三位国家级非遗代表性传承人，和他们手上的一辈子。">
+<meta property="og:image" content="assets/bg-water.jpg">
+<meta property="og:locale" content="zh_CN">
+
+<link rel="preload" href="assets/fonts/youran-xiaokai-title.woff2" as="font" type="font/woff2" crossorigin>
+<!-- 样式表自愈：分享链接偶发中途断流时，某张 CSS 会整份不生效，页面退化成无样式
+     （导航消失、列表序号露出来、卡片排版消失）。解析完成后再核对每张表是否真的
+     解析出规则，失败的带时间戳重取，最多两次；正常加载时什么都不做，不影响缓存。 -->
+<script data-css-guard>
+(function () {
+  var MAX = 2;
+  function heal() {
+    var links = document.querySelectorAll('link[rel="stylesheet"]');
+    for (var i = 0; i < links.length; i++) {
+      var l = links[i];
+      var n = parseInt(l.getAttribute('data-css-retry') || '0', 10);
+      if (n >= MAX) continue;
+      var ok = false;
+      if (l.sheet) {
+        try { ok = !!(l.sheet.cssRules && l.sheet.cssRules.length); }
+        catch (e) { ok = true; }   /* 跨源时读不到规则，视为正常 */
+      }
+      if (!ok) {
+        l.setAttribute('data-css-retry', String(n + 1));
+        l.href = l.href.split('?')[0] + '?fix=' + Date.now();
+      }
+    }
+  }
+  window.addEventListener('load', heal);
+  setTimeout(heal, 3000);
+})();
+</script>
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="stylesheet" href="assets/css/inheritors.css">
+<link rel="stylesheet" href="assets/css/bgm.css">
+<link rel="stylesheet" href="assets/css/chrome.css">
+
+<script>
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.documentElement.classList.add('anim');
+  }
+</script>
+</head>
+<body>
+
+<a class="skip-link" href="#main">跳到主要内容</a>
+
+<!-- 全站顶栏：五个页面同一份结构，只改 aria-current 的位置 -->
+<header class="topbar">
+  <div class="topbar__inner">
+    <a class="topbar__brand" href="index.html" aria-label="银绣山河 · 返回首页">
+      <span class="topbar__mark" aria-hidden="true">绣</span>
+      <span class="topbar__name">银绣山河</span>
+    </a>
+    <span class="topbar__divider" aria-hidden="true"></span>
+    <nav class="topbar__nav" aria-label="主导航">
+      <a class="topbar__link" href="index.html">首页</a>
+      <a class="topbar__link" href="history.html">历史溯源</a>
+      <a class="topbar__link" href="gallery.html">纹样图鉴</a>
+      <a class="topbar__link" href="inheritors.html" aria-current="page">匠心传承</a>
+      <a class="topbar__link" href="experience.html">互动创作</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page">
+  <div class="paper" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- 面包屑 -->
+  <nav class="crumb" aria-label="面包屑导航">
+    <ol>
+      <li><a href="index.html">首页</a></li>
+      <li aria-current="page">匠心传承</li>
+    </ol>
+  </nav>
+
+  <!-- 页头 -->
+  <header class="head">
+    <h1 class="page-title" aria-label="匠心传承">
+      <span aria-hidden="true">匠心</span>
+      <span class="gap" aria-hidden="true"></span>
+      <span aria-hidden="true">传承</span>
+    </h1>
+    <p class="tagline">一手一艺 · 一生一事</p>
+  </header>
+
+  <main class="roster" id="main" aria-label="非遗代表性传承人">
+    <ul class="people">
+
+      <!-- 01 银饰 -->
+      <li class="person" style="--i:0">
+        <div class="person__avatar">
+          <svg class="person__motif" viewBox="0 0 220 200" aria-hidden="true" focusable="false">
+            <use href="#craft-silver"></use>
+          </svg>
+        </div>
+        <h2 class="person__name">杨光宾</h2>
+        <p class="person__role">苗族银饰锻制技艺国家级传承人</p>
+        <p class="person__desc">
+          贵州雷山西江控拜银匠世家第五代传人，十三岁随父学艺，十五岁出师游艺。熔炼、铸型、锻制、拉丝、焊接、錾刻、编结、洗涤三十余道工序皆能手握，能把一块银锭反复锤成细如发丝，再编作振翅欲飞的蝴蝶。如今带徒授艺，把家传的手艺往外传。
+        </p>
+      </li>
+
+      <!-- 02 苗绣 -->
+      <li class="person" style="--i:1">
+        <div class="person__avatar">
+          <svg class="person__motif person__motif--round" viewBox="0 0 240 240" aria-hidden="true" focusable="false">
+            <use href="#craft-embroidery"></use>
+          </svg>
+        </div>
+        <h2 class="person__name">王启萍</h2>
+        <p class="person__role">苗绣（花溪苗绣）国家级传承人</p>
+        <p class="person__desc">
+          七岁起随母亲与长辈学绣，十二岁便掌住苗绣的基本技艺，后拜刺绣艺人王朝珍为师，习传统苗族挑花绣。以十字为基本针法，不用底稿、数纱而绣，先挑出轮廓再填细部，练就「反面挑、正面看」的绝活。代表作有《苗族妇女盛装》《娃娃肚兜》等。
+        </p>
+      </li>
+
+      <!-- 03 蜡染 -->
+      <li class="person" style="--i:2">
+        <div class="person__avatar">
+          <svg class="person__motif person__motif--wide" viewBox="60 46 300 218" aria-hidden="true" focusable="false">
+            <use href="#craft-batik"></use>
+          </svg>
+        </div>
+        <h2 class="person__name">杨芳</h2>
+        <p class="person__role">苗族蜡染技艺国家级传承人</p>
+        <p class="person__desc">
+          贵州丹寨人，自幼学习苗族蜡染，能独立复现老一辈传下来的古老图案，也挖出了带本地文化内涵的新纹样。作品里存着本民族本支系的历史文化，既是日常可用之物，又具收藏价值。在乡里办起蜡染专业合作社，四百余名社员，带当地妇女一道把手艺换成生计。
+        </p>
+      </li>
+
+    </ul>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="page-foot">
+    <div class="foot-rule" aria-hidden="true"></div>
+    <div class="foot-meta">
+      <a href="index.html">返回首页</a>
+      <span class="sep" aria-hidden="true">|</span>
+      <span>手艺在人 · 人在山间</span>
+    </div>
+  </footer>
+</div>
+
+<!-- 纹样定义：三位传承人各自的技艺符号（银饰蝴蝶 / 苗绣团花 / 蜡染鸟纹） -->
+<svg class="motif-defs" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="craft-silver" viewBox="0 0 220 200">
+      <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M110 66 C 72 22, 24 26, 24 72 C 24 104, 58 116, 100 102"/>
+        <path d="M110 66 C 148 22, 196 26, 196 72 C 196 104, 162 116, 120 102"/>
+        <path d="M100 106 C 68 114, 50 138, 62 160 C 72 178, 96 170, 104 146"/>
+        <path d="M120 106 C 152 114, 170 138, 158 160 C 148 178, 124 170, 116 146"/>
+        <ellipse cx="110" cy="106" rx="8" ry="38"/>
+        <path d="M104 66 C 94 44, 78 34, 62 34"/>
+        <path d="M116 66 C 126 44, 142 34, 158 34"/>
+        <g stroke-width="1.3">
+          <path d="M52 66 q 22 -10 38 6"/><path d="M168 66 q -22 -10 -38 6"/>
+          <path d="M44 84 q 24 -6 44 8"/><path d="M176 84 q -24 -6 -44 8"/>
+          <path d="M70 154 q 16 -18 32 -16"/><path d="M150 154 q -16 -18 -32 -16"/>
+        </g>
+        <circle cx="62" cy="34" r="3"/><circle cx="158" cy="34" r="3"/>
+        <circle cx="110" cy="86" r="2.4" fill="currentColor"/>
+        <circle cx="110" cy="126" r="2.4" fill="currentColor"/>
+      </g>
+    </symbol>
+
+    <symbol id="craft-embroidery" viewBox="0 0 240 240">
+      <g fill="none" stroke="currentColor" stroke-linecap="round">
+        <circle cx="120" cy="120" r="112" stroke-width="2.2"/>
+        <circle cx="120" cy="120" r="104" stroke-width="1" stroke-dasharray="2 6"/>
+        <circle cx="120" cy="120" r="88" stroke-width="1.6"/>
+        <circle cx="120" cy="120" r="30" stroke-width="2"/>
+        <circle cx="120" cy="120" r="18" stroke-width="1.3"/>
+        <g stroke-width="1.4">
+          <path d="M120 32 L 120 22"/><path d="M120 208 L 120 218"/>
+          <path d="M32 120 L 22 120"/><path d="M208 120 L 218 120"/>
+        </g>
+        <g stroke-width="1.8">
+          <path d="M120 96 c -8 -10 -4 -22 6 -26 c 8 -3 16 2 17 10 c 1 7 -5 12 -11 11"/>
+          <path d="M144 120 c 10 -8 22 -4 26 6 c 3 8 -2 16 -10 17 c -7 1 -12 -5 -11 -11"/>
+          <path d="M120 144 c 8 10 4 22 -6 26 c -8 3 -16 -2 -17 -10 c -1 -7 5 -12 11 -11"/>
+          <path d="M96 120 c -10 8 -22 4 -26 -6 c -3 -8 2 -16 10 -17 c 7 -1 12 5 11 11"/>
+        </g>
+        <g stroke-width="1.5">
+          <path d="M120 62 q 10 12 0 24 q -10 -12 0 -24 Z"/>
+          <path d="M178 120 q -12 10 -24 0 q 12 -10 24 0 Z"/>
+          <path d="M120 178 q -10 -12 0 -24 q 10 12 0 24 Z"/>
+          <path d="M62 120 q 12 -10 24 0 q -12 10 -24 0 Z"/>
+        </g>
+        <g stroke-width="1.1">
+          <path d="M158 82 q 6 16 -6 26"/><path d="M158 158 q -16 6 -26 -6"/>
+          <path d="M82 158 q -6 -16 6 -26"/><path d="M82 82 q 16 -6 26 6"/>
+        </g>
+      </g>
+    </symbol>
+
+    <symbol id="craft-batik" viewBox="0 0 400 300">
+      <g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+        <g stroke-width="1.6">
+          <path d="M150 190 C 90 230, 40 250, 8 252"/>
+          <path d="M150 196 C 95 240, 50 262, 16 268"/>
+          <path d="M152 202 C 104 250, 66 272, 34 282"/>
+          <path d="M155 188 C 100 216, 55 232, 22 234"/>
+        </g>
+        <g stroke-width="1.6">
+          <path d="M170 150 C 130 90, 90 55, 40 40"/>
+          <path d="M176 146 C 140 82, 104 46, 58 28"/>
+          <path d="M182 142 C 152 76, 120 38, 78 18"/>
+        </g>
+        <path d="M160 150 C 200 118, 260 112, 300 136 C 330 154, 336 190, 312 210 C 280 236, 210 232, 176 208 C 150 190, 146 168, 160 150 Z"/>
+        <g stroke-width="1.4">
+          <path d="M196 158 q 14 -12 28 0 q -14 12 -28 0 Z"/>
+          <path d="M232 154 q 14 -12 28 0 q -14 12 -28 0 Z"/>
+          <path d="M268 158 q 14 -12 28 0 q -14 12 -28 0 Z"/>
+          <path d="M206 182 q 14 -12 28 0 q -14 12 -28 0 Z"/>
+          <path d="M244 182 q 14 -12 28 0 q -14 12 -28 0 Z"/>
+          <path d="M222 204 q 13 -11 26 0 q -13 11 -26 0 Z"/>
+        </g>
+        <path d="M230 140 C 250 96, 300 70, 352 66 C 320 92, 300 120, 292 152"/>
+        <g stroke-width="1.4">
+          <path d="M244 134 C 264 104, 300 84, 334 76"/>
+          <path d="M254 142 C 274 114, 306 96, 336 88"/>
+        </g>
+        <path d="M300 136 C 312 116, 334 108, 352 116 C 366 123, 368 140, 356 150 C 344 160, 324 158, 312 148"/>
+        <circle cx="346" cy="130" r="3.2"/>
+        <path d="M356 122 C 366 108, 380 102, 394 104"/>
+        <path d="M352 116 C 358 100, 368 90, 382 86"/>
+        <path d="M360 138 L 384 144 L 360 148"/>
+        <path d="M120 120 c -14 -4 -22 6 -18 16 c 3 8 14 10 19 4 c 4 -5 1 -13 -6 -13" stroke-width="1.8"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<script src="assets/js/bgm.js"></script>
+</body>
+</html>

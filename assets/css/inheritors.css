@@ -1,0 +1,394 @@
+/* ==========================================================================
+   匠心传承 — 手艺人（04 板块）
+   --------------------------------------------------------------------------
+   版式：三张并排的人物卡，圆形银盘托技艺纹样 → 姓名 → 朱红头衔 → 一段小传。
+   骨架（.page / .paper / .grain / .crumb / .head / .page-title / .tagline）
+   与「银绣珍藏」「枫启长歌」同构，配色沿用全站靛蓝 + 银白，朱红只做头衔。
+   圆盘内的纹样取自体验页同款符号：银饰蝴蝶 / 苗绣团花 / 蜡染鸟纹。
+   ========================================================================== */
+
+/* 本页补充令牌 */
+:root {
+  --font-hei: "PingFang SC", "Microsoft YaHei", "Source Han Sans SC", "Noto Sans SC", "Heiti SC", sans-serif;
+  --font-kai: "STKaiti", "KaiTi", "Kaiti SC", "楷体", var(--font-brush), serif;
+
+  /* 头衔用的暖朱色：深靛蓝底上提亮过的朱红，色相与 --cinnabar 同族，
+     保证 6.4:1 的对比度（原色 #b03a2e 在深底上只有 2.4:1，读不清） */
+  --role-tone: #e28b74;
+}
+
+/* ==========================================================================
+   1. 页面骨架与做旧底（与前两页同款材质）
+   ========================================================================== */
+body { overflow-x: hidden; }
+
+.page {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  padding: clamp(14px, 2.2vh, 26px) clamp(16px, 3.4vw, 54px) clamp(12px, 2.2vh, 28px);
+}
+
+.paper {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(ellipse 62% 48% at 50% 34%, rgba(217, 178, 106, .08) 0%, rgba(217, 178, 106, 0) 68%),
+    radial-gradient(ellipse 90% 70% at 50% 110%, rgba(5, 14, 26, .9) 0%, rgba(5, 14, 26, 0) 62%),
+    linear-gradient(165deg, rgba(8, 22, 40, .88) 0%, rgba(7, 18, 32, .9) 45%, rgba(4, 12, 22, .92) 100%),
+    url("../bg-batik.jpg");
+  background-size: 420px auto;
+  background-position: center;
+  background-repeat: repeat;
+}
+
+.grain {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: .08;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* 四周压暗，把注意力收到中间的人物卡上 */
+.page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse 74% 66% at 50% 46%, rgba(3, 10, 20, 0) 46%, rgba(3, 10, 20, .62) 100%);
+}
+
+/* ==========================================================================
+   2. 面包屑 + 页头
+   ========================================================================== */
+.crumb {
+  font-family: var(--font-hei);
+  font-size: clamp(12px, 1.5vh, 14px);
+  letter-spacing: .04em;
+}
+.crumb ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: .5em;
+  align-items: center;
+}
+.crumb li { display: flex; align-items: center; gap: .5em; color: var(--silver-400); }
+.crumb li:not(:last-child)::after { content: "/"; color: rgba(142, 165, 194, .45); }
+.crumb a { color: var(--silver-300); text-decoration: none; transition: color .5s ease; }
+.crumb a:hover { color: var(--gold); }
+.crumb [aria-current] { color: var(--silver-200); }
+
+.head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(8px, 2vh, 22px) 0 clamp(10px, 2.4vh, 26px);
+  text-align: center;
+}
+
+.page-title {
+  display: flex;
+  align-items: baseline;
+  gap: .18em;
+  margin: 0;
+  font-family: var(--font-kai);
+  font-weight: 400;
+  font-size: clamp(34px, 5.4vh, 56px);
+  letter-spacing: .08em;
+  line-height: 1.05;
+  color: var(--silver-50);
+  background: linear-gradient(180deg, #f6faff 8%, #dce6f3 46%, #a9bfd8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 26px rgba(217, 178, 106, .22);
+}
+.page-title .gap { display: inline-block; width: .6em; }
+
+.tagline {
+  margin: .95em 0 0;
+  font-family: var(--font-kai);
+  font-size: clamp(13px, 1.9vh, 17px);
+  letter-spacing: .3em;
+  text-indent: .3em;
+  color: var(--silver-400);
+}
+
+/* ==========================================================================
+   3. 人物名单：三列并排
+   ========================================================================== */
+.roster {
+  display: grid;
+  align-content: center;
+  min-height: 0;
+  padding: 4px 0 clamp(14px, 2.6vh, 30px);
+}
+
+.people {
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  width: 100%;
+  max-width: 1320px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(16px, 2.2vw, 34px);
+  align-items: stretch;
+}
+
+/* --- 单张人物卡 --- */
+.person {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(24px, 3.4vh, 38px) clamp(18px, 1.9vw, 30px) clamp(22px, 3vh, 32px);
+  text-align: center;
+  border: 1px solid rgba(196, 216, 240, .15);
+  border-radius: 4px;
+  background:
+    linear-gradient(180deg, rgba(22, 52, 84, .58) 0%, rgba(9, 26, 46, .52) 58%, rgba(6, 19, 34, .58) 100%);
+  box-shadow: inset 0 1px 0 rgba(226, 238, 252, .08),
+              0 18px 44px -28px rgba(0, 0, 0, .9);
+  transition: border-color .7s var(--ease-soft),
+              transform .7s var(--ease-soft),
+              box-shadow .7s var(--ease-soft);
+}
+
+/* 卡片上沿一道极淡的金线，hover 时亮起来 */
+.person::before {
+  content: "";
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  top: -1px;
+  height: 1px;
+  background: linear-gradient(90deg,
+    rgba(217, 178, 106, 0) 0%,
+    rgba(217, 178, 106, .5) 50%,
+    rgba(217, 178, 106, 0) 100%);
+  opacity: .55;
+  transition: opacity .7s var(--ease-soft), left .7s var(--ease-soft), right .7s var(--ease-soft);
+}
+
+.person:hover {
+  border-color: rgba(217, 178, 106, .3);
+  transform: translateY(-3px);
+  box-shadow: inset 0 1px 0 rgba(226, 238, 252, .12),
+              0 26px 54px -30px rgba(0, 0, 0, .95);
+}
+.person:hover::before { opacity: 1; left: 8%; right: 8%; }
+
+/* --- 圆形银盘托技艺纹样 --- */
+.person__avatar {
+  position: relative;
+  flex: 0 0 auto;
+  width: clamp(104px, 12.4vh, 128px);
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 36% 28%, #f8fbff 0%, #e9f1fb 34%, #d8e3f1 62%, #bfcfe2 86%, #a8bcd2 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, .9),
+    inset 0 -12px 26px rgba(88, 118, 158, .3),
+    0 0 0 1px rgba(9, 28, 54, .32),
+    0 14px 34px -12px rgba(2, 10, 22, .7);
+  margin-bottom: clamp(16px, 2.4vh, 24px);
+}
+
+/* 外圈一圈银泡（12 颗），用重复锥形渐变 + 遮罩做成细环 */
+.person__avatar::before {
+  content: "";
+  position: absolute;
+  inset: -9px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from -1.5deg,
+    rgba(226, 238, 252, .62) 0deg 3.2deg,
+    rgba(226, 238, 252, 0) 3.2deg 30deg);
+  -webkit-mask: radial-gradient(circle,
+    transparent 0 78%, #000 79% 100%);
+  mask: radial-gradient(circle,
+    transparent 0 78%, #000 79% 100%);
+  pointer-events: none;
+}
+
+/* 更好看的一点：银盘边缘的细描边 */
+.person__avatar::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  border: 1px solid rgba(9, 28, 54, .34);
+  pointer-events: none;
+}
+
+.person__motif {
+  display: block;
+  width: 64%;
+  height: 64%;
+  color: var(--ink);
+  opacity: .86;
+}
+/* 团花自带外圈，放大一点才不显得空 */
+.person__motif--round { width: 78%; height: 78%; opacity: .78; }
+/* 鸟纹是横幅：宽度铺开、高度按视口比例收窄，才对得上 300×218 的构图
+   （只写 height:auto 会让 SVG 盒退化成正方形，纹样被压缩到中间一小块） */
+.person__motif--wide { width: 80%; height: 58%; opacity: .9; }
+
+/* --- 文字 --- */
+.person__name {
+  margin: 0;
+  font-family: var(--font-kai);
+  font-size: clamp(20px, 2.6vh, 26px);
+  font-weight: 400;
+  letter-spacing: .16em;
+  text-indent: .16em;
+  line-height: 1.3;
+  color: var(--silver-50);
+}
+
+.person__role {
+  margin: .7em 0 0;
+  font-family: var(--font-hei);
+  font-size: clamp(12px, 1.5vh, 13.5px);
+  letter-spacing: .06em;
+  line-height: 1.6;
+  color: var(--role-tone);
+}
+
+/* 头衔与正文之间一道短纹样分隔 */
+.person__role::after {
+  content: "";
+  display: block;
+  width: 34px;
+  height: 1px;
+  margin: clamp(12px, 1.8vh, 18px) auto clamp(12px, 1.8vh, 18px);
+  background: linear-gradient(90deg,
+    rgba(196, 216, 240, 0) 0%,
+    rgba(196, 216, 240, .45) 50%,
+    rgba(196, 216, 240, 0) 100%);
+}
+
+.person__desc {
+  margin: 0;
+  max-width: min(32em, 100%);
+  font-family: var(--font-serif);
+  font-size: clamp(13px, 1.55vh, 14.5px);
+  line-height: 2;
+  letter-spacing: .015em;
+  color: var(--silver-300);
+  /* 中文左对齐：窄卡里两端对齐会把字距拉开，读起来一顿一顿的 */
+  text-align: start;
+}
+
+/* --- 入场：脚本确认后才加 html.anim，动画失效也不影响可读 --- */
+html.anim .person {
+  opacity: 0;
+  animation: personIn 1.5s var(--ease-soft) both;
+  animation-delay: calc(.3s + var(--i, 0) * .15s);
+}
+
+@keyframes personIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* 纹样定义块本身不占位 */
+.motif-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   4. 页脚
+   ========================================================================== */
+.page-foot { padding-top: clamp(12px, 2.2vh, 22px); }
+
+/* ==========================================================================
+   5. 自适应
+   ========================================================================== */
+
+/* 平板：三列会挤，改成单列横排（圆盘在左、文字在右） */
+@media (max-width: 940px) {
+  .roster { align-content: start; padding-top: 2px; }
+
+  .people {
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(12px, 1.8vh, 16px);
+    max-width: 720px;
+  }
+
+  .person {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr;
+    align-items: start;
+    justify-items: start;
+    column-gap: clamp(16px, 2.6vw, 26px);
+    text-align: left;
+    padding: clamp(18px, 2.4vh, 24px) clamp(16px, 3vw, 24px);
+  }
+
+  .person__avatar {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    align-self: center;
+    width: clamp(76px, 13vw, 104px);
+    margin-bottom: 0;
+  }
+
+  .person__name,
+  .person__role,
+  .person__desc { grid-column: 2; }
+
+  .person__name { text-indent: 0; font-size: clamp(18px, 2.4vh, 22px); }
+
+  .person__role::after { margin: 8px 0 9px; }
+
+  /* 横排后行长会拉到四十来字，限一下宽度，读起来不费劲 */
+  .person__desc { max-width: 34em; }
+}
+
+/* 手机：横排也挤了，回到竖排居中 */
+@media (max-width: 560px) {
+  .head { padding: clamp(4px, 1.4vh, 12px) 0 clamp(8px, 1.8vh, 18px); }
+  .tagline { letter-spacing: .22em; text-indent: .22em; }
+
+  .person {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 22px 18px 24px;
+  }
+
+  .person__avatar {
+    width: 88px;
+    margin-bottom: 16px;
+  }
+
+  .person__role::after { margin: 10px auto 12px; }
+  .person__desc { max-width: 100%; }
+}
+
+/* 尊重系统的"减少动态效果" */
+@media (prefers-reduced-motion: reduce) {
+  .person,
+  .person::before { transition: none; }
+  .person:hover { transform: none; }
+  html.anim .person { animation: none; opacity: 1; }
+}
