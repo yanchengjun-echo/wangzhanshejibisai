@@ -250,6 +250,59 @@
     </div>
   </section>
 
+  <!-- 照片墙：苗族节庆热闹图集（扁平化） -->
+  <section class="gallery" aria-labelledby="gallery-title">
+    <header class="gallery__head">
+      <h2 class="gallery__title" id="gallery-title">节庆掠影</h2>
+      <p class="gallery__sub">盛装如海 · 银铃满山</p>
+    </header>
+
+    <div class="gallery__grid">
+      <figure class="shot shot--a">
+        <img src="assets/festival/gallery-1.jpg" alt="雷山苗年万人芦笙踩鼓" width="800" height="600" loading="lazy">
+        <figcaption class="shot__cap">万人芦笙 · 踩鼓迎年</figcaption>
+      </figure>
+      <figure class="shot shot--b">
+        <img src="assets/festival/gallery-2.jpg" alt="苗族芦笙手吹奏长芦笙" width="800" height="600" loading="lazy">
+        <figcaption class="shot__cap">芦笙声声 · 诉尽乡音</figcaption>
+      </figure>
+      <figure class="shot shot--c">
+        <img src="assets/festival/gallery-3.jpg" alt="头戴银角的苗族盛装姑娘" width="800" height="1200" loading="lazy">
+        <figcaption class="shot__cap">银角映日 · 盛装如霞</figcaption>
+      </figure>
+      <figure class="shot shot--d">
+        <img src="assets/festival/gallery-4.jpg" alt="苗家拦门酒迎宾" width="800" height="600" loading="lazy">
+        <figcaption class="shot__cap">拦门敬酒 · 高山流水</figcaption>
+      </figure>
+      <figure class="shot shot--e">
+        <img src="assets/festival/gallery-5.jpg" alt="五谷丰登巡游队伍" width="800" height="600" loading="lazy">
+        <figcaption class="shot__cap">五谷丰登 · 欢庆丰年</figcaption>
+      </figure>
+      <figure class="shot shot--f">
+        <img src="assets/festival/gallery-6.jpg" alt="盛装姑娘起舞芦笙舞" width="800" height="600" loading="lazy">
+        <figcaption class="shot__cap">芦笙踏歌 · 裙摆飞扬</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 节日日历：高光标注未来一年苗族节日，点击看详情 -->
+  <section class="festival" aria-labelledby="festival-title">
+    <header class="festival__head">
+      <h2 class="festival__title" id="festival-title">节庆日历</h2>
+      <p class="festival__sub">未来一年 · 山间的盛大约定</p>
+    </header>
+
+    <div class="festival__shell">
+      <button class="festival__nav festival__nav--prev" id="cal-prev" type="button" aria-label="上一月">‹</button>
+      <div class="festival__stage">
+        <div class="festival__month-head" id="cal-month-label">2026 年 11 月</div>
+        <div class="festival__calendar" id="festival-calendar" role="list"></div>
+        <div class="festival__legend" id="cal-legend"></div>
+      </div>
+      <button class="festival__nav festival__nav--next" id="cal-next" type="button" aria-label="下一月">›</button>
+    </div>
+  </section>
+
   <!-- 资讯详情弹层：点开后内部元素从四周滑入 -->
   <div class="news-overlay" id="news-overlay" hidden></div>
   <div class="news-dialog" id="news-dialog" role="dialog" aria-modal="true" aria-labelledby="news-dialog-title" hidden>
@@ -281,6 +334,24 @@
     </div>
   </div>
 
+  <!-- 节日详情弹层：点日历高亮日弹出（四周滑入） -->
+  <div class="festival-overlay" id="festival-overlay" hidden></div>
+  <div class="festival-dialog" id="festival-dialog" role="dialog" aria-modal="true" aria-labelledby="festival-dialog-name" hidden>
+    <button class="festival-dialog__close" type="button" aria-label="关闭详情">×</button>
+    <div class="festival-dialog__body">
+      <div class="festival-dialog__head">
+        <div class="festival-dialog__titlebox">
+          <span class="festival-dialog__date" id="festival-dialog-date"></span>
+          <h3 class="festival-dialog__name" id="festival-dialog-name"></h3>
+        </div>
+      </div>
+      <div class="festival-dialog__img"><img src="" alt="" id="festival-dialog-img"></div>
+      <p class="festival-dialog__lead" id="festival-dialog-lead"></p>
+      <div class="festival-dialog__text" id="festival-dialog-text"></div>
+      <p class="festival-dialog__note" id="festival-dialog-note"></p>
+    </div>
+  </div>
+
   <!-- 页脚 -->
   <footer class="page-foot">
     <div class="foot-rule" aria-hidden="true"></div>
@@ -294,6 +365,7 @@
 
 <script src="assets/js/inheritors.js"></script>
 <script src="assets/js/activity.js"></script>
+<script src="assets/js/festival.js"></script>
 <script src="assets/js/bgm.js"></script>
 </body>
 </html>
