@@ -102,42 +102,69 @@
   </header>
 
   <main class="roster" id="main" aria-label="非遗代表性传承人">
+
+    <!-- 左侧人物大图：hover 右侧卡片时切换，默认显示第一位 -->
+    <div class="roster__stage">
+      <figure class="portrait" id="stage">
+        <div class="portrait__frame">
+          <img id="stage-img" class="is-on" src="assets/portraits/yang-guangbin.jpg" alt="杨光宾 · 苗族银饰锻制技艺" width="800" height="1000">
+        </div>
+        <figcaption class="portrait__tag" aria-hidden="true">
+          <span class="portrait__name" id="stage-name">杨光宾</span>
+          <span class="portrait__craft" id="stage-craft">银饰锻制</span>
+        </figcaption>
+      </figure>
+    </div>
+
+    <!-- 右侧人物卡片列表 -->
     <ul class="people">
 
-      <!-- 01 银饰 -->
       <li class="person" style="--i:0">
-        <div class="person__avatar">
-          <img src="assets/portraits/yang-guangbin.jpg" alt="杨光宾" width="560" height="560">
-        </div>
-        <h2 class="person__name">杨光宾</h2>
-        <p class="person__role">苗族银饰锻制技艺国家级传承人</p>
-        <p class="person__desc">
-          贵州雷山西江控拜银匠世家第五代传人，十三岁随父学艺，十五岁出师游艺。熔炼、铸型、锻制、拉丝、焊接、錾刻、编结、洗涤三十余道工序皆能手握，能把一块银锭反复锤成细如发丝，再编作振翅欲飞的蝴蝶。如今带徒授艺，把家传的手艺往外传。
-        </p>
+        <button class="person__card" type="button" data-index="0" aria-haspopup="dialog">
+          <span class="person__name">杨光宾</span>
+          <span class="person__role">苗族银饰锻制技艺</span>
+          <span class="person__more">详情</span>
+        </button>
       </li>
 
-      <!-- 02 苗绣 -->
       <li class="person" style="--i:1">
-        <div class="person__avatar">
-          <img src="assets/portraits/wang-qiping.jpg" alt="王启萍" width="560" height="560">
-        </div>
-        <h2 class="person__name">王启萍</h2>
-        <p class="person__role">苗绣（花溪苗绣）国家级传承人</p>
-        <p class="person__desc">
-          七岁起随母亲与长辈学绣，十二岁便掌住苗绣的基本技艺，后拜刺绣艺人王朝珍为师，习传统苗族挑花绣。以十字为基本针法，不用底稿、数纱而绣，先挑出轮廓再填细部，练就「反面挑、正面看」的绝活。代表作有《苗族妇女盛装》《娃娃肚兜》等。
-        </p>
+        <button class="person__card" type="button" data-index="1" aria-haspopup="dialog">
+          <span class="person__name">王启萍</span>
+          <span class="person__role">苗绣 · 花溪苗绣</span>
+          <span class="person__more">详情</span>
+        </button>
       </li>
 
-      <!-- 03 蜡染 -->
       <li class="person" style="--i:2">
-        <div class="person__avatar">
-          <img src="assets/portraits/yang-fang.jpg" alt="杨芳" width="560" height="560">
-        </div>
-        <h2 class="person__name">杨芳</h2>
-        <p class="person__role">苗族蜡染技艺国家级传承人</p>
-        <p class="person__desc">
-          贵州丹寨人，自幼学习苗族蜡染，能独立复现老一辈传下来的古老图案，也挖出了带本地文化内涵的新纹样。作品里存着本民族本支系的历史文化，既是日常可用之物，又具收藏价值。在乡里办起蜡染专业合作社，四百余名社员，带当地妇女一道把手艺换成生计。
-        </p>
+        <button class="person__card" type="button" data-index="2" aria-haspopup="dialog">
+          <span class="person__name">杨芳</span>
+          <span class="person__role">苗族蜡染技艺</span>
+          <span class="person__more">详情</span>
+        </button>
+      </li>
+
+      <li class="person" style="--i:3">
+        <button class="person__card" type="button" data-index="3" aria-haspopup="dialog">
+          <span class="person__name">莫厌学</span>
+          <span class="person__role">苗族芦笙制作技艺</span>
+          <span class="person__more">详情</span>
+        </button>
+      </li>
+
+      <li class="person" style="--i:4">
+        <button class="person__card" type="button" data-index="4" aria-haspopup="dialog">
+          <span class="person__name">姜文英</span>
+          <span class="person__role">剪纸 · 苗族剪纸</span>
+          <span class="person__more">详情</span>
+        </button>
+      </li>
+
+      <li class="person" style="--i:5">
+        <button class="person__card" type="button" data-index="5" aria-haspopup="dialog">
+          <span class="person__name">王景才</span>
+          <span class="person__role">苗族芦笙舞 · 滚山珠</span>
+          <span class="person__more">详情</span>
+        </button>
       </li>
 
     </ul>
@@ -237,6 +264,23 @@
     </div>
   </div>
 
+  <!-- 人物详情弹层：点人物卡弹出详细介绍（四周滑入） -->
+  <div class="person-overlay" id="person-overlay" hidden></div>
+  <div class="person-dialog" id="person-dialog" role="dialog" aria-modal="true" aria-labelledby="person-dialog-name" hidden>
+    <button class="person-dialog__close" type="button" aria-label="关闭详情">×</button>
+    <div class="person-dialog__body">
+      <div class="person-dialog__head">
+        <div class="person-dialog__avatar"><img src="" alt="" id="person-dialog-avatar"></div>
+        <div class="person-dialog__titlebox">
+          <h3 class="person-dialog__name" id="person-dialog-name"></h3>
+          <p class="person-dialog__role" id="person-dialog-role"></p>
+        </div>
+      </div>
+      <div class="person-dialog__text" id="person-dialog-text"></div>
+      <p class="person-dialog__note" id="person-dialog-note"></p>
+    </div>
+  </div>
+
   <!-- 页脚 -->
   <footer class="page-foot">
     <div class="foot-rule" aria-hidden="true"></div>
@@ -248,6 +292,7 @@
   </footer>
 </div>
 
+<script src="assets/js/inheritors.js"></script>
 <script src="assets/js/activity.js"></script>
 <script src="assets/js/bgm.js"></script>
 </body>

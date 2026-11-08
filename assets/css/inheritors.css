@@ -126,184 +126,206 @@ body { overflow-x: hidden; }
 }
 
 /* ==========================================================================
-   3. 人物名单：三列并排
+   3. 人物区：左大图 + 右卡片列表（hover 联动 / 点击看详情）
    ========================================================================== */
 .roster {
   display: grid;
-  align-content: start;
-  min-height: 0;
+  grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+  gap: clamp(24px, 3.4vw, 60px);
+  align-items: center;
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
   padding: 0 0 clamp(8px, 1.6vh, 18px);
 }
 
-.people {
-  list-style: none;
-  margin: 0 auto;
-  padding: 0;
-  width: 100%;
-  max-width: 1320px;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(16px, 2.2vw, 34px);
-  align-items: stretch;
+/* --- 左侧人物大图 --- */
+.roster__stage {
+  min-width: 0;
 }
 
-/* --- 单张人物卡 --- */
-.person {
+.portrait {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: clamp(20px, 2.4vh, 28px) clamp(18px, 1.9vw, 30px) clamp(18px, 2.2vh, 26px);
-  text-align: center;
-  border: 1px solid rgba(196, 216, 240, .15);
-  border-radius: 4px;
-  background:
-    linear-gradient(180deg, rgba(22, 52, 84, .58) 0%, rgba(9, 26, 46, .52) 58%, rgba(6, 19, 34, .58) 100%);
-  box-shadow: inset 0 1px 0 rgba(226, 238, 252, .08),
-              0 18px 44px -28px rgba(0, 0, 0, .9);
-  transition: border-color .7s var(--ease-soft),
-              transform .7s var(--ease-soft),
-              box-shadow .7s var(--ease-soft);
-}
-
-/* 卡片上沿一道极淡的金线，hover 时亮起来 */
-.person::before {
-  content: "";
-  position: absolute;
-  left: 18%;
-  right: 18%;
-  top: -1px;
-  height: 1px;
-  background: linear-gradient(90deg,
-    rgba(217, 178, 106, 0) 0%,
-    rgba(217, 178, 106, .5) 50%,
-    rgba(217, 178, 106, 0) 100%);
-  opacity: .55;
-  transition: opacity .7s var(--ease-soft), left .7s var(--ease-soft), right .7s var(--ease-soft);
-}
-
-.person:hover {
-  border-color: rgba(217, 178, 106, .3);
-  transform: translateY(-3px);
-  box-shadow: inset 0 1px 0 rgba(226, 238, 252, .12),
-              0 26px 54px -30px rgba(0, 0, 0, .95);
-}
-.person:hover::before { opacity: 1; left: 8%; right: 8%; }
-
-/* --- 圆形头像：照片外留一圈银边，像苗银相框 --- */
-.person__avatar {
-  position: relative;
-  flex: 0 0 auto;
-  width: clamp(104px, 12.4vh, 128px);
-  aspect-ratio: 1 / 1;
-  display: block;
-  /* 3px 内边距就是那圈银边，底色外露 */
+  margin: 0;
+  aspect-ratio: 4 / 5;
+  border-radius: 10px;
+  overflow: hidden;
+  /* 一圈银边，像苗银相框 */
   padding: 3px;
-  border-radius: 50%;
   background:
     radial-gradient(circle at 36% 28%, #f8fbff 0%, #e9f1fb 34%, #d8e3f1 62%, #bfcfe2 86%, #a8bcd2 100%);
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, .9),
-    inset 0 -12px 26px rgba(88, 118, 158, .3),
     0 0 0 1px rgba(9, 28, 54, .32),
-    0 14px 34px -12px rgba(2, 10, 22, .7);
-  margin-bottom: clamp(14px, 2vh, 20px);
+    0 24px 60px -30px rgba(2, 10, 22, .9);
 }
 
-/* 外圈一圈银泡（12 颗），用重复锥形渐变 + 遮罩做成细环 */
-.person__avatar::before {
-  content: "";
-  position: absolute;
-  inset: -9px;
-  border-radius: 50%;
-  background: repeating-conic-gradient(from -1.5deg,
-    rgba(226, 238, 252, .62) 0deg 3.2deg,
-    rgba(226, 238, 252, 0) 3.2deg 30deg);
-  -webkit-mask: radial-gradient(circle,
-    transparent 0 78%, #000 79% 100%);
-  mask: radial-gradient(circle,
-    transparent 0 78%, #000 79% 100%);
-  pointer-events: none;
+.portrait__frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 7px;
+  overflow: hidden;
+  background: #0a1f38;
 }
 
-.person__avatar::after {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: 50%;
-  border: 1px solid rgba(9, 28, 54, .34);
-  /* 往里压一圈暗角。三张原片背景亮度不一（木门 / 白墙 / 浅色布），
-     有了这层过渡，亮背景的照片也能坐进深色卡片里，不会像贴上去的 */
-  box-shadow: inset 0 0 16px rgba(6, 21, 39, .42);
-  pointer-events: none;
-}
-
-/* 照片：源图已是 1:1，直接铺满；换成非正方形照片时 cover 会自动裁切，
-   object-position 让裁切保住头部而不是切在天灵盖上 */
-.person__avatar img {
+.portrait img {
   display: block;
   width: 100%;
   height: 100%;
-  border-radius: 50%;
   object-fit: cover;
-  object-position: 50% 26%;
+  object-position: 50% 20%;
+  opacity: 0;
+  transform: scale(1.04);
+  transition: opacity .8s var(--ease-soft), transform .9s var(--ease-soft);
+}
+.portrait.is-switching img {
+  opacity: 0;
+  transform: scale(1.06);
+}
+.portrait img.is-on {
+  opacity: 1;
+  transform: scale(1);
 }
 
-/* --- 文字 --- */
-.person__name {
-  margin: 0;
+/* 图下角的名字角标 */
+.portrait__tag {
+  position: absolute;
+  left: 14px;
+  bottom: 12px;
+  display: flex;
+  align-items: baseline;
+  gap: .5em;
+  padding: .5em .9em;
+  border-radius: 4px;
+  background: linear-gradient(90deg, rgba(6, 18, 33, .72), rgba(6, 18, 33, .4));
+  backdrop-filter: blur(2px);
+  pointer-events: none;
+}
+.portrait__tag .portrait__name {
   font-family: var(--font-kai);
-  font-size: clamp(20px, 2.6vh, 26px);
+  font-size: clamp(16px, 2vh, 20px);
+  color: var(--silver-50);
+  letter-spacing: .1em;
+}
+.portrait__tag .portrait__craft {
+  font-family: var(--font-hei);
+  font-size: clamp(11px, 1.4vh, 12.5px);
+  color: var(--role-tone);
+  letter-spacing: .04em;
+}
+
+/* --- 右侧人物卡片列表 --- */
+.people {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.6vh, 14px);
+}
+
+.person {
+  margin: 0;
+}
+
+.person__card {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 1em;
+  width: 100%;
+  padding: clamp(12px, 1.8vh, 16px) clamp(16px, 2vw, 22px);
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  font-family: inherit;
+  border: 1px solid rgba(196, 216, 240, .13);
+  border-radius: 4px;
+  background: linear-gradient(180deg,
+    rgba(22, 52, 84, .42) 0%,
+    rgba(9, 26, 46, .38) 100%);
+  box-shadow: inset 0 1px 0 rgba(226, 238, 252, .06);
+  transition: border-color .6s var(--ease-soft),
+              background .6s var(--ease-soft),
+              transform .6s var(--ease-soft);
+}
+
+/* 卡片左侧一道竖金线，选中时亮起 */
+.person__card::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 16%;
+  bottom: 16%;
+  width: 2px;
+  background: linear-gradient(180deg,
+    rgba(217, 178, 106, 0) 0%,
+    rgba(217, 178, 106, .7) 50%,
+    rgba(217, 178, 106, 0) 100%);
+  opacity: 0;
+  transform: scaleY(.5);
+  transition: opacity .6s var(--ease-soft), transform .6s var(--ease-soft);
+}
+
+.person__card:hover,
+.person__card.is-active {
+  border-color: rgba(217, 178, 106, .34);
+  background: linear-gradient(180deg,
+    rgba(28, 62, 96, .5) 0%,
+    rgba(10, 28, 48, .46) 100%);
+  transform: translateX(4px);
+}
+.person__card:hover::before,
+.person__card.is-active::before { opacity: 1; transform: scaleY(1); }
+
+.person__card:focus-visible {
+  outline: 1px solid rgba(217, 178, 106, .7);
+  outline-offset: 3px;
+}
+
+.person__name {
+  flex: 0 0 auto;
+  font-family: var(--font-kai);
+  font-size: clamp(18px, 2.3vh, 23px);
   font-weight: 400;
-  letter-spacing: .16em;
-  text-indent: .16em;
+  letter-spacing: .1em;
   line-height: 1.3;
   color: var(--silver-50);
+  white-space: nowrap;
 }
 
 .person__role {
-  margin: .7em 0 0;
+  margin: 0;
   font-family: var(--font-hei);
-  font-size: clamp(12px, 1.5vh, 13.5px);
-  letter-spacing: .06em;
-  line-height: 1.6;
+  font-size: clamp(11.5px, 1.5vh, 13px);
+  letter-spacing: .04em;
+  line-height: 1.5;
   color: var(--role-tone);
 }
 
-/* 头衔与正文之间一道短纹样分隔 */
-.person__role::after {
-  content: "";
-  display: block;
-  width: 34px;
-  height: 1px;
-  margin: clamp(12px, 1.8vh, 18px) auto clamp(12px, 1.8vh, 18px);
-  background: linear-gradient(90deg,
-    rgba(196, 216, 240, 0) 0%,
-    rgba(196, 216, 240, .45) 50%,
-    rgba(196, 216, 240, 0) 100%);
+.person__more {
+  margin-left: auto;
+  flex: 0 0 auto;
+  font-family: var(--font-hei);
+  font-size: clamp(11px, 1.3vh, 12px);
+  letter-spacing: .06em;
+  color: var(--silver-400);
+  opacity: .75;
+  transition: color .5s ease, opacity .5s ease;
 }
-
-.person__desc {
-  margin: 0;
-  max-width: min(32em, 100%);
-  font-family: var(--font-serif);
-  font-size: clamp(13px, 1.55vh, 14.5px);
-  line-height: 2;
-  letter-spacing: .015em;
-  color: var(--silver-300);
-  /* 中文左对齐：窄卡里两端对齐会把字距拉开，读起来一顿一顿的 */
-  text-align: start;
-}
+.person__card:hover .person__more { color: var(--gold); opacity: 1; }
 
 /* --- 入场：脚本确认后才加 html.anim，动画失效也不影响可读 --- */
+html.anim .roster__stage,
 html.anim .person {
   opacity: 0;
-  animation: personIn 1.5s var(--ease-soft) both;
-  animation-delay: calc(.3s + var(--i, 0) * .15s);
+  animation: personIn 1.3s var(--ease-soft) both;
 }
+html.anim .person { animation-delay: calc(.25s + var(--i, 0) * .09s); }
 
 @keyframes personIn {
-  from { opacity: 0; transform: translateY(18px); }
+  from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: none; }
 }
 
@@ -316,75 +338,35 @@ html.anim .person {
    5. 自适应
    ========================================================================== */
 
-/* 平板：三列会挤，改成单列横排（圆盘在左、文字在右） */
+/* 平板：左右分栏挤，改成上图下卡单列 */
 @media (max-width: 940px) {
-  .roster { align-content: start; padding-top: 2px; }
-
-  .people {
+  .roster {
     grid-template-columns: minmax(0, 1fr);
-    gap: clamp(12px, 1.8vh, 16px);
+    gap: clamp(18px, 2.6vh, 28px);
     max-width: 720px;
   }
 
-  .person {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    grid-template-rows: auto auto 1fr;
-    align-items: start;
-    justify-items: start;
-    column-gap: clamp(16px, 2.6vw, 26px);
-    text-align: left;
-    padding: clamp(18px, 2.4vh, 24px) clamp(16px, 3vw, 24px);
-  }
-
-  .person__avatar {
-    grid-column: 1;
-    grid-row: 1 / -1;
-    align-self: center;
-    width: clamp(76px, 13vw, 104px);
-    margin-bottom: 0;
-  }
-
-  .person__name,
-  .person__role,
-  .person__desc { grid-column: 2; }
-
-  .person__name { text-indent: 0; font-size: clamp(18px, 2.4vh, 22px); }
-
-  .person__role::after { margin: 8px 0 9px; }
-
-  /* 横排后行长会拉到四十来字，限一下宽度，读起来不费劲 */
-  .person__desc { max-width: 34em; }
+  .portrait { max-width: min(440px, 86%); margin: 0 auto; }
+  .people { gap: clamp(8px, 1.4vh, 12px); }
 }
 
-/* 手机：横排也挤了，回到竖排居中 */
+/* 手机：进一步收紧 */
 @media (max-width: 560px) {
   .head { padding: clamp(4px, 1.4vh, 12px) 0 clamp(8px, 1.8vh, 18px); }
   .tagline { letter-spacing: .22em; text-indent: .22em; }
 
-  .person {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 22px 18px 24px;
-  }
-
-  .person__avatar {
-    width: 88px;
-    margin-bottom: 16px;
-  }
-
-  .person__role::after { margin: 10px auto 12px; }
-  .person__desc { max-width: 100%; }
+  .portrait { max-width: 100%; }
+  .person__name { font-size: 17px; }
+  .person__role { letter-spacing: .02em; }
 }
 
 /* 尊重系统的"减少动态效果" */
 @media (prefers-reduced-motion: reduce) {
-  .person,
-  .person::before { transition: none; }
-  .person:hover { transform: none; }
-  html.anim .person { animation: none; opacity: 1; }
+  .person__card,
+  .portrait img { transition: none; }
+  .person__card:hover { transform: none; }
+  html.anim .person,
+  html.anim .roster__stage { animation: none; opacity: 1; }
 }
 
 /* ==========================================================================
@@ -780,4 +762,172 @@ body.no-scroll { overflow: hidden; }
     padding: 20px 18px;
   }
   .news-dialog__img img { max-height: 220px; }
+}
+
+/* ==========================================================================
+   9. 人物详情弹层：点卡片看详细介绍（四周滑入）
+   ========================================================================== */
+.person-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: radial-gradient(ellipse at 50% 40%,
+    rgba(4, 12, 22, .55) 0%,
+    rgba(3, 10, 20, .88) 100%);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.person-dialog {
+  position: fixed;
+  z-index: 90;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(680px, calc(100vw - 32px));
+  max-height: min(86vh, 820px);
+  overflow-y: auto;
+  padding: clamp(22px, 4vh, 40px) clamp(20px, 3.4vw, 44px);
+  border: 1px solid rgba(217, 178, 106, .28);
+  border-radius: 8px;
+  background:
+    radial-gradient(ellipse 70% 52% at 50% 20%, rgba(217, 178, 106, .07) 0%, rgba(217, 178, 106, 0) 62%),
+    linear-gradient(170deg, rgba(14, 34, 58, .97) 0%, rgba(7, 18, 32, .98) 55%, rgba(4, 12, 22, .99) 100%);
+  box-shadow: 0 40px 90px -30px rgba(0, 0, 0, .9),
+              inset 0 1px 0 rgba(226, 238, 252, .1);
+}
+
+.person-dialog__close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--silver-300);
+  cursor: pointer;
+  border: 1px solid rgba(196, 216, 240, .2);
+  border-radius: 50%;
+  background: rgba(6, 19, 34, .5);
+  transition: color .5s ease, border-color .5s ease, transform .5s ease;
+}
+.person-dialog__close:hover {
+  color: var(--gold);
+  border-color: rgba(217, 178, 106, .5);
+  transform: rotate(90deg);
+}
+.person-dialog__close:focus-visible {
+  outline: 1px solid rgba(217, 178, 106, .8);
+  outline-offset: 3px;
+}
+
+.person-dialog__body {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 2vh, 18px);
+}
+
+/* 头像 + 姓名头衔并排 */
+.person-dialog__head {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2.4vw, 22px);
+}
+
+.person-dialog__avatar {
+  flex: 0 0 auto;
+  width: clamp(76px, 11vh, 96px);
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid rgba(196, 216, 240, .28);
+  box-shadow: 0 0 0 1px rgba(9, 28, 54, .4), 0 10px 24px -10px rgba(0, 0, 0, .7);
+}
+.person-dialog__avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 22%;
+}
+
+.person-dialog__titlebox { display: flex; flex-direction: column; gap: .4em; }
+
+.person-dialog__name {
+  margin: 0;
+  font-family: var(--font-kai);
+  font-weight: 400;
+  font-size: clamp(22px, 3.2vh, 30px);
+  letter-spacing: .1em;
+  line-height: 1.3;
+  color: var(--silver-50);
+}
+
+.person-dialog__role {
+  margin: 0;
+  font-family: var(--font-hei);
+  font-size: clamp(12px, 1.5vh, 13.5px);
+  letter-spacing: .06em;
+  line-height: 1.6;
+  color: var(--role-tone);
+}
+
+.person-dialog__text {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(13.5px, 1.6vh, 15px);
+  line-height: 2.1;
+  letter-spacing: .015em;
+  text-align: justify;
+  text-justify: inter-ideograph;
+  color: var(--silver-300);
+}
+
+.person-dialog__note {
+  margin: 0;
+  font-family: var(--font-hei);
+  font-size: clamp(12px, 1.4vh, 13px);
+  letter-spacing: .14em;
+  text-align: center;
+  color: var(--silver-400);
+  padding-top: .4em;
+  border-top: 1px solid rgba(196, 216, 240, .12);
+}
+
+/* --- 四周滑入动效 --- */
+.person-dialog__body > * {
+  opacity: 0;
+  transition: opacity .6s var(--ease-soft), transform .6s var(--ease-soft);
+}
+.person-dialog__body .person-dialog__head { transform: translateY(-18px); }
+.person-dialog__body .person-dialog__text { transform: translateY(22px); }
+.person-dialog__body .person-dialog__note { transform: translateY(16px); }
+
+.person-dialog.is-open .person-dialog__body > * {
+  opacity: 1;
+  transform: none;
+}
+.person-dialog.is-open .person-dialog__head { transition-delay: .05s; }
+.person-dialog.is-open .person-dialog__text { transition-delay: .16s; }
+.person-dialog.is-open .person-dialog__note { transition-delay: .26s; }
+
+.person-dialog.is-closing .person-dialog__body > * {
+  opacity: 0;
+  transition-delay: 0s !important;
+  transition-duration: .2s !important;
+}
+
+@media (max-width: 560px) {
+  .person-dialog {
+    width: calc(100vw - 24px);
+    max-height: 88vh;
+    padding: 20px 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .person-dialog__body > * { transition: none; opacity: 1; transform: none; }
 }
