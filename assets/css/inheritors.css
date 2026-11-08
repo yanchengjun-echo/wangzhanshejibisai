@@ -320,9 +320,9 @@ body { overflow-x: hidden; }
 html.anim .roster__stage,
 html.anim .person {
   opacity: 0;
-  animation: personIn 1.3s var(--ease-soft) both;
+  animation: personIn .8s var(--ease-soft) both;
 }
-html.anim .person { animation-delay: calc(.25s + var(--i, 0) * .09s); }
+html.anim .person { animation-delay: calc(.1s + var(--i, 0) * .06s); }
 
 @keyframes personIn {
   from { opacity: 0; transform: translateY(16px); }

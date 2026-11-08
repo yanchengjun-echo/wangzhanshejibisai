@@ -284,3 +284,44 @@
 @media (prefers-reduced-motion: reduce) {
   .topbar__link::after { transition: none; }
 }
+
+/* ==========================================================================
+   8. 切页流畅度增强
+   --------------------------------------------------------------------------
+   多页站每次点导航都是整页重载，白屏/抖动来自两个瞬间：
+   ① 外部 CSS 加载前画布是白色  → 已由各页 <head> 的 data-first-paint
+      内联样式把 html/body 底色先涂成靛蓝解决；
+   ② 入场动画用 both 填充 + 较长 delay，内容在延迟期停在 opacity:0，
+      以及背景图/字体晚到导致的布局位移 → 这里把关键容器提上合成层，
+      用 transform/opacity 做动效（不触发重排），并在进入新页时给一个
+      极短、渐进的可见过渡，抹平「深色底 → 完整内容」的那一下跳变。
+   -------------------------------------------------------------------------- */
+html.anim .page,
+html.anim .head,
+html.anim .roster__stage {
+  will-change: opacity, transform;
+}
+
+/* 兜底：万一某页脚本异常、html.anim 没加上，内容也要立即可见 */
+html:not(.anim) .page,
+html:not(.anim) .head,
+html:not(.anim) .roster__stage,
+html:not(.anim) .person,
+html:not(.anim) .chapter__title,
+html:not(.anim) .chapter__lede,
+html:not(.anim) .breathe__quote,
+html:not(.anim) .page-foot {
+  opacity: 1 !important;
+  animation: none !important;
+  transform: none !important;
+}
+
+/* 减少进入新页瞬间字体切换引起的重排抖动：先挂系统字体，正文渲染稳定后
+   标题楷体再替换，二者宽度差不会把整版顶得乱跳。 */
+@supports (font-display: swap) {
+  .page__title,
+  .head__title,
+  .chapter__title {
+    font-display: swap;
+  }
+}

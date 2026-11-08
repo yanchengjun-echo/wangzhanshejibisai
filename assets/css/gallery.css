@@ -550,8 +550,8 @@ body { overflow-x: hidden; }
   to { opacity: 1; transform: none; }
 }
 
-html.anim .head { animation: fadeIn 1s var(--ease-soft) both; }
-html.anim .body { animation: riseIn 1s .15s var(--ease-soft) both; }
+html.anim .head { animation: fadeIn .7s var(--ease-soft) both; }
+html.anim .body { animation: riseIn .8s .08s var(--ease-soft) both; }
 
 @media (prefers-reduced-motion: reduce) {
   html.anim .head, html.anim .body { animation: none; }
