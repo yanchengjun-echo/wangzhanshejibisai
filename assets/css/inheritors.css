@@ -1208,6 +1208,8 @@ body.no-scroll { overflow: hidden; }
 
 /* 高亮日：金色圆底 + 银字，hover 展开详情 */
 .day--fest {
+  /* 浮层向上弹出，必须让溢出可见，否则被父级 .day 的 overflow:hidden 裁掉 */
+  overflow: visible;
   cursor: pointer;
   color: #f7e7c0;
   font-weight: 600;
