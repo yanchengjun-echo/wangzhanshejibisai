@@ -28,7 +28,8 @@ body { overflow-x: hidden; }
   min-height: 100vh;
   min-height: 100dvh;
   display: grid;
-  grid-template-rows: auto auto 1fr auto;
+  grid-template-rows: auto auto auto auto;
+  align-content: start;
   padding: clamp(14px, 2.2vh, 26px) clamp(16px, 3.4vw, 54px) clamp(12px, 2.2vh, 28px);
 }
 
@@ -92,7 +93,7 @@ body { overflow-x: hidden; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: clamp(8px, 2vh, 22px) 0 clamp(10px, 2.4vh, 26px);
+  padding: clamp(4px, 1.2vh, 12px) 0 clamp(6px, 1.6vh, 18px);
   text-align: center;
 }
 
@@ -116,7 +117,7 @@ body { overflow-x: hidden; }
 .page-title .gap { display: inline-block; width: .6em; }
 
 .tagline {
-  margin: .95em 0 0;
+  margin: .6em 0 0;
   font-family: var(--font-kai);
   font-size: clamp(13px, 1.9vh, 17px);
   letter-spacing: .3em;
@@ -129,9 +130,9 @@ body { overflow-x: hidden; }
    ========================================================================== */
 .roster {
   display: grid;
-  align-content: center;
+  align-content: start;
   min-height: 0;
-  padding: 4px 0 clamp(14px, 2.6vh, 30px);
+  padding: 0 0 clamp(8px, 1.6vh, 18px);
 }
 
 .people {
@@ -152,7 +153,7 @@ body { overflow-x: hidden; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: clamp(24px, 3.4vh, 38px) clamp(18px, 1.9vw, 30px) clamp(22px, 3vh, 32px);
+  padding: clamp(20px, 2.4vh, 28px) clamp(18px, 1.9vw, 30px) clamp(18px, 2.2vh, 26px);
   text-align: center;
   border: 1px solid rgba(196, 216, 240, .15);
   border-radius: 4px;
@@ -206,7 +207,7 @@ body { overflow-x: hidden; }
     inset 0 -12px 26px rgba(88, 118, 158, .3),
     0 0 0 1px rgba(9, 28, 54, .32),
     0 14px 34px -12px rgba(2, 10, 22, .7);
-  margin-bottom: clamp(16px, 2.4vh, 24px);
+  margin-bottom: clamp(14px, 2vh, 20px);
 }
 
 /* 外圈一圈银泡（12 颗），用重复锥形渐变 + 遮罩做成细环 */
@@ -394,8 +395,8 @@ body.no-scroll { overflow: hidden; }
 
 .activity {
   position: relative;
-  margin-top: clamp(28px, 5vh, 56px);
-  padding-top: clamp(22px, 4vh, 40px);
+  margin-top: clamp(18px, 2.6vh, 30px);
+  padding-top: 0;
 }
 
 /* 区块与人物名单之间一道淡分隔 */
@@ -404,7 +405,7 @@ body.no-scroll { overflow: hidden; }
   display: block;
   width: min(720px, 82%);
   height: 1px;
-  margin: 0 auto clamp(24px, 4vh, 44px);
+  margin: 0 auto clamp(16px, 2.6vh, 30px);
   background: linear-gradient(90deg,
     rgba(196, 216, 240, 0) 0%,
     rgba(196, 216, 240, .38) 50%,
@@ -413,7 +414,7 @@ body.no-scroll { overflow: hidden; }
 
 .activity__head {
   text-align: center;
-  margin-bottom: clamp(24px, 4.6vh, 48px);
+  margin-bottom: clamp(16px, 3vh, 32px);
 }
 
 .activity__title {
@@ -447,10 +448,10 @@ body.no-scroll { overflow: hidden; }
   grid-template-areas:
     "fan-tl col-tr"
     "col-bl fan-br";
-  gap: clamp(16px, 2.4vw, 36px);
+  gap: clamp(18px, 2.6vw, 40px) clamp(20px, 3vw, 48px);
   align-items: center;
   width: 100%;
-  max-width: 1240px;
+  max-width: 1160px;
   margin: 0 auto;
 }
 
@@ -459,10 +460,11 @@ body.no-scroll { overflow: hidden; }
 .activity__col--bl { grid-area: col-bl; }
 .activity__fan--br { grid-area: fan-br; }
 
-/* 扇形图 */
+/* 扇形图：不占满整列，收窄到约七成宽，垂直方向也相应变矮，
+   让两行内容互相咬合，避免正方形图把对面两行资讯卡衬出一大块空白 */
 .activity__fan {
   margin: 0;
-  width: 100%;
+  width: min(72%, 360px);
   aspect-ratio: 1 / 1;
   overflow: hidden;
   border-radius: 6px;
@@ -477,9 +479,9 @@ body.no-scroll { overflow: hidden; }
   object-fit: cover;
 }
 
-/* 左上扇形占位偏上，右下偏下，制造对角呼应 */
-.activity__fan--tl { align-self: start; }
-.activity__fan--br { align-self: end; }
+/* 左上扇形贴向对角外侧、右下扇形贴向对角外侧，制造对角呼应 */
+.activity__fan--tl { align-self: center; justify-self: start; }
+.activity__fan--br { align-self: center; justify-self: end; }
 
 /* 资讯列 */
 .activity__col {
@@ -488,8 +490,8 @@ body.no-scroll { overflow: hidden; }
   gap: clamp(14px, 2vh, 20px);
 }
 
-.activity__col--tr { align-self: start; padding-top: clamp(0px, 2vh, 18px); }
-.activity__col--bl { align-self: end; padding-bottom: clamp(0px, 2vh, 18px); }
+.activity__col--tr { align-self: center; padding-top: 0; }
+.activity__col--bl { align-self: center; padding-bottom: 0; }
 
 /* --- 单张资讯卡 --- */
 .news {
@@ -751,9 +753,10 @@ body.no-scroll { overflow: hidden; }
     gap: clamp(18px, 3vh, 28px);
     max-width: 620px;
   }
-  .activity__fan { max-width: 420px; margin: 0 auto; }
-  .activity__fan--tl { align-self: center; }
-  .activity__fan--br { align-self: center; }
+  /* 单列时扇形图恢复接近满宽居中，不用再缩到 72% */
+  .activity__fan { width: min(88%, 420px); max-width: 420px; margin: 0 auto; }
+  .activity__fan--tl { align-self: center; justify-self: center; }
+  .activity__fan--br { align-self: center; justify-self: center; }
   .activity__col--tr { padding-top: 0; }
   .activity__col--bl { padding-bottom: 0; }
 }
