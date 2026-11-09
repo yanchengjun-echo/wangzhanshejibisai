@@ -76,35 +76,6 @@
   background: rgba(245, 230, 200, .04);
 }
 
-/* ---------- 目录 ---------- */
-.bi-toc {
-  padding: 28px 0;
-  border-top: 1px solid rgba(233, 237, 242, .1);
-  border-bottom: 1px solid rgba(233, 237, 242, .1);
-  margin-bottom: 0;
-}
-.bi-toc__list {
-  display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  padding-bottom: 8px;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-}
-.bi-toc__list a {
-  white-space: nowrap;
-  font-size: 14px;
-  color: var(--exp-text-dim);
-  padding: 6px 12px;
-  border-radius: 4px;
-  text-decoration: none;
-  transition: color .2s, background .2s;
-}
-.bi-toc__list a:hover {
-  color: var(--exp-wax);
-  background: rgba(245, 230, 200, .08);
-}
-
 /* ---------- 章节 ---------- */
 .bi-section { padding: 64px 0; }
 .bi-section__eyebrow {
@@ -391,6 +362,63 @@
   font-family: var(--exp-font-title);
   font-size: 24px;
   margin-top: 32px;
+}
+
+/* ---------- 纹样卡（图片卡） ---------- */
+.bi-motif-card { padding: 16px; }
+.bi-motif-card .bi-fig__media {
+  background: rgba(255, 255, 255, .96);
+  box-shadow: 0 1px 0 rgba(0,0,0,.2) inset;
+}
+.bi-motif-card .bi-fig__media img { object-fit: contain; padding: 12px; }
+.bi-motif-card .bi-card__title { margin: 14px 0 6px; font-family: var(--exp-font-title); font-weight: 500; }
+.bi-motif-card .bi-card__text { margin: 0; }
+
+/* ---------- 案例卡（图片卡） ---------- */
+.bi-case-card { padding: 0; overflow: hidden; }
+.bi-case-card .bi-fig__media { border-radius: 8px 8px 0 0; }
+.bi-case-card__body { padding: 20px 22px; }
+
+/* ---------- 卡片 hover 抬升 ---------- */
+.bi-card {
+  transition: transform .35s cubic-bezier(.22,.61,.36,1), box-shadow .35s ease, border-color .35s ease;
+}
+@media (hover: hover) {
+  .bi-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, .28);
+    border-color: rgba(245, 230, 200, .4);
+  }
+}
+
+/* ---------- 图片悬浮缩放 ---------- */
+.bi-fig__media { overflow: hidden; }
+.bi-fig__media img {
+  transition: transform .8s cubic-bezier(.22,.61,.36,1);
+}
+@media (hover: hover) {
+  .bi-fig:hover .bi-fig__media img { transform: scale(1.05); }
+}
+
+/* ---------- 滚动渐显（由 JS 添加 .is-visible） ---------- */
+.bi [data-animate] {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity .7s ease, transform .7s cubic-bezier(.22,.61,.36,1);
+  will-change: opacity, transform;
+}
+.bi [data-animate].is-visible {
+  opacity: 1;
+  transform: none;
+}
+/* 时间轴逐项入场：交错延迟 */
+.bi [data-animate][data-stagger] {
+  transition-delay: 0ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bi [data-animate] { opacity: 1; transform: none; transition: none; }
+  .bi-card { transition: none; }
+  .bi-fig__media img { transition: none; }
 }
 
 /* ---------- 响应式 ---------- */
