@@ -932,6 +932,49 @@ body.exp-root::before {
   opacity: .55;
 }
 
+/* ---------- 13.9b 向下导引箭头 ---------- */
+.intro-scroll {
+  position: absolute;
+  left: 50%;
+  bottom: 34px;
+  transform: translateX(-50%);
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: rgba(244, 246, 248, .92);
+  filter: drop-shadow(0 1px 6px rgba(0, 0, 0, .45));
+  transition: color .3s var(--exp-ease);
+}
+.intro-scroll:hover,
+.intro-scroll:focus-visible { color: #F4F6F8; }
+.intro-scroll:focus-visible {
+  outline: 2px solid rgba(217, 178, 106, .85);
+  outline-offset: 6px;
+  border-radius: 50%;
+}
+.intro-scroll__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .85;
+}
+.intro-scroll__chev {
+  width: 22px;
+  height: 22px;
+  animation: introScrollFloat 1.8s var(--exp-ease) infinite;
+}
+@keyframes introScrollFloat {
+  0%, 100% { transform: translateY(0); opacity: .85; }
+  50% { transform: translateY(6px); opacity: .4; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .intro-scroll__chev { animation: none; }
+}
+
 /* ---------- 13.10 入场：门户内容分层升起 ---------- */
 .intro-anim .portal-inner > * {
   animation: introRise .9s var(--exp-ease) both;
@@ -966,6 +1009,8 @@ body.exp-root::before {
 /* 窄屏：上下分屏，分缝线转横 */
 @media (max-width: 860px) {
   .intro { flex-direction: column; }
+
+  .intro-scroll { bottom: 48px; }
 
   .portal { flex: 1 1 50%; }
 
