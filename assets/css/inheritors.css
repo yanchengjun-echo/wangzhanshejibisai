@@ -129,7 +129,7 @@ body { overflow-x: hidden; }
   font-size: clamp(13px, 1.9vh, 17px);
   letter-spacing: .3em;
   text-indent: .3em;
-  color: var(--silver-400);
+  color: var(--silver-200);
 }
 
 /* ==========================================================================
@@ -160,11 +160,11 @@ body { overflow-x: hidden; }
   letter-spacing: .12em;
   line-height: 1.2;
   color: var(--silver-50);
-  background: linear-gradient(180deg, #f6faff 6%, #dce6f3 48%, #a9bfd8 100%);
+  background: linear-gradient(180deg, #0a1f38 8%, #16395f 46%, #33506b 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 2px 22px rgba(217, 178, 106, .18);
+  text-shadow: 0 1px 18px rgba(217, 178, 106, .18);
 }
 .roster__sub {
   margin: .7em 0 0;
@@ -172,7 +172,7 @@ body { overflow-x: hidden; }
   font-size: clamp(12px, 1.7vh, 15px);
   letter-spacing: .28em;
   text-indent: .28em;
-  color: var(--silver-400);
+  color: var(--silver-200);
 }
 
 /* --- 左侧人物大图 --- */
@@ -439,11 +439,11 @@ body.no-scroll { overflow: hidden; }
   letter-spacing: .12em;
   line-height: 1.2;
   color: var(--silver-50);
-  background: linear-gradient(180deg, #f6faff 6%, #dce6f3 48%, #a9bfd8 100%);
+  background: linear-gradient(180deg, #0a1f38 8%, #16395f 46%, #33506b 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 2px 22px rgba(217, 178, 106, .18);
+  text-shadow: 0 1px 18px rgba(217, 178, 106, .18);
 }
 
 .activity__sub {
@@ -452,7 +452,7 @@ body.no-scroll { overflow: hidden; }
   font-size: clamp(12px, 1.7vh, 15px);
   letter-spacing: .28em;
   text-indent: .28em;
-  color: var(--silver-400);
+  color: var(--silver-200);
 }
 
 /* 对角网格：2 列，行高按内容自适应 */
@@ -992,11 +992,11 @@ body.no-scroll { overflow: hidden; }
   letter-spacing: .12em;
   line-height: 1.2;
   color: var(--silver-50);
-  background: linear-gradient(180deg, #f6faff 6%, #dce6f3 48%, #a9bfd8 100%);
+  background: linear-gradient(180deg, #0a1f38 8%, #16395f 46%, #33506b 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 2px 22px rgba(217, 178, 106, .18);
+  text-shadow: 0 1px 18px rgba(217, 178, 106, .18);
 }
 
 .gallery__sub {
@@ -1005,7 +1005,7 @@ body.no-scroll { overflow: hidden; }
   font-size: clamp(12px, 1.7vh, 15px);
   letter-spacing: .28em;
   text-indent: .28em;
-  color: var(--silver-400);
+  color: var(--silver-200);
 }
 
 /* 扁平化图集：错落网格，竖版图做视觉锚点 */
@@ -1103,11 +1103,11 @@ body.no-scroll { overflow: hidden; }
   letter-spacing: .12em;
   line-height: 1.2;
   color: var(--silver-50);
-  background: linear-gradient(180deg, #f6faff 6%, #dce6f3 48%, #a9bfd8 100%);
+  background: linear-gradient(180deg, #0a1f38 8%, #16395f 46%, #33506b 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 2px 22px rgba(217, 178, 106, .18);
+  text-shadow: 0 1px 18px rgba(217, 178, 106, .18);
 }
 
 .festival__sub {
@@ -1116,7 +1116,7 @@ body.no-scroll { overflow: hidden; }
   font-size: clamp(12px, 1.7vh, 15px);
   letter-spacing: .28em;
   text-indent: .28em;
-  color: var(--silver-400);
+  color: var(--silver-200);
 }
 
 /* 翻页日历外壳：左右箭头 + 中间单月卡 */
