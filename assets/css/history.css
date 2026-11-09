@@ -634,6 +634,14 @@ html.anim .page-foot { opacity: .5; animation: riseIn .9s var(--ease-soft) .14s 
   .tnode__brief { font-size: 12px; }
 }
 
+/* 窄屏：两侧卷草纹样带约占视口 11%，内容区留白提到 13% 避让，文字不压纹样 */
+@media (max-width: 700px) {
+  .page {
+    padding-left: max(46px, 13vw);
+    padding-right: max(46px, 13vw);
+  }
+}
+
 /* 脚本缺席时（head 兜底撤掉 js-tree）回退单栏静态全文，避免 12 个浮层叠在一起 */
 html:not(.js-tree) .tree-stage { width: 100%; margin-left: 0; height: auto; }
 html:not(.js-tree) .tree-lines { display: none; }

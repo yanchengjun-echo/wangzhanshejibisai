@@ -726,6 +726,11 @@ html.anim .body { animation: riseIn .8s .08s var(--ease-soft) both; }
 }
 
 @media (max-width: 620px) {
+  /* 窄屏：两侧卷草纹样带约占视口 11%，内容区留白提到 13% 避让，文字不压纹样 */
+  .page {
+    padding-left: max(46px, 13vw);
+    padding-right: max(46px, 13vw);
+  }
   .masonry {
     --masonry-cols: 2;
     column-gap: 8px;
