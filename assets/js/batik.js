@@ -23,16 +23,23 @@
     { name: "月白", hex: "#E9EFF5" },
     { name: "浅茶", hex: "#EFE4CF" }
   ];
+  // 纹样图片：优先用 Base64 内嵌（patterns.js 提供），保证 file:// 双击打开也能读像素；
+  // 未提供时回退到相对路径（HTTP 下同样可用）。
+  function resolveSrc(key) {
+    const b = (typeof window !== "undefined") && window.BATIK_PATTERNS && window.BATIK_PATTERNS[key];
+    if (b) return b;
+    return "assets/batik/pattern-" + key + ".jpg";
+  }
   const PATTERNS = [
-    { id: "peacock", name: "孔雀花枝", src: "assets/batik/pattern-peacock.jpg", crop: null },
-    { id: "bird1", name: "鸟纹·回首", src: "assets/batik/pattern-birds.jpg", crop: { x: 58, y: 57, w: 346, h: 347 } },
-    { id: "bird2", name: "鸟纹·展翅", src: "assets/batik/pattern-birds.jpg", crop: { x: 466, y: 467, w: 349, h: 345 } },
-    { id: "p04", name: "纹样·四", src: "assets/batik/pattern-04.jpg", crop: null },
-    { id: "p05", name: "纹样·五", src: "assets/batik/pattern-05.jpg", crop: null },
-    { id: "p06", name: "纹样·六", src: "assets/batik/pattern-06.jpg", crop: null },
-    { id: "p07", name: "纹样·七", src: "assets/batik/pattern-07.jpg", crop: null },
-    { id: "p08", name: "纹样·八", src: "assets/batik/pattern-08.jpg", crop: null },
-    { id: "p09", name: "纹样·九", src: "assets/batik/pattern-09.jpg", crop: null }
+    { id: "peacock", key: "peacock", name: "孔雀花枝", src: resolveSrc("peacock"), crop: null },
+    { id: "bird1", key: "birds", name: "鸟纹·回首", src: resolveSrc("birds"), crop: { x: 58, y: 57, w: 346, h: 347 } },
+    { id: "bird2", key: "birds", name: "鸟纹·展翅", src: resolveSrc("birds"), crop: { x: 466, y: 467, w: 349, h: 345 } },
+    { id: "p04", key: "p04", name: "纹样·四", src: resolveSrc("p04"), crop: null },
+    { id: "p05", key: "p05", name: "纹样·五", src: resolveSrc("p05"), crop: null },
+    { id: "p06", key: "p06", name: "纹样·六", src: resolveSrc("p06"), crop: null },
+    { id: "p07", key: "p07", name: "纹样·七", src: resolveSrc("p07"), crop: null },
+    { id: "p08", key: "p08", name: "纹样·八", src: resolveSrc("p08"), crop: null },
+    { id: "p09", key: "p09", name: "纹样·九", src: resolveSrc("p09"), crop: null }
   ];
   const CFG = { MIN_WAX: 0.55, R: 22, TOL: 12, DYE_MS: 2600, OX_MS: 1200, DEWAX_MS: 2000, CRACKS: 50 };
   const HINTS = {
@@ -624,7 +631,8 @@
     const token = ++loadToken;
     const img = new Image();
     img.decoding = "async";
-    img.crossOrigin = "anonymous";
+    // 仅对跨域 HTTP 图片设置 crossOrigin；data URL 与 file:// 下设置反而会触发 CORS 拦截
+    if (/^https?:/i.test(p.src)) img.crossOrigin = "anonymous";
     img.onload = function () {
       if (token !== loadToken) return;
       try {
@@ -636,12 +644,12 @@
         updateProgressUI(); requestDraw();
         toast("纹样「" + p.name + "」已就绪");
       } catch (e) {
-        showLoad("纹样读取失败", "浏览器阻止了像素读取，请用本地服务器打开。", true);
+        showLoad("纹样读取失败", "浏览器阻止了像素读取，请刷新重试。", true);
       }
     };
     img.onerror = function () {
       if (token !== loadToken) return;
-      showLoad("纹样加载失败", "请确认 " + p.src + " 存在，并且通过 HTTP 打开。", true);
+      showLoad("纹样加载失败", "纹样资源未能加载，请刷新重试。", true);
     };
     img.src = p.src;
   }
@@ -668,7 +676,7 @@
     c.fillStyle = "#eee"; c.font = "10px sans-serif"; c.textAlign = "center";
     c.fillText(p.name, size / 2, size / 2);
     const img = new Image();
-    img.crossOrigin = "anonymous";
+    if (/^https?:/i.test(p.src)) img.crossOrigin = "anonymous";
     img.onload = function () {
       c.fillStyle = "#fff"; c.fillRect(0, 0, size, size);
       const sw = p.crop ? p.crop.w : img.naturalWidth;
@@ -762,7 +770,10 @@
         }
       }
     });
-    if (location.protocol === "file:") el.proto.classList.add("show");
+    // 仅当内嵌纹样数据缺失时才提示（正常情况下 Base64 内嵌，file:// 也能直接玩）
+    if (location.protocol === "file:" && !(window.BATIK_PATTERNS && window.BATIK_PATTERNS.peacock)) {
+      el.proto.classList.add("show");
+    }
     if (DEBUG) el.debug.classList.add("show");
   }
 
