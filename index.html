@@ -7,12 +7,6 @@
 <meta name="description" content="银绣山河——以苗族银饰锻造技艺与苗绣纹样为线索的数字展馆，从飞鸟纹、角花纹到靛蓝蜡染，拾起苗岭之间的手艺与山河。">
 <meta name="theme-color" content="#08172c">
 <meta name="color-scheme" content="dark">
-<!-- 首帧防白屏：在任何外部 CSS / 背景图 / 字体加载前，先给画布涂上靛蓝底，
-     页面切换时浏览器不再闪白，而是从深色平滑过渡到完整内容。 -->
-<style data-first-paint>
-  html, body { background: #061527; }
-  body { color: #d3e0f1; }
-</style>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a1f38'/%3E%3Ccircle cx='16' cy='16' r='9.5' fill='none' stroke='%23dce6f3' stroke-width='1.5' stroke-dasharray='1.6 2.4'/%3E%3Cpath d='M10.5 18.5c3-4.6 8.4-4.2 11-1.2-2.2-4.6-7.6-4.4-9.2-2.4' fill='%23dce6f3'/%3E%3C/svg%3E">
 <link rel="canonical" href="https://yinxue-shanhe.app.workbuddy.host/">
 
@@ -25,7 +19,6 @@
 
 <!-- 标题字体：演示悠然小楷（子集，仅含「银绣山河」四字，5.7KB 本地加载） -->
 <link rel="preload" href="assets/fonts/youran-xiaokai-title.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="assets/bg-water.jpg" as="image">
 <!-- 样式表自愈：分享链接偶发中途断流时，某张 CSS 会整份不生效，页面退化成无样式
      （导航消失、列表序号露出来、卡片排版消失）。解析完成后再核对每张表是否真的
      解析出规则，失败的带时间戳重取，最多两次；正常加载时什么都不做，不影响缓存。 -->
@@ -57,8 +50,15 @@
 <link rel="stylesheet" href="assets/css/bgm.css">
 <link rel="stylesheet" href="assets/css/map.css">
 <link rel="stylesheet" href="assets/css/chrome.css">
+<link rel="stylesheet" href="assets/css/craft.css">
+<link rel="stylesheet" href="assets/css/switch.css">
 
-<!-- 第二屏地图：滚动到附近才下载 echarts 与底图，这里只是登记脚本 -->
+<!-- three.js 已本地化到 assets/js/vendor/three/，model3d.js 内部用相对路径直接 import，
+     不依赖 CDN 与 import map，离线也能正常打开 3D 模型。 -->
+
+<!-- 第二屏地图：滚动到附近才下载 echarts；底图数据改为 script 预载，
+     避免 file:// 双击打开时 fetch 被拦截导致「地图数据未能载入」 -->
+<script defer src="assets/geo/miao-map-data.js"></script>
 <script defer src="assets/js/map.js"></script>
 
 <!-- 入场动画的开关：只有脚本确认能跑，才给 html 加 anim 类。
@@ -85,11 +85,55 @@
       <a class="topbar__link" href="index.html" aria-current="page">首页</a>
       <a class="topbar__link" href="history.html">历史溯源</a>
       <a class="topbar__link" href="gallery.html">纹样图鉴</a>
-      <a class="topbar__link" href="inheritors.html">匠心传承</a>
       <a class="topbar__link" href="experience.html">互动创作</a>
     </nav>
   </div>
 </header>
+
+<!-- ==================================================================
+     板块快速切换：屏幕上/下两边居中的半箭头 + 屏幕左侧垂直居中的三颗光点
+     三个板块为「银绣山河（首屏）/ 苗疆万里 / 苗岭风物」。
+     上箭头在屏幕顶端、指向上一屏；下箭头在屏幕底端、指向下一屏；
+     点一次翻一屏，到底回绕到另一端。光点实时反映当前所在板块，
+     也可直接点光点跳转。切换逻辑与滚轮吸附共用 index.html 末尾的同一段脚本。
+     半箭头 = 只有折线的 chevron（无底边、无底板），双线一淡一亮作方向暗示。
+     ================================================================== -->
+<nav class="screen-nav" id="screen-nav" aria-label="首页板块快速切换">
+  <button class="screen-nav__arrow screen-nav__arrow--up" type="button" data-screen-step="-1" aria-label="上一屏">
+    <svg viewBox="0 0 40 30" aria-hidden="true" focusable="false">
+      <path class="screen-nav__chev screen-nav__chev--ghost" d="M7 23 20 10 33 23"/>
+      <path class="screen-nav__chev screen-nav__chev--main" d="M7 23 20 10 33 23"/>
+    </svg>
+  </button>
+
+  <ol class="screen-nav__dots">
+    <li>
+      <button class="screen-dot is-active" type="button" data-screen-go="0" aria-current="true" aria-label="第一屏 · 银绣山河">
+        <span class="screen-dot__label">银绣山河</span>
+        <span class="screen-dot__core" aria-hidden="true"></span>
+      </button>
+    </li>
+    <li>
+      <button class="screen-dot" type="button" data-screen-go="1" aria-label="第二屏 · 苗疆万里">
+        <span class="screen-dot__label">苗疆万里</span>
+        <span class="screen-dot__core" aria-hidden="true"></span>
+      </button>
+    </li>
+    <li>
+      <button class="screen-dot" type="button" data-screen-go="2" aria-label="第三屏 · 苗岭风物">
+        <span class="screen-dot__label">苗岭风物</span>
+        <span class="screen-dot__core" aria-hidden="true"></span>
+      </button>
+    </li>
+  </ol>
+
+  <button class="screen-nav__arrow screen-nav__arrow--down" type="button" data-screen-step="1" aria-label="下一屏">
+    <svg viewBox="0 0 40 30" aria-hidden="true" focusable="false">
+      <path class="screen-nav__chev screen-nav__chev--ghost" d="M7 23 20 10 33 23"/>
+      <path class="screen-nav__chev screen-nav__chev--main" d="M7 23 20 10 33 23"/>
+    </svg>
+  </button>
+</nav>
 
 <div class="stage">
   <!-- 背景层：第二张图（青花水波）+ 靛蓝罩色 -->
@@ -218,16 +262,18 @@
        放里面会被上面那层织纹（z-index:6）盖住 -->
   <div id="detail" role="dialog" aria-modal="true"
        aria-labelledby="detail-title" aria-hidden="true">
-    <div class="detail__top">
-      <button class="detail__back" type="button" id="back-btn">‹ 返回地图</button>
-      <div>
-        <h2 class="detail__title" id="detail-title"></h2>
-        <div class="detail__tag" id="detail-tag"></div>
+    <div class="detail__panel">
+      <div class="detail__top">
+        <button class="detail__back" type="button" id="back-btn">‹ 返回地图</button>
+        <div>
+          <h2 class="detail__title" id="detail-title"></h2>
+          <div class="detail__tag" id="detail-tag"></div>
+        </div>
       </div>
-    </div>
-    <div class="detail__body">
-      <p class="detail__intro" id="detail-intro"></p>
-      <div class="m-cards" id="detail-cards"></div>
+      <div class="detail__body">
+        <p class="detail__intro" id="detail-intro"></p>
+        <div class="m-cards" id="detail-cards"></div>
+      </div>
     </div>
   </div>
 
@@ -236,9 +282,531 @@
   <div class="map-cloth map-cloth--crackle" aria-hidden="true"></div>
 </section>
 
+<!-- ==================================================================
+     第三屏 · 匠心千年：银饰与苗绣技艺
+     版式参考剪纸主题网页（左文右图 + 数据卡 + 对比卡），按本站主题重做：
+     左图右文（主视觉在左、文字卡在右），置于地图屏之下，随滚动进入。
+     ================================================================== -->
+<section class="craft-sec" id="craft-sec" aria-labelledby="craft-title">
+  <div class="craft-sec__bg" aria-hidden="true"></div>
+  <div class="craft-sec__inner">
+
+    <!-- 顶部：统一小标题 + 介绍（居中） -->
+    <header class="craft-head">
+      <h2 class="craft-head__title" id="craft-title">苗岭风物</h2>
+      <p class="craft-head__desc">
+        巍巍苗岭，藏着世代传承的手工文脉。苗族先民以巧手造物，锻银成饰、刺绣为诗、蜡染绘布，
+        将民族的神话、信仰与自然观察，凝结在一件件非遗作品之中。
+      </p>
+    </header>
+
+    <!-- 下方：左右对称卡片 -->
+    <div class="craft-cols">
+
+    <!-- 左：银饰卡（与右卡同风格白底：小标题+介绍+三小卡+平面图轮播+3D入口） -->
+    <div class="craft-card craft-card--silver craft-panel">
+      <h2 class="craft-card__title">银韵苗饰</h2>
+      <p class="craft-card__lead">
+        苗族银饰为盛装之冠，银角象征牛图腾与山岳。匠人熔银锻坯，历经锤錾、编丝、焊接数十道工序，
+        将日月星辰、花鸟鸟兽錾刻入银器，是苗岭之间彰显身份、寄托祈愿的瑰宝。
+      </p>
+
+      <div class="craft-stats" role="list">
+        <div class="craft-stat" role="listitem">
+          <div class="craft-stat__num">30余道</div>
+          <div class="craft-stat__label">锻银手工工序</div>
+        </div>
+        <div class="craft-stat" role="listitem">
+          <div class="craft-stat__num">纯银为材</div>
+          <div class="craft-stat__label">錾刻编丝焊接</div>
+        </div>
+        <div class="craft-stat" role="listitem">
+          <div class="craft-stat__num">盛装之首</div>
+          <div class="craft-stat__label">银冠银角银项</div>
+        </div>
+      </div>
+
+      <!-- 平面图轮播 -->
+      <figure class="craft-figure craft-figure--inner">
+        <div class="craft-figure__frame">
+          <div class="craft-figure__slider" role="img" aria-label="苗族银饰系列展示">
+            <img class="craft-figure__img" src="assets/craft/silver-1.jpg" alt="苗族银冠银角" width="1024" height="1024" loading="lazy">
+            <img class="craft-figure__img" src="assets/craft/silver-2.jpg" alt="苗族银项圈银压领" width="1024" height="1024" loading="lazy">
+            <img class="craft-figure__img" src="assets/craft/silver-3.jpg" alt="苗族银手镯" width="1024" height="1024" loading="lazy">
+          </div>
+          <div class="craft-figure__dots" role="tablist" aria-label="银饰切换指示">
+            <button type="button" class="craft-dot is-active" aria-label="第1件银饰"></button>
+            <button type="button" class="craft-dot" aria-label="第2件银饰"></button>
+            <button type="button" class="craft-dot" aria-label="第3件银饰"></button>
+          </div>
+          <div class="craft-figure__shade" aria-hidden="true"></div>
+          <figcaption class="craft-figure__caption">苗族银饰盛装 · 一针一银皆天工</figcaption>
+        </div>
+        <span class="craft-figure__badge" aria-hidden="true">银绣山河</span>
+      </figure>
+
+      <!-- 3D 查看按钮 -->
+      <button class="craft-3d-btn" type="button" data-open-3d>
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/></svg>
+        <span>查看 3D 模型</span>
+      </button>
+    </div>
+
+    <!-- 右：内容卡片（苗绣 + 蜡染） -->
+    <div class="craft-card craft-panel">
+      <h2 class="craft-card__title">彩染绣章</h2>
+      <p class="craft-card__lead">
+        苗绣以针为笔、以线为墨，蜡染以蜡代笔、冰纹生花。蝴蝶妈妈、鸟兽草木的纹样被凝于布帛，
+        一针一蜡，承载苗族古老传说，是流传千年的织物非遗。
+      </p>
+
+      <div class="craft-stats" role="list">
+        <div class="craft-stat" role="listitem">
+          <div class="craft-stat__num">千年积淀</div>
+          <div class="craft-stat__label">苗绣蜡染传承</div>
+        </div>
+        <div class="craft-stat" role="listitem">
+          <div class="craft-stat__num">布上匠心</div>
+          <div class="craft-stat__label">针线蜡绘工序</div>
+        </div>
+        <div class="craft-stat" role="listitem">
+          <div class="craft-stat__num">首批入选</div>
+          <div class="craft-stat__label">国家级非遗名录</div>
+        </div>
+      </div>
+
+      <div class="craft-compare">
+        <div class="craft-compare__item">
+          <img class="craft-compare__img" src="assets/bg-batik.jpg" alt="苗族蜡染纹样" loading="lazy">
+          <div class="craft-compare__shade" aria-hidden="true"></div>
+          <span class="craft-compare__tag">蜡染 · 靛</span>
+          <span class="craft-compare__name">蓝白冰纹 · 几何花鸟</span>
+        </div>
+        <div class="craft-compare__item">
+          <img class="craft-compare__img" src="assets/museum/m439_big.jpg" alt="苗族苗绣绣片纹样" loading="lazy">
+          <div class="craft-compare__shade" aria-hidden="true"></div>
+          <span class="craft-compare__tag">苗绣 · 彩</span>
+          <span class="craft-compare__name">蝴蝶妈妈 · 鸟兽花草</span>
+        </div>
+        <div class="craft-compare__item">
+          <img class="craft-compare__img" src="assets/museum/m433_big.jpg" alt="苗族苗绣服饰成品" loading="lazy">
+          <div class="craft-compare__shade" aria-hidden="true"></div>
+          <span class="craft-compare__tag">成品 · 衣</span>
+          <span class="craft-compare__name">苗绣盛装 · 衣摆流光</span>
+        </div>
+        <div class="craft-compare__item">
+          <img class="craft-compare__img" src="assets/craft/craft-embroidery.jpg" alt="苗族苗绣针脚特写" loading="lazy">
+          <div class="craft-compare__shade" aria-hidden="true"></div>
+          <span class="craft-compare__tag">工艺 · 针</span>
+          <span class="craft-compare__name">彩线为墨 · 针脚成章</span>
+        </div>
+      </div>
+    </div>
+
+    </div><!-- /craft-cols -->
+
+  </div>
+</section>
+
+<!-- ==================================================================
+     3D 银饰查看弹窗：点击第三屏左卡的「查看 3D 模型」按钮打开。
+     顶部可切换三件银饰，中间 three.js 渲染 GLB 模型（先内置第一件）。
+     模型文件已压缩（97MB → 11MB），打开弹窗时才按需加载，不拖累首屏。
+     ================================================================== -->
+<div class="model-modal" id="model-modal" role="dialog" aria-modal="true"
+     aria-labelledby="model-modal-title" aria-hidden="true">
+  <div class="model-modal__panel">
+    <div class="model-modal__top">
+      <h2 class="model-modal__title" id="model-modal-title">银饰 3D 展台</h2>
+      <button class="model-modal__close" type="button" data-close-3d aria-label="关闭 3D 模型弹窗">✕</button>
+    </div>
+
+    <div class="model-modal__tabs" role="tablist" aria-label="选择银饰 3D 模型">
+      <button class="model-tab" type="button" role="tab" data-model="0" aria-selected="false">银冠银角</button>
+      <button class="model-tab is-active" type="button" role="tab" data-model="1" aria-selected="true">银项圈压领</button>
+      <button class="model-tab" type="button" role="tab" data-model="2" aria-selected="false">银手镯</button>
+    </div>
+
+    <div class="model-modal__stage" id="model-stage">
+      <div class="model-modal__loading" id="model-loading">
+        <div class="model-spinner"></div>
+        <div>3D 模型加载中…</div>
+      </div>
+      <div class="model-modal__hint" id="model-hint">拖拽旋转 · 滚轮缩放</div>
+      <p class="model-modal__disclaimer">本 3D 模型由 AI 辅助创作，参考苗族传统银饰实物形制，<br>基于苗族银饰锻制非遗技艺复原再设计</p>
+
+      <!-- 银饰介绍入口：置于展台左下角，与右下角声明、底部居中提示互不遮挡 -->
+      <button class="model-info-btn" type="button" id="model-info-btn"
+              aria-haspopup="dialog" aria-controls="silver-info" aria-expanded="false">
+        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <circle cx="8" cy="8" r="6.5"></circle>
+          <path d="M8 7.1v4.2"></path>
+          <circle cx="8" cy="4.7" r=".95" fill="currentColor" stroke="none"></circle>
+        </svg>
+        <span>了解此件</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 银饰介绍弹窗：覆盖在 3D 界面之上，内容随顶部标签切换 -->
+  <div class="silver-info" id="silver-info" aria-hidden="true">
+    <div class="silver-info__dialog" role="dialog" aria-modal="true"
+         aria-labelledby="silver-info-title">
+      <button class="silver-info__close" type="button" data-close-info aria-label="关闭银饰介绍">✕</button>
+      <header class="silver-info__head">
+        <p class="silver-info__eyebrow">银饰图说 · 形制与文脉</p>
+        <h3 class="silver-info__title" id="silver-info-title">银项圈压领</h3>
+        <p class="silver-info__sub" id="silver-info-sub"></p>
+      </header>
+      <div class="silver-info__body" id="silver-info-body"></div>
+      <footer class="silver-info__foot">
+        <span>关闭后即可继续拖拽旋转查看纹样细部</span>
+        <span class="silver-info__foot-key"><kbd>Esc</kbd> 或点击空白处关闭</span>
+      </footer>
+    </div>
+  </div>
+</div>
+
+<!-- 第三屏入场渐显：滚动到「匠心千年」屏附近时加 is-visible 触发淡入。
+     渐显只在 html.anim（用户未要求减少动效）下生效，脚本被拦也不影响可见性。 -->
+<script>
+(function () {
+  var sec = document.getElementById('craft-sec');
+  if (!sec) return;
+  function show() { sec.classList.add('is-visible'); }
+  if (typeof IntersectionObserver === 'function') {
+    var io = new IntersectionObserver(function (entries) {
+      for (var i = 0; i < entries.length; i++) {
+        if (entries[i].isIntersecting) { show(); io.disconnect(); return; }
+      }
+    }, { rootMargin: '120px 0px', threshold: 0.08 });
+    io.observe(sec);
+  } else {
+    show();
+  }
+})();
+</script>
+
+<!-- 银饰轮播指示点同步：每 2.5 秒切换高亮，与 CSS 淡入淡出节奏一致。
+     也支持点击指示点手动切换。 -->
+<script>
+(function () {
+  var dots = document.querySelectorAll('.craft-dot');
+  var slider = document.querySelector('.craft-figure__slider');
+  if (!dots.length || !slider) return;
+  var imgs = slider.querySelectorAll('.craft-figure__img');
+  var total = dots.length;
+  var index = 0;
+  var timer = null;
+
+  function show(i) {
+    index = ((i % total) + total) % total;
+    for (var d = 0; d < dots.length; d++) {
+      dots[d].classList.toggle('is-active', d === index);
+    }
+    for (var k = 0; k < imgs.length; k++) {
+      imgs[k].classList.toggle('is-active', k === index);
+    }
+  }
+
+  // 用 JS 完全接管显示（关闭 CSS 自动动画，避免冲突）
+  slider.classList.add('js-managed');
+
+  function next() { show(index + 1); }
+  function start() { stop(); timer = setInterval(next, 2500); }
+  function stop() { if (timer) { clearInterval(timer); timer = null; } }
+
+  for (var d = 0; d < dots.length; d++) {
+    (function (n) {
+      dots[n].addEventListener('click', function () {
+        show(n);
+        start();
+      });
+    })(d);
+  }
+
+  show(0);
+  start();
+})();
+</script>
+
+<!-- 板块整屏切换：接管鼠标滚轮与触摸滑动，用自定义缓动平滑滚动到
+     最近的完整板块（吸附位置 = 板块 offsetTop - 顶栏高）。
+     只在页面已停靠在某屏起点时才接管，第二屏地图内正常浏览不受干扰；
+     原生 proximity 吸附 + scroll-snap-stop: always 兜底（滚动条拖动、
+     键盘翻页等场景逐屏就近对齐）。
+     同一段脚本还驱动屏幕下方的上/下箭头（前后翻屏、到底回绕）与
+     右侧三颗位置光点（随滚动位置实时换亮）。
+     尊重「减少动态效果」：滚轮/触摸接管退回普通滚动，箭头改为直接跳转。 -->
+<script>
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var sections = [].slice.call(document.querySelectorAll('.stage, .map-sec, .craft-sec'))
+    .filter(function (s) { return s.offsetHeight > 0; });
+  if (sections.length < 2) return;
+
+  var navH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h')) || 64;
+
+  function target(i) {
+    return Math.max(0, Math.round(sections[i].offsetTop - navH));
+  }
+
+  function currentIndex() {
+    var y = window.scrollY + navH + 1;
+    var idx = 0;
+    for (var i = 0; i < sections.length; i++) {
+      if (sections[i].offsetTop <= y) idx = i;
+    }
+    return idx;
+  }
+
+  // 页面是否「精确停靠」在某个板块起点（允许 ±2px 误差）
+  function isSettled() {
+    for (var i = 0; i < sections.length; i++) {
+      if (Math.abs(window.scrollY - target(i)) <= 2) return true;
+    }
+    return false;
+  }
+
+  // 平滑滚动：rAF 逐帧 + 自定义缓动，总时长 720ms。
+  // 不用浏览器原生 smooth 的原因：它时长不可控（Chromium 约 400ms、中段
+  // 偏线性），观感偏「急、硬」。
+  // 逐帧 scrollTo 走主线程，所以动画期间做三件事保证不卡：
+  //   1) 给 html 加 .is-switching，CSS 暂停首屏背景无限动画，避免抢 GPU；
+  //   2) 临时把 scroll-snap-type 置 none，避免吸附在动画中途抢目标造成顿挫；
+  //   3) 目标整数位移没变化就不再调 scrollTo —— 缓动尾部大量帧只移动
+  //      零点几像素，跳过它们能少一半以上的滚动更新。
+  var animating = false;
+  var rafId = 0;
+  var DURATION = 720;
+  // 点箭头/光点时先记住目标屏：光点立刻亮到目标位置，不必等滚动过半才跳。
+  var pendingIndex = -1;
+  // 动画开始前 html 上的 scroll-snap-type 内联值。中途再点一次箭头要能
+  // 接着走（而不是把上一次的 'none' 当成原值存下来），所以单独记住。
+  var savedSnap = null;
+
+  // 缓动曲线：起停都缓，但尾部比 quart 收得干净——
+  // 上一版 easeInOutQuart 在最后 10% 时间里只走完 0.08% 的距离，
+  // 视觉上等于提前停住再补一个极小的跳动，反而像「卡了一下」。
+  function easeInOutCubic(t) {
+    return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  }
+
+  function smoothTo(to, duration) {
+    var html = document.documentElement;
+    var from = window.scrollY;
+    var diff = to - from;
+    if (Math.abs(diff) < 1) { pendingIndex = -1; return; }
+
+    var dur = duration || DURATION;
+
+    animating = true;
+    html.classList.add('is-switching');
+    if (savedSnap === null) {
+      savedSnap = html.style.scrollSnapType;
+      html.style.scrollSnapType = 'none';
+    }
+
+    var t0 = 0;
+    var applied = Math.round(from);
+    cancelAnimationFrame(rafId);
+
+    // 收尾：直接落在终点帧里做完，不再轮询等待。
+    // 旧版用 setTimeout 每 60ms 探测一次滚动是否停止，并把状态至少再压
+    // 420ms，导致动画结束后近半秒内滚轮事件仍被吞掉——「滚了没反应」。
+    function end() {
+      if (savedSnap) {
+        html.style.scrollSnapType = savedSnap;
+      } else {
+        html.style.removeProperty('scroll-snap-type');
+        if (!html.getAttribute('style')) html.removeAttribute('style');
+      }
+      savedSnap = null;
+      html.classList.remove('is-switching');
+      animating = false;
+      pendingIndex = -1;
+      syncDots();
+    }
+
+    function step(ts) {
+      if (!t0) t0 = ts;
+      var p = Math.min(1, (ts - t0) / dur);
+      var y = p >= 1 ? to : Math.round(from + diff * easeInOutCubic(p));
+      if (y !== applied) {
+        window.scrollTo(0, y);
+        applied = y;
+      }
+      if (p < 1) {
+        rafId = requestAnimationFrame(step);
+      } else {
+        end();
+      }
+    }
+    rafId = requestAnimationFrame(step);
+  }
+
+  function trigger(dir) {
+    var idx = currentIndex();
+    var next = Math.min(sections.length - 1, Math.max(0, idx + dir));
+    smoothTo(target(next));
+  }
+
+  /* ---------- 控件：屏幕上/下两边的半箭头 + 屏幕左侧的位置光点 ----------
+     上箭头点一次回到上一屏、下箭头进入下一屏，到底回绕到另一端（三屏循环）；
+     光点在翻屏动画期间直接亮到目标屏，其余时刻跟着页面实际位置走，
+     滚轮、触摸、拖动滚动条、键盘翻页都能实时同步。 */
+  var switchEl = document.getElementById('screen-nav');
+  var stepEls  = [].slice.call(document.querySelectorAll('[data-screen-step]'));
+  var dotEls   = [].slice.call(document.querySelectorAll('[data-screen-go]'));
+  var litIndex = -1;
+
+  // 正在翻屏时以「目标屏」为准，否则以页面实际位置为准
+  function activeIndex() {
+    return (animating && pendingIndex >= 0) ? pendingIndex : currentIndex();
+  }
+
+  function syncDots() {
+    if (!dotEls.length) return;
+    var i = activeIndex();
+    if (i === litIndex) return;
+    litIndex = i;
+    for (var k = 0; k < dotEls.length; k++) {
+      var on = k === i;
+      dotEls[k].classList.toggle('is-active', on);
+      if (on) dotEls[k].setAttribute('aria-current', 'true');
+      else dotEls[k].removeAttribute('aria-current');
+    }
+    // 第三屏是浅米底 + 白卡：底部的下箭头要换成深色才看得清
+    // 第二屏是地图：手机上下箭头原位会压到左下角的「海南省·附图」标注
+    if (switchEl) {
+      switchEl.classList.toggle('is-light', i === 2);
+      switchEl.classList.toggle('is-map', i === 1);
+    }
+  }
+
+  // 翻到第 i 屏：越界即回绕，三屏首尾相接
+  function goTo(i) {
+    var n = sections.length;
+    i = ((i % n) + n) % n;
+    var to = target(i);
+    pendingIndex = i;
+    syncDots();
+
+    if (reduce) {                      // 减少动态效果：不做缓动，直接落位
+      window.scrollTo(0, to);
+      pendingIndex = -1;
+      animating = false;
+      syncDots();
+      return;
+    }
+
+    // 距离越远走时略长，跨两屏回绕时不至于像「瞬移」
+    var dist = Math.abs(to - window.scrollY);
+    smoothTo(to, Math.min(1050, Math.max(520, Math.round(dist * 0.85))));
+  }
+
+  for (var s = 0; s < stepEls.length; s++) {
+    (function (el) {
+      el.addEventListener('click', function () {
+        // 动画中也能接着点：以当前目标屏为基准继续往下走
+        goTo(activeIndex() + (parseInt(el.getAttribute('data-screen-step'), 10) || 1));
+      });
+    })(stepEls[s]);
+  }
+
+  for (var q = 0; q < dotEls.length; q++) {
+    (function (el, idx) {
+      el.addEventListener('click', function () {
+        if (idx === activeIndex()) return;
+        goTo(idx);
+      });
+    })(dotEls[q], q);
+  }
+
+  // 滚动即同步：rAF 合并，一帧最多算一次，不额外占用主线程
+  var dotTick = false;
+  window.addEventListener('scroll', function () {
+    if (dotTick) return;
+    dotTick = true;
+    requestAnimationFrame(function () { dotTick = false; syncDots(); });
+  }, { passive: true });
+
+  window.addEventListener('resize', syncDots);
+
+  // 地图详情是第二屏内的模态框，打开时把这组控件一起收起，免得压在人家的面板上
+  var detailEl = document.getElementById('detail');
+  if (switchEl && detailEl && window.MutationObserver) {
+    new MutationObserver(function () {
+      switchEl.classList.toggle('is-off', detailEl.classList.contains('is-open'));
+    }).observe(detailEl, { attributes: true, attributeFilter: ['class'] });
+  }
+
+  syncDots();
+
+  // 以下滚轮/触摸接管在「减少动态效果」下不启用，退回普通滚动
+  if (reduce) return;
+
+  // 鼠标滚轮：只在「停靠态 + 未在动画」时接管。
+  // 阈值 90 ≈ 桌面滚轮一个刻度（Edge/Chrome 每刻度约 100），
+  // 即「一格即走」；触控板的零碎小增量靠 200ms 窗口累计，
+  // 攒不满就不触发，不会因为手指微动误切屏。
+  var acc = 0;
+  var accTimer = null;
+  var WHEEL_STEP = 90;
+  var WHEEL_WINDOW = 200;
+
+  window.addEventListener('wheel', function (e) {
+    if (animating) { e.preventDefault(); return; }
+    if (!isSettled()) return;                    // 未停靠时交给原生滚动
+
+    // deltaMode: 0=像素 1=行 2=页。Firefox 等按「行」上报（一格 deltaY=3），
+    // 不折算的话会被下面的 <4 过滤掉，滚轮完全失效。
+    var d = e.deltaY;
+    if (e.deltaMode === 1) d *= 16;
+    else if (e.deltaMode === 2) d *= window.innerHeight;
+
+    if (Math.abs(d) < 4) return;                 // 忽略触控板极微抖动
+    e.preventDefault();
+
+    acc += d;
+    clearTimeout(accTimer);
+    accTimer = setTimeout(function () { acc = 0; }, WHEEL_WINDOW);
+
+    if (Math.abs(acc) >= WHEEL_STEP) {
+      trigger(d > 0 ? 1 : -1);
+      acc = 0;
+    }
+  }, { passive: false });
+
+  // 触摸滑动：快速有力的一滑才切屏（滑动距离 > 60px 且较快）
+  var touchY = 0, touchT = 0;
+  window.addEventListener('touchstart', function (e) {
+    if (e.touches.length === 1) { touchY = e.touches[0].clientY; touchT = Date.now(); }
+  }, { passive: true });
+  window.addEventListener('touchend', function (e) {
+    if (animating || !isSettled() || e.changedTouches.length !== 1) return;
+    var dy = e.changedTouches[0].clientY - touchY;
+    var dt = Date.now() - touchT;
+    if (Math.abs(dy) > 60 && dt < 500) {
+      trigger(dy < 0 ? 1 : -1);
+    }
+  }, { passive: true });
+})();
+</script>
+
 <!-- 背景音乐：《天地开辟》苗族古歌（Suno AI 谱曲），点击右下角按钮播放/暂停 -->
 <script src="assets/js/bgm.js"></script>
-<!-- 全站统一交互动效：滚动渐显 + 卡片抬升（渐进增强） -->
-<script src="assets/js/reveal.js"></script>
+
+<!-- 3D 银饰弹窗：three.js 已本地化（UMD 全局构建 + 全局版 OrbitControls/GLTFLoader），
+     用普通 script 按顺序加载，file:// 双击打开也能正常渲染 3D 模型。
+     模型数据内嵌为 base64（silver-3d-data.js），规避 file:// 下 fetch 本地 .glb 被拦截。 -->
+<script src="assets/js/vendor/three/three.min.js"></script>
+<script src="assets/js/vendor/three/BufferGeometryUtils.js"></script>
+<script src="assets/js/vendor/three/GLTFLoader.js"></script>
+<script src="assets/js/vendor/three/OrbitControls.js"></script>
+<!-- 模型 base64 数据体积较大（银冠 9MB / 银压领 6MB），由 model3d.js 在首次查看时按需注入，
+     不再随首屏同步加载，避免拖慢页面。 -->
+<script src="assets/js/model3d.js"></script>
 </body>
 </html>

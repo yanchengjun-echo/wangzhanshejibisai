@@ -30,7 +30,11 @@
 
   /* ---------- 0. 资源路径 ---------- */
   var ECHARTS_SRC = 'assets/js/vendor/echarts.min.js';
-  var GEO_SRC = 'assets/geo/miao-map.json';
+  /* 底图数据不再用 fetch 拉取：fetch 在 file:// 协议下会被浏览器同源策略拦截，
+     导致「双击本地 HTML 直接打开」时地图永远显示「数据未能载入」。
+     改为把 miao-map.json 包成 window.__MIAO_MAP__ 的 JS 文件（miao-map-data.js），
+     用 <script> 标签引入 —— script 标签在 file:// 下不受 CORS 限制，两种打开方式都能加载。 */
+  var GEO_GLOBAL = '__MIAO_MAP__';
 
   /* ---------- 1. 数据：苗族分布省份 + 聚居地代表性非遗 ---------- */
   var REGIONS = {
@@ -351,9 +355,24 @@
   }
 
   function loadGeo() {
-    return fetch(GEO_SRC, { credentials: 'same-origin' }).then(function (res) {
-      if (!res.ok) throw new Error('底图加载失败：HTTP ' + res.status);
-      return res.json();
+    // 数据已由 <script> 预载入 window.__MIAO_MAP__，这里只做兜底：
+    // 万一脚本顺序错乱导致变量还没就绪，稍等重试（最多 2 秒）。
+    var data = window[GEO_GLOBAL];
+    if (data) return Promise.resolve(data);
+
+    return new Promise(function (resolve, reject) {
+      var tries = 0;
+      var timer = setInterval(function () {
+        tries++;
+        var d = window[GEO_GLOBAL];
+        if (d) {
+          clearInterval(timer);
+          resolve(d);
+        } else if (tries >= 40) {
+          clearInterval(timer);
+          reject(new Error('底图数据未就绪'));
+        }
+      }, 50);
     });
   }
 
@@ -610,6 +629,17 @@
     rec.g.classList.toggle('is-active', on);
   }
 
+  /* 清除所有引线标注的 is-active 高亮（打开/关闭详情时调用，
+     避免 hover 加上的高亮因弹窗挡住而无法 mouseleave、残留卡黄） */
+  function clearCallouts() {
+    for (var k in calloutEls) {
+      if (calloutEls.hasOwnProperty(k)) {
+        calloutEls[k].el.classList.remove('is-active');
+        calloutEls[k].g.classList.remove('is-active');
+      }
+    }
+  }
+
   function layoutCallouts() {
     if (!chart || !svgEl) return;
 
@@ -703,6 +733,19 @@
     else stageEl.removeAttribute('inert');
   }
 
+  /* 清除地图所有高亮。ECharts 的 dispatchAction({type:'downplay'}) 不带
+     seriesIndex 时只作用于第一个 series 且仅一个数据项，无法彻底清除
+     hover 残留；这里遍历全部 series（主地图 + 海南附图）逐个 downplay，
+     确保任何「卡黄/卡高亮」都能被还原。 */
+  function clearHighlight() {
+    if (!chart) return;
+    var opt = chart.getOption();
+    var series = (opt && opt.series) || [];
+    for (var i = 0; i < series.length; i++) {
+      chart.dispatchAction({ type: 'downplay', seriesIndex: i });
+    }
+  }
+
   function openDetail(regionName, trigger) {
     var r = REGIONS[regionName];
     if (!r) return;
@@ -728,6 +771,12 @@
     setStageInert(true);
     if (dBody) dBody.scrollTop = 0;
 
+    // 打开详情前先清除地图高亮：弹窗盖在地图上，鼠标可能仍停留在
+    // 被点省份上，若不 downplay，ECharts 会一直保持 emphasis 高亮色，
+    // 退出后省份就「卡黄」恢复不了。
+    clearHighlight();
+    clearCallouts();
+
     // 焦点交给返回键：键盘用户按回车即可退出，Esc 亦可
     if (backWrap && backWrap.focus) backWrap.focus({ preventScroll: true });
   }
@@ -741,11 +790,22 @@
 
     if (lastTrigger && lastTrigger.focus) lastTrigger.focus({ preventScroll: true });
     lastTrigger = null;
+
+    // 兜底：退出时再清一次高亮。注意必须放在 focus() 之后——
+    // lastTrigger 若是引线标注按钮，focus() 会触发它的 focus 事件监听器
+    // 重新加上 is-active 高亮；只有在此之后再清理，才能彻底还原配色。
+    clearHighlight();
+    clearCallouts();
   }
 
   if (backEl || backWrap) {
     (backWrap || backEl).addEventListener('click', closeDetail);
   }
+
+  // 点击遮罩（弹窗卡片之外的半透明区域）也关闭弹窗
+  detailEl.addEventListener('click', function (e) {
+    if (e.target === detailEl) closeDetail();
+  });
 
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' || e.key === 'Esc') closeDetail();

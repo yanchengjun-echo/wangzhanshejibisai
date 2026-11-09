@@ -1,0 +1,964 @@
+/* ==========================================================================
+   银绣山河 · 首页第三屏「匠心千年」· 银饰与苗绣技艺
+   --------------------------------------------------------------------------
+   版式参考一份剪纸主题网页（左文右图 + 数据卡 + 风格对比卡），
+   按「银绣山河」主题重做：左图右文（图片在左、文字在右），
+   全站靛蓝 + 银白 + 暖金配色，图片本地化。
+   选择器一律以 .craft-sec 前缀收口，不污染 main.css。
+   ========================================================================== */
+
+.craft-sec {
+  position: relative;
+  /* 与第一屏(stage/hero)、第二屏(map-sec)统一为「视口高 - 顶栏高」，
+     使三个板块等高，滚动吸附点均匀分布、精准停靠 */
+  min-height: calc(100dvh - var(--nav-h, 64px));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--nav-h, 64px) + 28px) clamp(20px, 5vw, 80px) 44px;
+  /* 背景仿第一屏：青花水波底纹 + 靛蓝罩色 + 颗粒，与首页统一质感 */
+  background:
+    radial-gradient(1200px 600px at 50% 0%, rgba(22, 57, 95, .35), transparent 70%),
+    linear-gradient(180deg, var(--indigo-900) 0%, var(--indigo-800) 100%);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* 底部收口处与地图屏之间的一道暖金渐隐细线 */
+.craft-sec::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(720px, 80%);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(217, 178, 106, .4), transparent);
+  z-index: 2;
+}
+
+/* 背景层一：靛蓝云雷纹底纹（bg-craft.jpg），压暗后当底纹。
+   与首页同用靛蓝水纹风格，但图案不同（云雷纹/卷草纹），避免与首屏重复 */
+.craft-sec::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: url("../bg-craft.jpg");
+  background-position: center 50%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: .6;
+  filter: brightness(.86) saturate(1.1) contrast(1.02);
+  transform: scale(1.05);
+  animation: craftBgFloat 42s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+/* 背景层二：靛蓝罩色 + 颗粒，盖在底纹之上、内容之下 */
+.craft-sec .craft-sec__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 55% 48% at 50% 46%, rgba(122, 168, 226, .10) 0%, rgba(122, 168, 226, 0) 70%),
+    radial-gradient(ellipse 62% 58% at 50% 44%, rgba(8, 26, 48, .10) 0%, rgba(7, 22, 42, .52) 60%, rgba(5, 16, 32, .86) 100%),
+    linear-gradient(180deg, rgba(6, 20, 38, .82) 0%, rgba(8, 26, 48, .36) 30%, rgba(8, 26, 48, .30) 64%, rgba(5, 15, 30, .92) 100%);
+}
+
+.craft-sec .craft-sec__bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: .10;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@keyframes craftBgFloat {
+  from { transform: scale(1.05) translate3d(0, 0, 0); }
+  to   { transform: scale(1.08) translate3d(-1.1%, -.7%, 0); }
+}
+
+.craft-sec__inner {
+  position: relative;
+  z-index: 1;
+  width: min(1240px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(24px, 3.4vh, 40px);
+  align-items: stretch;
+}
+
+/* ---------- 顶部：统一小标题 + 介绍（居中） ---------- */
+.craft-head {
+  text-align: center;
+}
+
+.craft-head__title {
+  margin: 0 0 14px;
+  font-family: var(--font-brush);
+  font-weight: 400;
+  font-size: clamp(30px, 3.6vw, 46px);
+  line-height: 1.1;
+  letter-spacing: .14em;
+  color: var(--gold, #d9b26a);
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+}
+
+/* 标题两侧的暖金装饰横线 */
+.craft-head__title::before,
+.craft-head__title::after {
+  content: "";
+  width: clamp(28px, 5vw, 64px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(217, 178, 106, .75));
+  flex: none;
+}
+.craft-head__title::after {
+  background: linear-gradient(90deg, rgba(217, 178, 106, .75), transparent);
+}
+
+.craft-head__desc {
+  margin: 0 auto;
+  max-width: 640px;
+  font-size: 15px;
+  line-height: 1.95;
+  letter-spacing: .03em;
+  color: rgba(230, 238, 250, .88);
+}
+
+/* ---------- 下方：左右对称卡片 ---------- */
+.craft-cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: clamp(28px, 5vw, 72px);
+  align-items: stretch;
+}
+
+/* 左右两张卡等高、圆角一致，作为「一样的卡面」 */
+.craft-panel {
+  border-radius: 20px;
+}
+
+/* ---------- 左侧：银饰轮播（内嵌于白色卡片中） ---------- */
+.craft-figure {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+/* 圆形展示容器：静态平面，银饰在其中淡入淡出轮播 */
+.craft-figure__frame {
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow:
+    0 24px 48px -24px rgba(0, 0, 0, .5),
+    0 8px 20px -12px rgba(0, 0, 0, .35);
+  border: 1px solid rgba(217, 178, 106, .4);
+  aspect-ratio: 1 / 1;
+  width: min(340px, 72%);
+  background: radial-gradient(circle at 50% 40%, #1b2a44, #0b1730 70%);
+}
+
+/* 银饰轮播舞台：5 件银饰叠放，靠 opacity 淡入淡出自动切换 */
+.craft-figure__slider {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.craft-figure__slider .craft-figure__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  animation: craft-fade 12.5s ease-in-out infinite;
+}
+
+/* 5 件银饰轮流显现：每件占 20%（2.5s），期间淡入停留再淡出 */
+.craft-figure__slider .craft-figure__img:nth-child(1) { animation-delay: 0s; }
+.craft-figure__slider .craft-figure__img:nth-child(2) { animation-delay: 2.5s; }
+.craft-figure__slider .craft-figure__img:nth-child(3) { animation-delay: 5s; }
+.craft-figure__slider .craft-figure__img:nth-child(4) { animation-delay: 7.5s; }
+.craft-figure__slider .craft-figure__img:nth-child(5) { animation-delay: 10s; }
+
+@keyframes craft-fade {
+  0%       { opacity: 0; }
+  4%       { opacity: 1; }
+  18%      { opacity: 1; }
+  22%      { opacity: 0; }
+  100%     { opacity: 0; }
+}
+
+/* JS 接管轮播后，关闭 CSS 自动动画，由 JS 控制 opacity（保证指示点与图片严格同步） */
+.craft-figure__slider.js-managed .craft-figure__img {
+  animation: none;
+  opacity: 0;
+  transition: opacity .6s ease;
+}
+
+.craft-figure__slider.js-managed .craft-figure__img.is-active {
+  opacity: 1;
+}
+
+.craft-figure__img {
+  display: block;
+}
+
+/* 底部指示点：5 个圆点，随轮播高亮当前件 */
+.craft-figure__dots {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 3;
+}
+
+.craft-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  background: rgba(230, 238, 250, .35);
+  cursor: pointer;
+  transition: background .3s, width .3s;
+}
+
+.craft-dot.is-active {
+  width: 22px;
+  border-radius: 4px;
+  background: var(--gold);
+}
+
+/* 光影层次：顶部暖金高光 + 底部深色收束，让圆盘有「悬浮于屏幕之上」的立体厚度 */
+.craft-figure__shade {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 22%, rgba(255, 232, 190, .16), transparent 45%),
+    radial-gradient(circle at 50% 50%, transparent 55%, rgba(6, 21, 39, .42) 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.craft-figure__caption {
+  margin: 16px auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #6b635a;
+  font-size: 13px;
+  letter-spacing: .04em;
+}
+
+.craft-figure__caption::before,
+.craft-figure__caption::after {
+  content: "";
+  width: 22px;
+  height: 1px;
+  background: rgba(176, 90, 58, .5);
+  opacity: .7;
+  flex: none;
+}
+
+.craft-figure__badge {
+  position: absolute;
+  top: -4px;
+  right: 4px;
+  writing-mode: vertical-rl;
+  letter-spacing: .35em;
+  font-family: var(--font-brush);
+  font-size: 14px;
+  color: rgba(176, 90, 58, .85);
+  padding: 6px 4px;
+  z-index: 2;
+}
+
+/* ---------- 3D 查看按钮 ---------- */
+.craft-3d-btn {
+  margin-top: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 24px;
+  border-radius: 999px;
+  border: 1px solid rgba(176, 90, 58, .35);
+  background: linear-gradient(180deg, #f3ece0, #e9decb);
+  color: #8a4a2f;
+  font-size: 14px;
+  letter-spacing: .06em;
+  cursor: pointer;
+  transition: transform .25s var(--ease-soft), background .25s, box-shadow .25s;
+}
+.craft-3d-btn:hover {
+  background: linear-gradient(180deg, #efe5d4, #e2d3b8);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -8px rgba(176, 90, 58, .35);
+}
+.craft-3d-btn svg {
+  flex: none;
+}
+
+/* ---------- 右侧：内容卡片 ---------- */
+.craft-card {
+  position: relative;
+  background: #f7f5f1;
+  color: #23272e;
+  border-radius: 20px;
+  padding: clamp(26px, 3.4vw, 44px);
+  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, .6);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+/* 左侧红色竖线装饰（呼应参考图） */
+.craft-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 34px;
+  bottom: 34px;
+  width: 3px;
+  background: linear-gradient(180deg, var(--cinnabar), #d97757);
+  border-radius: 3px;
+}
+
+.craft-card__title {
+  font-family: var(--font-brush);
+  font-size: clamp(22px, 2.4vw, 30px);
+  color: var(--cinnabar);
+  margin: 0 0 6px;
+  letter-spacing: .06em;
+}
+
+.craft-card__lead {
+  margin: 0 0 22px;
+  font-size: 15px;
+  line-height: 1.8;
+  color: #4a4f58;
+}
+
+/* 三个数据卡 */
+.craft-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 0 0 22px;
+}
+
+.craft-stat {
+  background: #fff;
+  border: 1px solid #e8e4dc;
+  border-radius: 12px;
+  padding: 16px 10px;
+  text-align: center;
+}
+
+.craft-stat__num {
+  font-family: var(--font-brush);
+  font-size: clamp(18px, 1.7vw, 23px);
+  font-weight: 700;
+  color: #1a1f27;
+  line-height: 1.2;
+  letter-spacing: .02em;
+}
+
+.craft-stat__label {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #8a8f98;
+  letter-spacing: .02em;
+}
+
+/* 四个配图卡：2×2 网格，尺寸与间距统一 */
+.craft-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.craft-compare__item {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  background: #1a1f27;
+}
+
+.craft-compare__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 图片暗化渐变，保证标签文字可读 */
+.craft-compare__shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(6, 21, 39, 0) 40%, rgba(6, 21, 39, .82) 100%);
+}
+
+/* 左上角黄色标签条 */
+.craft-compare__tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: var(--gold);
+  color: #3a2c12;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 4px;
+  letter-spacing: .05em;
+}
+
+.craft-compare__name {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  color: #f6faff;
+  font-size: 14px;
+  letter-spacing: .06em;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, .6);
+}
+
+/* ---------- 入场渐显（与全站 .anim 体系一致） ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  html.anim .craft-sec .craft-figure,
+  html.anim .craft-sec .craft-card {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity .8s var(--ease-soft), transform .8s var(--ease-soft);
+  }
+  html.anim .craft-sec.is-visible .craft-figure {
+    opacity: 1;
+    transform: none;
+    transition-delay: .05s;
+  }
+  html.anim .craft-sec.is-visible .craft-card {
+    opacity: 1;
+    transform: none;
+    transition-delay: .18s;
+  }
+}
+
+/* ---------- 3D 模型弹窗 ---------- */
+.model-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(4, 12, 24, .72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .35s var(--ease-soft), visibility .35s;
+}
+
+.model-modal.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.model-modal__panel {
+  width: min(990px, 100%);
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #0d1f38, #08172c);
+  border: 1px solid rgba(217, 178, 106, .35);
+  border-radius: 20px;
+  box-shadow: 0 40px 90px -30px rgba(0, 0, 0, .85);
+  overflow: hidden;
+  transform: translateY(20px) scale(.98);
+  transition: transform .35s var(--ease-soft);
+}
+
+.model-modal.is-open .model-modal__panel {
+  transform: translateY(0) scale(1);
+}
+
+.model-modal__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 26px 14px;
+}
+
+.model-modal__title {
+  margin: 0;
+  font-family: var(--font-brush);
+  font-weight: 400;
+  font-size: clamp(20px, 2.4vw, 26px);
+  letter-spacing: .1em;
+  color: var(--gold, #d9b26a);
+}
+
+.model-modal__close {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(230, 238, 250, .25);
+  background: rgba(230, 238, 250, .06);
+  color: rgba(230, 238, 250, .85);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .25s, color .25s, transform .25s;
+}
+.model-modal__close:hover {
+  background: rgba(230, 238, 250, .16);
+  color: #fff;
+  transform: rotate(90deg);
+}
+
+/* 顶部三件银饰切换标签 */
+.model-modal__tabs {
+  display: flex;
+  gap: 10px;
+  padding: 0 26px 14px;
+  flex-wrap: wrap;
+}
+
+.model-tab {
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(217, 178, 106, .35);
+  background: transparent;
+  color: rgba(230, 238, 250, .78);
+  font-size: 14px;
+  letter-spacing: .04em;
+  cursor: pointer;
+  transition: background .25s, color .25s, border-color .25s;
+}
+.model-tab:hover {
+  border-color: rgba(217, 178, 106, .7);
+  color: #fff;
+}
+.model-tab.is-active {
+  background: linear-gradient(180deg, rgba(217, 178, 106, .28), rgba(217, 178, 106, .12));
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* 3D 渲染舞台 */
+.model-modal__stage {
+  position: relative;
+  flex: 1;
+  min-height: 480px;
+  height: 64vh;
+  background:
+    radial-gradient(ellipse 60% 55% at 50% 48%, rgba(122, 168, 226, .12), transparent 70%),
+    #060f1e;
+  cursor: grab;
+}
+.model-modal__stage:active {
+  cursor: grabbing;
+}
+
+.model-modal__stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.model-modal__loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: rgba(230, 238, 250, .8);
+  font-size: 14px;
+  letter-spacing: .04em;
+}
+
+.model-spinner {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid rgba(217, 178, 106, .2);
+  border-top-color: var(--gold);
+  animation: model-spin .9s linear infinite;
+}
+
+@keyframes model-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 暂无 3D 模型的银饰：占位说明 */
+.model-empty {
+  text-align: center;
+  line-height: 1.9;
+  color: rgba(230, 238, 250, .62);
+}
+
+.model-modal__hint {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: rgba(6, 15, 30, .65);
+  color: rgba(230, 238, 250, .65);
+  font-size: 12px;
+  letter-spacing: .06em;
+  pointer-events: none;
+}
+
+/* 右下角 AI 创作声明：常驻展台右下，不随模型旋转，不拦截鼠标事件 */
+.model-modal__disclaimer {
+  position: absolute;
+  right: 20px;
+  bottom: 14px;
+  max-width: 380px;
+  margin: 0;
+  text-align: right;
+  color: rgba(214, 227, 245, .56);
+  font-size: 11px;
+  line-height: 1.7;
+  letter-spacing: .03em;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, .85);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* 左下角「了解此件」入口：与右下角声明、底部居中提示互不遮挡 */
+.model-info-btn {
+  position: absolute;
+  left: 20px;
+  bottom: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px 7px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(217, 178, 106, .45);
+  background: rgba(6, 15, 30, .62);
+  color: rgba(230, 238, 250, .84);
+  font-size: 12.5px;
+  letter-spacing: .06em;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: color .25s, border-color .25s, background .25s, transform .25s;
+}
+.model-info-btn svg {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.3;
+  flex: none;
+}
+.model-info-btn:hover {
+  color: var(--gold, #d9b26a);
+  border-color: rgba(217, 178, 106, .85);
+  background: rgba(217, 178, 106, .14);
+}
+.model-info-btn:active {
+  transform: scale(.97);
+}
+.model-info-btn:focus-visible {
+  outline: 2px solid rgba(217, 178, 106, .8);
+  outline-offset: 2px;
+}
+
+/* ---------- 银饰介绍弹窗 ---------- */
+.silver-info {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(3, 9, 18, .66);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .28s var(--ease-soft), visibility .28s;
+}
+
+.silver-info.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.silver-info__dialog {
+  position: relative;
+  width: min(880px, 100%);
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #0e2139, #08172c);
+  border: 1px solid rgba(217, 178, 106, .35);
+  border-radius: 18px;
+  box-shadow: 0 40px 90px -30px rgba(0, 0, 0, .85);
+  overflow: hidden;
+  transform: translateY(14px) scale(.985);
+  transition: transform .28s var(--ease-soft);
+}
+
+.silver-info.is-open .silver-info__dialog {
+  transform: translateY(0) scale(1);
+}
+
+.silver-info__close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(230, 238, 250, .25);
+  background: rgba(230, 238, 250, .06);
+  color: rgba(230, 238, 250, .85);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .25s, color .25s, transform .25s;
+  z-index: 1;
+}
+.silver-info__close:hover {
+  background: rgba(230, 238, 250, .16);
+  color: #fff;
+  transform: rotate(90deg);
+}
+
+.silver-info__head {
+  padding: 26px 30px 16px;
+  border-bottom: 1px solid rgba(217, 178, 106, .16);
+}
+.silver-info__eyebrow {
+  margin: 0 0 8px;
+  font-size: 11px;
+  letter-spacing: .22em;
+  color: rgba(217, 178, 106, .78);
+}
+.silver-info__title {
+  margin: 0;
+  font-family: var(--font-brush);
+  font-weight: 400;
+  font-size: clamp(22px, 2.6vw, 28px);
+  letter-spacing: .08em;
+  color: var(--gold, #d9b26a);
+}
+.silver-info__sub {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  letter-spacing: .08em;
+  color: rgba(214, 227, 245, .55);
+}
+
+.silver-info__body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 34px;
+  padding: 22px 30px 26px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.silver-info__sec + .silver-info__sec {
+  border-left: 1px solid rgba(217, 178, 106, .26);
+  padding-left: 34px;
+}
+
+.silver-info__sec-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 16px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  color: #eaf2ff;
+}
+.silver-info__sec-title em {
+  font-style: normal;
+  flex: none;
+  padding: 1px 6px;
+  border: 1px solid rgba(217, 178, 106, .45);
+  border-radius: 4px;
+  font-size: 11px;
+  letter-spacing: .06em;
+  color: var(--gold, #d9b26a);
+}
+.silver-info__sec-title i {
+  font-style: normal;
+  margin-left: auto;
+  font-size: 10.5px;
+  letter-spacing: .18em;
+  color: rgba(214, 227, 245, .46);
+}
+
+.silver-info__list {
+  margin: 0;
+}
+.silver-info__item {
+  padding-bottom: 13px;
+  margin-bottom: 13px;
+  border-bottom: 1px dashed rgba(214, 227, 245, .1);
+}
+.silver-info__item:last-child {
+  padding-bottom: 0;
+  margin-bottom: 0;
+  border-bottom: 0;
+}
+.silver-info__item dt {
+  margin-bottom: 4px;
+  font-size: 12px;
+  letter-spacing: .12em;
+  color: rgba(217, 178, 106, .9);
+}
+.silver-info__item dd {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.85;
+  color: rgba(226, 236, 250, .8);
+  text-align: justify;
+}
+
+.silver-info__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 30px 15px;
+  border-top: 1px solid rgba(217, 178, 106, .16);
+  font-size: 11px;
+  letter-spacing: .05em;
+  color: rgba(214, 227, 245, .4);
+}
+.silver-info__foot-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: none;
+}
+.silver-info__foot kbd {
+  padding: 1px 5px;
+  border: 1px solid rgba(214, 227, 245, .28);
+  border-radius: 3px;
+  font-family: inherit;
+  font-size: 10px;
+  color: rgba(214, 227, 245, .62);
+}
+
+/* 弹窗打开时锁定页面滚动 */
+html.model-lock {
+  overflow: hidden;
+}
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 860px) {
+  .craft-cols {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .craft-figure__frame {
+    width: min(260px, 68%);
+  }
+  .craft-stats {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .craft-stat {
+    padding: 12px 6px;
+  }
+  .model-modal__stage {
+    height: 52vh;
+    min-height: 360px;
+  }
+  /* 窄屏下声明上移到操作提示上方，避免与居中的「拖拽旋转」文字重叠；
+     模型在这类小画幅里会占满画面，故加半透明底保证压在流苏上也读得清 */
+  .model-modal__disclaimer {
+    right: 12px;
+    bottom: 48px;
+    max-width: calc(100% - 24px);
+    padding: 7px 11px;
+    border-radius: 10px;
+    background: rgba(6, 15, 30, .58);
+    font-size: 10px;
+    line-height: 1.6;
+  }
+
+  /* 窄屏：入口按键改到右下角、操作提示改到左下角，形成左右对称的一行，
+     避免原先两者在底部居中位置横向相撞 */
+  .model-modal__hint {
+    left: 12px;
+    right: auto;
+    bottom: 12px;
+    transform: none;
+    padding: 5px 12px;
+    font-size: 11px;
+  }
+  .model-info-btn {
+    left: auto;
+    right: 12px;
+    bottom: 12px;
+    padding: 6px 11px 6px 10px;
+    font-size: 11.5px;
+  }
+
+  /* 窄屏：介绍弹窗改单列，两段内容上下排列 */
+  .silver-info {
+    padding: 14px;
+  }
+  .silver-info__dialog {
+    max-height: 90vh;
+  }
+  .silver-info__head {
+    padding: 20px 20px 14px;
+  }
+  .silver-info__title {
+    padding-right: 34px;
+  }
+  .silver-info__body {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 18px 20px 22px;
+  }
+  .silver-info__sec + .silver-info__sec {
+    border-left: 0;
+    padding-left: 0;
+    border-top: 1px solid rgba(217, 178, 106, .16);
+    padding-top: 18px;
+  }
+  .silver-info__item dd {
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .silver-info__foot {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 10px 20px 13px;
+  }
+}

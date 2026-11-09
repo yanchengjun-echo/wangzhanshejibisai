@@ -1,0 +1,291 @@
+/* ==========================================================================
+   银绣山河 · 首页板块快速切换（上/下两枚半箭头 + 左侧位置光点）
+   --------------------------------------------------------------------------
+   只被 index.html 引入，其余三个页面不带这套控件。
+
+   构成：
+     .screen-nav__arrow--up     屏幕顶端居中，半箭头指向上，点击回到上一屏
+     .screen-nav__arrow--down   屏幕底端居中，半箭头指向下，点击进入下一屏
+     .screen-nav__dots          屏幕左侧垂直居中，三个光点，当前屏点亮、其余转暗
+
+   「半箭头」= 只有折线的 chevron，没有底边、没有底板；
+   每枚箭头由两条同形折线组成：下面一条实（主体），上面一条淡（残影），
+   残影落在箭头指向的前方，静态时就有一层"正要往那边走"的暗示。
+
+   层级 z-index: 92 —— 高于音乐按钮(90)与顶栏(40)，低于 3D 弹窗(1000)；
+   地图详情浮层打开时由脚本加 .is-off 收起，避免压在人家的面板上。
+
+   容器铺满视口但 pointer-events: none，只有箭头与光点本身可点，
+   不会挡住页面里任何可交互元素。
+   ========================================================================== */
+
+.screen-nav {
+  position: fixed;
+  inset: 0;
+  z-index: 92;
+  pointer-events: none;
+  font-family: var(--font-ui, sans-serif);
+  transition: opacity .35s ease, visibility .35s ease;
+}
+
+/* 地图详情浮层打开时整组收起（脚本切 .is-off） */
+.screen-nav.is-off {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* ---------- 1. 上 / 下两枚半箭头 ---------- */
+.screen-nav__arrow {
+  position: absolute;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 54px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: rgba(233, 242, 253, .95);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transform: translateX(-50%);
+  pointer-events: auto;
+  transition: color .3s ease, opacity .3s ease;
+}
+
+/* 上箭头落在顶栏下沿的下方：避开第二屏「苗疆万里」题头（视口内约 60–82px），
+   也留出第三屏「苗岭风物」标题（约 156px 起）与首屏徽章（约 185px 起）的空档 */
+.screen-nav__arrow--up {
+  top: calc(var(--nav-h, 64px) + clamp(14px, 3vh, 32px));
+}
+
+.screen-nav__arrow--down {
+  /* 先给一条不含 env() 的兜底值，旧浏览器不支持时也能落在底部 */
+  bottom: clamp(10px, 1.8vh, 18px);
+  bottom: calc(clamp(10px, 1.8vh, 18px) + env(safe-area-inset-bottom, 0px));
+}
+
+/* chevron 本体：只有折线，无填充无底边 */
+.screen-nav__arrow svg {
+  display: block;
+  width: 48px;
+  height: 36px;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  /* 深底上不刺眼、浅底上也有边界 */
+  filter: drop-shadow(0 1px 2px rgba(4, 16, 30, .35));
+}
+
+/* 下箭头把同一份 path 翻转 180° 复用：
+   残影的 translateY 会在翻转后的坐标系里跟着朝下，方向语义自动对齐 */
+.screen-nav__arrow--down svg {
+  transform: rotate(180deg);
+}
+
+.screen-nav__chev--main { opacity: .95; }
+
+/* 残影：比主体淡一档，位置在指向的前方（上箭头时在上方） */
+.screen-nav__chev--ghost {
+  opacity: .4;
+  transform: translateY(-11px);
+}
+
+.screen-nav__arrow:hover,
+.screen-nav__arrow:focus-visible {
+  color: var(--gold, #d9b26a);
+}
+
+.screen-nav__arrow:focus-visible {
+  outline: 2px solid rgba(217, 178, 106, .8);
+  outline-offset: -3px;
+}
+
+/* 悬停时残影沿着箭头方向轻轻上浮，进一步说明"点我往这边走"；
+   常态静止（不常驻动画，首屏滚动时零额外合成开销） */
+.screen-nav__arrow:hover .screen-nav__chev--ghost,
+.screen-nav__arrow:focus-visible .screen-nav__chev--ghost {
+  animation: chevGhost 1.8s cubic-bezier(.4, 0, .2, 1) infinite;
+}
+
+@keyframes chevGhost {
+  0%, 100% { opacity: .2;  transform: translateY(-5px); }
+  50%      { opacity: .72; transform: translateY(-15px); }
+}
+
+/* 第三屏（苗岭风物）底部箭头的颜色要分桌面 / 手机两套：
+   桌面上左右两张卡片之间有一条约 70px 的深色缝隙，箭头正好落在里面，浅色线最清楚；
+   手机上卡片是单列排布，箭头直接压在白卡上，得换成深靛蓝。
+   所以 .is-light 只在窄屏改写颜色（见文末响应式），桌面沿用浅色。 */
+
+/* ---------- 2. 左侧位置光点 ---------- */
+.screen-nav__dots {
+  position: absolute;
+  left: clamp(2px, 1vw, 14px);
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(4px, 1.2vh, 14px);
+  pointer-events: auto;
+}
+
+.screen-dot {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 光点本体：未点亮时是一颗暗银点。
+   底纹深浅不一（首屏水波、第二屏地图、第三屏白卡），
+   所以暗点取「中间调」——深底上偏亮、浅底上偏沉，两边都压得住又不抢戏 */
+.screen-dot__core {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(140, 163, 194, .72);
+  box-shadow: 0 0 0 1px rgba(224, 236, 250, .38),
+              0 0 8px rgba(6, 21, 39, .45);
+  transition: transform .45s var(--ease-soft, cubic-bezier(.19, 1, .22, 1)),
+              background-color .45s ease,
+              box-shadow .45s ease;
+}
+
+.screen-dot:hover .screen-dot__core { background: rgba(230, 238, 250, .66); }
+
+.screen-dot:focus-visible { outline: 2px solid rgba(217, 178, 106, .85); outline-offset: -2px; }
+
+/* 点亮：暖金 + 外扩光晕，和顶栏当前页的金线是同一套语言 */
+.screen-dot.is-active .screen-dot__core {
+  background: var(--gold, #d9b26a);
+  box-shadow: 0 0 10px rgba(217, 178, 106, .85),
+              0 0 22px rgba(217, 178, 106, .38),
+              0 0 0 1px rgba(217, 178, 106, .5);
+  transform: scale(1.35);
+}
+
+/* 说明：第三屏的光点落在左侧深色背景带上（白卡从约 70px 才起），
+   所以 .is-light 只调下箭头，不动光点 */
+
+/* 悬停/聚焦时在光点右侧浮出板块名，说明这颗点对应哪一屏 */
+.screen-dot__label {
+  position: absolute;
+  left: calc(100% + 2px);
+  top: 50%;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(217, 178, 106, .26);
+  background: rgba(8, 23, 44, .88);
+  color: var(--silver-100, #e6eefa);
+  font-size: 11.5px;
+  line-height: 1.4;
+  letter-spacing: .12em;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate(-6px, -50%);
+  pointer-events: none;
+  transition: opacity .3s ease, transform .35s var(--ease-soft, cubic-bezier(.19, 1, .22, 1));
+}
+
+.screen-dot:hover .screen-dot__label,
+.screen-dot:focus-visible .screen-dot__label {
+  opacity: 1;
+  transform: translate(0, -50%);
+}
+
+/* 刚点过的那颗点会一直处于 :hover，标签会赖着不走；
+   而它本来就是当前屏，不必再自报名字 —— 点亮即收起 */
+.screen-dot.is-active:hover .screen-dot__label,
+.screen-dot.is-active:focus-visible .screen-dot__label {
+  opacity: 0;
+}
+
+/* ---------- 3. 首屏页脚让位 ----------
+   下箭头固定在屏幕底部中央，首屏页脚的三项导航正好也落在这一带。
+   把页脚整体上提一档，两者互不压字；其余两屏底部没有常驻内容，不受影响。
+   下界 66px = 箭头点击区(46) + 底距(~16) + 一点余量。 */
+.stage .nav {
+  margin-bottom: clamp(66px, 7.6vh, 80px);
+}
+
+/* ---------- 4. 入场（只在脚本确认能跑时生效） ---------- */
+@keyframes chevInUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@keyframes chevInDown {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@keyframes screenDotsIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+html.anim .screen-nav__arrow--up {
+  opacity: 0;
+  animation: chevInUp .8s var(--ease-soft, cubic-bezier(.19, 1, .22, 1)) 1.05s forwards;
+}
+html.anim .screen-nav__arrow--down {
+  opacity: 0;
+  animation: chevInDown .8s var(--ease-soft, cubic-bezier(.19, 1, .22, 1)) 1.05s forwards;
+}
+html.anim .screen-nav__dots {
+  opacity: 0;
+  animation: screenDotsIn .9s ease 1.2s forwards;
+}
+
+/* ---------- 5. 响应式 ---------- */
+@media (max-width: 760px) {
+  .screen-nav__arrow { width: 54px; height: 46px; }
+  .screen-nav__arrow svg { width: 40px; height: 30px; }
+  /* 手机端顶栏更矮(56)，标题离顶栏也更近，箭头贴着顶栏下沿放 */
+  .screen-nav__arrow--up { top: calc(var(--nav-h, 56px) + 6px); }
+  .screen-nav__dots { left: 3px; gap: 4px; }
+  .screen-dot { width: 22px; height: 22px; }
+  .screen-dot__label { display: none; }   /* 触屏没有悬停，标签只会碍事 */
+  .stage .nav { margin-bottom: clamp(58px, 7vh, 72px); }
+
+  /* 地图屏底部左下有「海南省·附图」等标注，下箭头原位会压在上面，
+     整枚上提一档；其余两屏底部没有这类内容，保持原位 */
+  .screen-nav.is-map .screen-nav__arrow--down {
+    bottom: calc(58px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* 手机单列卡片：第三屏的下箭头压在白卡上，换深靛蓝 + 一圈极淡的白色衬底 */
+  .screen-nav.is-light .screen-nav__arrow--down {
+    color: rgba(24, 50, 78, .92);
+  }
+  .screen-nav.is-light .screen-nav__arrow--down svg {
+    filter: drop-shadow(0 1px 1px rgba(255, 255, 255, .8));
+  }
+}
+
+/* ---------- 6. 减少动态效果 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .screen-nav { transition: none; }
+  .screen-nav__arrow,
+  .screen-dot__core,
+  .screen-dot__label { transition: none; }
+  .screen-nav__arrow:hover .screen-nav__chev--ghost,
+  .screen-nav__arrow:focus-visible .screen-nav__chev--ghost { animation: none; }
+  html.anim .screen-nav__arrow,
+  html.anim .screen-nav__dots { animation: none; opacity: 1; }
+}
