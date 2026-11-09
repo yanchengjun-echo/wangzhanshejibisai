@@ -96,16 +96,8 @@
   function cardHTML(it, isFeature) {
     var author = it.author ? '<span class="author">· ' + it.author + '</span>' : '';
     var cls = 'card' + (isFeature ? ' card--feature' : '') + ' anim-card';
-    var featureHint = isFeature
-      ? '<span class="feature-hint">本类精选 · 点击查看详情</span>'
-      : '';
-    var featureDesc = (isFeature && it.desc)
-      ? '<span class="feature-desc">' + it.desc + '</span>'
-      : '';
-    // 首图立即加载（eager），其余卡片用 data-src 延迟加载
-    var imgTag = isFeature
-      ? '<img src="' + it.big + '" alt="' + it.name + '" decoding="async">'
-      : '<img data-src="' + it.small + '" alt="' + it.name + '" decoding="async">';
+    // 普通卡片用 data-src 延迟加载
+    var imgTag = '<img data-src="' + it.small + '" alt="' + it.name + '" decoding="async">';
     return '<article class="' + cls + '" tabindex="0" role="button" ' +
         'data-reveal ' +
         'data-id="' + it.id + '" ' +
@@ -114,10 +106,188 @@
         '<div class="meta">' +
           '<span class="nm">' + it.name + '</span>' +
           '<span class="cat-tag">' + it.cat + author + '</span>' +
-          featureDesc +
-          featureHint +
         '</div>' +
       '</article>';
+  }
+
+  /* ---------- 精选轮播 ---------- */
+  // 生成轮播 DOM：图片轨道 + 文字介绍 + 左右箭头 + 指示点 + 进度条
+  function carouselHTML(list) {
+    var slides = '';
+    var dots = '';
+    for (var i = 0; i < list.length; i++) {
+      var it = list[i];
+      var author = it.author ? ' · ' + it.author : '';
+      var desc = it.desc || '（暂无文字介绍，图片待后续完善）';
+      slides +=
+        '<div class="caro-slide" data-id="' + it.id + '" role="group" aria-label="第 ' + (i + 1) + ' 件，共 ' + list.length + ' 件">' +
+          '<div class="caro-img"><img src="' + it.big + '" alt="' + it.name + '" decoding="async"></div>' +
+          '<div class="caro-info">' +
+            '<span class="caro-cat">' + it.cat + author + '</span>' +
+            '<h3 class="caro-name">' + it.name + '</h3>' +
+            '<p class="caro-desc">' + desc + '</p>' +
+            '<button class="caro-more" type="button" data-id="' + it.id + '">查看详情</button>' +
+          '</div>' +
+        '</div>';
+      dots += '<button class="caro-dot" type="button" data-index="' + i + '" aria-label="切换到第 ' + (i + 1) + ' 件展品"></button>';
+    }
+
+    var arrows = list.length > 1
+      ? '<button class="caro-arrow caro-prev" type="button" aria-label="上一件展品">‹</button>' +
+        '<button class="caro-arrow caro-next" type="button" aria-label="下一件展品">›</button>'
+      : '';
+
+    return '<section class="carousel" data-reveal aria-roledescription="carousel" aria-label="精选展品轮播">' +
+        '<div class="caro-track">' + slides + '</div>' +
+        arrows +
+        '<div class="caro-dots">' + dots + '</div>' +
+        '<div class="caro-progress" aria-hidden="true"><span></span></div>' +
+      '</section>';
+  }
+
+  /* 轮播状态 */
+  var caroTimer = null;
+  var caroIndex = 0;
+  var caroCount = 0;
+  var caroEl = null;
+  var caroTrack = null;
+  var caroDots = null;
+  var caroProgressBar = null;
+  var CARO_INTERVAL = 5000; // 自动切换间隔（毫秒）
+  var caroPaused = false;
+
+  function initCarousel(list) {
+    stopCarousel();
+    caroEl = grid.querySelector('.carousel');
+    if (!caroEl) return;
+    caroTrack = caroEl.querySelector('.caro-track');
+    caroDots = caroEl.querySelector('.caro-dots');
+    caroProgressBar = caroEl.querySelector('.caro-progress span');
+    caroIndex = 0;
+    caroCount = list.length;
+    caroPaused = false;
+
+    goTo(0, true);
+    // 尊重「减少动态效果」偏好：不自动播放，仅手动切换
+    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reduced) startCarousel();
+  }
+
+  function goTo(idx, instant) {
+    if (!caroEl || !caroTrack) return;
+    if (idx < 0) idx = caroCount - 1;
+    if (idx >= caroCount) idx = 0;
+    caroIndex = idx;
+
+    // 位移轨道
+    if (instant) {
+      caroTrack.classList.add('no-anim');
+    } else {
+      caroTrack.classList.remove('no-anim');
+    }
+    caroTrack.style.transform = 'translateX(' + (-100 * caroIndex) + '%)';
+
+    // 指示点
+    var dots = caroDots ? caroDots.children : null;
+    if (dots) {
+      for (var i = 0; i < dots.length; i++) {
+        if (i === caroIndex) dots[i].classList.add('is-active');
+        else dots[i].classList.remove('is-active');
+      }
+    }
+
+    // 进度条重置
+    if (caroProgressBar) {
+      caroProgressBar.style.transition = 'none';
+      caroProgressBar.style.transform = 'scaleX(0)';
+    }
+  }
+
+  function startCarousel() {
+    // 注意：这里不能调 stopCarousel()——那会把刚初始化好的 caroEl/caroTrack
+    // 等引用清成 null，导致后续点击箭头时 goTo 提前 return、切换失效。
+    clearInterval(caroTimer);
+    caroTimer = null;
+    caroPaused = false;
+    restartTimer();
+    restartProgress();
+  }
+
+  function restartTimer() {
+    clearInterval(caroTimer);
+    caroTimer = setInterval(function () {
+      if (caroPaused || !caroEl) return;
+      goTo(caroIndex + 1, false);
+      restartProgress();
+    }, CARO_INTERVAL);
+  }
+
+  function restartProgress() {
+    if (!caroProgressBar) return;
+    // 先复位到 0 再过渡到满，形成「倒计时」进度条
+    caroProgressBar.style.transition = 'none';
+    caroProgressBar.style.transform = 'scaleX(0)';
+    // 强制重排，确保复位生效后再开始过渡
+    void caroProgressBar.offsetWidth;
+    caroProgressBar.style.transition = 'transform ' + CARO_INTERVAL + 'ms linear';
+    caroProgressBar.style.transform = 'scaleX(1)';
+  }
+
+  function stopCarousel() {
+    clearInterval(caroTimer);
+    caroTimer = null;
+    caroEl = null;
+    caroTrack = null;
+    caroDots = null;
+    caroProgressBar = null;
+  }
+
+  function pauseCarousel() {
+    caroPaused = true;
+  }
+  function resumeCarousel() {
+    if (!caroEl) return;
+    caroPaused = false;
+    restartTimer();
+    restartProgress();
+  }
+
+  function bindCarouselEvents() {
+    // 复用 grid 的事件委托：箭头 / 指示点 / 「查看详情」按钮
+    grid.addEventListener('click', function (e) {
+      var arrow = e.target.closest('.caro-arrow');
+      if (arrow) {
+        var dir = arrow.classList.contains('caro-next') ? 1 : -1;
+        goTo(caroIndex + dir, false);
+        restartProgress();
+        return;
+      }
+      var dot = e.target.closest('.caro-dot');
+      if (dot) {
+        goTo(parseInt(dot.getAttribute('data-index'), 10), false);
+        restartProgress();
+        return;
+      }
+      var more = e.target.closest('.caro-more');
+      if (more) {
+        openModal(more.getAttribute('data-id'));
+        return;
+      }
+    });
+
+    // 悬停 / 聚焦暂停，移出恢复（事件委托到 grid，避免切分类后失效）
+    grid.addEventListener('mouseover', function (e) {
+      if (e.target.closest('.carousel')) pauseCarousel();
+    });
+    grid.addEventListener('mouseout', function (e) {
+      if (e.target.closest('.carousel') && !e.relatedTarget.closest('.carousel')) resumeCarousel();
+    });
+    grid.addEventListener('focusin', function (e) {
+      if (e.target.closest('.carousel')) pauseCarousel();
+    });
+    grid.addEventListener('focusout', function (e) {
+      if (e.target.closest('.carousel') && !e.relatedTarget.closest('.carousel')) resumeCarousel();
+    });
   }
 
   function renderGrid() {
@@ -127,35 +297,39 @@
 
     if (!list.length) {
       grid.innerHTML = '<div class="empty">该分类暂无藏品</div>';
+      stopCarousel();
       return;
     }
 
     // 「全部」视图下打散类别；单个分类视图保持原顺序（本就同类）
     var ordered = activeCat === '全部' ? shuffle(list) : list;
 
-    // 首图固定为内容最丰富的精品（织金苗族少女缠绣背扇，id=463）
-    var FEATURE_ID = '463';
-    var featureIdx = -1;
-    for (var k = 0; k < ordered.length; k++) {
-      if (ordered[k].id === FEATURE_ID) { featureIdx = k; break; }
+    // 轮播取前 N 件「有完整大图 + 介绍」的展品；不足则用列表里的凑数
+    var CAROUSEL_MAX = 6;
+    var carouselItems = [];
+    for (var i = 0; i < ordered.length && carouselItems.length < CAROUSEL_MAX; i++) {
+      if (ordered[i].desc && ordered[i].big) carouselItems.push(ordered[i]);
     }
-    var feature = null;
-    if (featureIdx >= 0) {
-      feature = ordered.splice(featureIdx, 1)[0];
+    // 若凑不满，再用缺介绍的补齐（轮播里介绍为空时显示占位文案）
+    if (carouselItems.length < 2) {
+      for (var j = 0; j < ordered.length && carouselItems.length < CAROUSEL_MAX; j++) {
+        if (carouselItems.indexOf(ordered[j]) === -1) carouselItems.push(ordered[j]);
+      }
     }
 
-    // 直接同步渲染：首图通栏 + 其余卡片流入 CSS columns 瀑布流。
-    // 不再为「均衡列高」预加载所有缩略图宽高比——那是点进展馆长时间白屏的元凶。
-    // 其余卡片用 data-src + IntersectionObserver 懒加载，首屏立即出内容。
-    var html = feature ? cardHTML(feature, true) : '';
+    var html = '';
+    if (carouselItems.length) {
+      html += carouselHTML(carouselItems);
+    }
     html += '<div class="masonry">';
-    for (var i = 0; i < ordered.length; i++) {
-      html += cardHTML(ordered[i], false);
+    for (var k = 0; k < ordered.length; k++) {
+      html += cardHTML(ordered[k], false);
     }
     html += '</div>';
 
     grid.innerHTML = html;
     initLazyObserver();
+    initCarousel(carouselItems);
   }
 
   /* ---------- 详情浮层 ---------- */
@@ -210,6 +384,8 @@
       }
     }
   });
+
+  bindCarouselEvents();
 
   // 关闭：点击遮罩、关闭按钮
   modalLayer.addEventListener('click', function (e) {

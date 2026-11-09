@@ -34,12 +34,21 @@
   /* ---- 全站统一扁平化卡片（各页卡片复用，保证视觉一致） ---- */
   --card-radius: 10px;                       /* 卡片圆角：统一 10px */
   --card-radius-sm: 8px;                     /* 小卡/标签圆角 */
-  --card-border: rgba(211, 224, 241, .14);   /* 细银边 */
-  --card-bg: rgba(20, 38, 62, .38);          /* 卡片底：靛蓝半透明 */
-  --card-bg-hover: rgba(26, 48, 76, .5);     /* 悬浮底 */
+  --card-border: rgba(255, 255, 255, .55);   /* 银白卡细边：半透明白 */
+  --card-border-soft: rgba(163, 185, 213, .35); /* 银白卡柔和内边 */
+  --card-bg: linear-gradient(180deg, #f7faff 0%, #eef4fb 58%, #e3ecf7 100%); /* 卡片底：银白 */
+  --card-bg-hover: linear-gradient(180deg, #ffffff 0%, #f3f8fd 60%, #e8effa 100%); /* 悬浮底 */
   --card-shadow: 0 2px 10px rgba(2, 8, 18, .28);       /* 轻阴影 */
-  --card-shadow-hover: 0 18px 34px -14px rgba(2, 8, 18, .65); /* 悬浮阴影 */
+  --card-shadow-hover: 0 18px 34px -14px rgba(2, 8, 18, .5); /* 悬浮阴影 */
   --lift: -5px;                              /* hover 抬升量 */
+
+  /* 银白卡片内的文字色（深靛蓝系，保证浅底上的可读性） */
+  --card-ink:      #0f2c4c;   /* 卡片主文字：深靛蓝 */
+  --card-ink-strong:#0a1f38;  /* 卡片标题：更深 */
+  --card-ink-soft: #33506b;   /* 卡片次级文字：靛蓝灰 */
+  --card-ink-mute: #6b7f94;   /* 卡片弱化文字：灰蓝 */
+  --card-accent:   #b03a2e;   /* 卡片内朱红点缀 */
+  --card-gold:     #8a6a2a;   /* 卡片内金色：加深以保证浅底对比度 */
   --section-gap: clamp(56px, 9vh, 96px);     /* 区块纵向间距 */
   --wrap-w: 1180px;                          /* 内容最大宽度 */
   --wrap-pad: clamp(20px, 3.4vw, 48px);      /* 内容左右留白 */
@@ -64,7 +73,7 @@
   .anim-card:hover {
     transform: translateY(var(--lift, -5px));
     box-shadow: var(--card-shadow-hover);
-    border-color: rgba(211, 224, 241, .28);
+    border-color: rgba(163, 185, 213, .55);
   }
 }
 /* 卡片内图片 hover 缓慢缩放 */

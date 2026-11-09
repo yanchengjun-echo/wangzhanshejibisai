@@ -40,6 +40,15 @@
 .stage--page {
   overflow-x: clip;      /* 裁掉横向溢出（呼吸位是 100vw 通栏），纵向要能滚 */
   overflow-y: visible;
+  /* 浅色纸底：把页面级文字令牌从银白反转为深靛蓝，保证可读性 */
+  --silver-50:  #0a1f38;
+  --silver-100: #0f2c4c;
+  --silver-200: #16395f;
+  --silver-300: #33506b;
+  --silver-400: #6b7f94;
+  --gold:    #8a6a2a;
+  --gold-hi: #6f551f;
+  --gold-mid:#7a5e25;
 }
 
 .stage--page .layer-bg,
@@ -49,15 +58,21 @@
   position: fixed;       /* 滚动时水波与角花留在视野里，不随页面拉长 */
 }
 
-/* 子页内容多，背景必须退让：底纹压暗一档，避免青花大纹和图文抢注意力 */
+/* 子页换成左右对称卷草纹样底：保持原图浅色留白 + 两侧深蓝纹样带，
+   上下 repeat-y 无缝平铺（fixed 固定，滚动时纹样带留在视野两侧） */
 .stage--page .layer-bg {
-  opacity: .30;
-  filter: brightness(.58) saturate(1.04) contrast(1.02);
+  background-image: url("../bg-sym.jpg");
+  background-size: 100% auto;
+  background-position: top center;
+  background-repeat: repeat-y;
+  opacity: 1;
+  filter: none;
 }
 .stage--page .layer-tint {
+  /* 浅色纸底：去掉深蓝压暗，改用极淡的靛蓝收束保持纸面层次 */
   background:
-    radial-gradient(ellipse 52% 38% at 50% 24%, rgba(122, 168, 226, .10) 0%, rgba(122, 168, 226, 0) 74%),
-    linear-gradient(180deg, rgba(5, 15, 30, .93) 0%, rgba(7, 22, 42, .64) 32%, rgba(6, 18, 34, .70) 100%);
+    radial-gradient(ellipse 52% 38% at 50% 24%, rgba(15, 44, 76, .05) 0%, rgba(15, 44, 76, 0) 74%),
+    linear-gradient(180deg, rgba(15, 44, 76, .06) 0%, rgba(15, 44, 76, .02) 32%, rgba(15, 44, 76, .05) 100%);
 }
 
 /* 上排角花会压住顶栏文字，这张页把它调淡（下排保持原样作压角） */
@@ -100,7 +115,7 @@ html.anim .stage--page .orn--tr { animation-name: fadeTopPage; }
   letter-spacing: .2em;
   color: var(--silver-200);
   text-decoration: none;
-  text-shadow: 0 1px 10px rgba(3, 10, 20, .95), 0 0 22px rgba(3, 10, 20, .8);
+  text-shadow: none;
   transition: color .5s ease;
 }
 
@@ -139,11 +154,11 @@ html.anim .stage--page .orn--tr { animation-name: fadeTopPage; }
   line-height: 1.05;
   letter-spacing: .14em;
   text-indent: .14em;
-  background: linear-gradient(178deg, var(--silver-50) 6%, var(--silver-100) 46%, var(--silver-300) 88%, #9fb4cf 100%);
+  background: linear-gradient(178deg, #0a1f38 6%, #16395f 46%, #33506b 88%, #4a6d92 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 6px 26px rgba(120, 168, 224, .34));
+  filter: drop-shadow(0 1px 14px rgba(217, 178, 106, .18));
 }
 
 .chapter__lede {
@@ -304,16 +319,15 @@ html.anim .stage--page .orn--tr { animation-name: fadeTopPage; }
   top: calc(14px + var(--dy, 0px));
   width: clamp(190px, 16.5vw, 232px);
   padding: 8px 11px 10px;
-  background: linear-gradient(180deg, rgba(9, 22, 40, .92), rgba(7, 18, 34, .88));
-  border: 1px solid rgba(198, 219, 244, .16);
+  background: var(--card-bg, linear-gradient(180deg, #f7faff 0%, #eef4fb 58%, #e3ecf7 100%));
+  border: 1px solid rgba(163, 185, 213, .45);
   border-radius: var(--card-radius-sm, 8px);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
+  box-shadow: var(--card-shadow, 0 2px 10px rgba(2, 8, 18, .28));
   transition: transform .5s var(--ease-soft), box-shadow .5s var(--ease-soft);
 }
 .tnode--east .tnode__card { left: 14px; }
 .tnode--west .tnode__card { right: 14px; }
-.tnode--myth .tnode__card { border-color: rgba(217, 178, 106, .24); }
+.tnode--myth .tnode__card { border-color: rgba(138, 106, 42, .45); }
 
 /* 悬浮漂浮：鼠标放上整行文字，卡片轻轻上浮、浮起一层柔光，
    让人一眼看出这是可点击的入口。金/银两类各配一档同色柔光。
@@ -321,16 +335,16 @@ html.anim .stage--page .orn--tr { animation-name: fadeTopPage; }
 @media (hover: hover) {
   html.js-tree .tnode__card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 28px -14px rgba(120, 168, 224, .5), 0 2px 10px -2px rgba(120, 168, 224, .3);
+    box-shadow: 0 12px 28px -14px rgba(2, 8, 18, .4), 0 2px 10px -2px rgba(2, 8, 18, .25);
   }
   html.js-tree .tnode--myth .tnode__card:hover {
-    box-shadow: 0 12px 28px -14px rgba(217, 178, 106, .45), 0 2px 10px -2px rgba(217, 178, 106, .3);
+    box-shadow: 0 12px 28px -14px rgba(138, 106, 42, .4), 0 2px 10px -2px rgba(138, 106, 42, .28);
   }
 }
 
 /* 当前节点：点开在读的那一节，用一条金色竖线作标记（全页唯一强调点） */
 .tnode.is-current .tnode__card {
-  box-shadow: inset 3px 0 0 var(--embroidery-gold);
+  box-shadow: inset 3px 0 0 var(--card-gold, #8a6a2a);
 }
 
 /* 点开某一节时，其余卡片退到背景，避免被详情浮层压出半截「残影」 */
@@ -370,27 +384,15 @@ html.anim .stage--page .orn--tr { animation-name: fadeTopPage; }
 /* 小圆点已由 .tnode::before 落在锚点上，按钮内不再重复画点 */
 .tnode__toggle::before { display: none; }
 
-/* 根脉会穿过文字区，给标签 / 标题 / 概要加一层深色投影保证可读 */
-.tnode__type,
-.tnode__name,
-.tnode__brief {
-  text-shadow:
-    0 0 3px rgba(3, 10, 20, 1),
-    0 0 7px rgba(3, 10, 20, 1),
-    0 0 14px rgba(3, 10, 20, .98),
-    0 0 26px rgba(3, 10, 20, .92),
-    0 1px 2px rgba(3, 10, 20, 1);
-}
-
-/* 类型标注：历史银、传说金 */
+/* 类型标注：历史银、传说金（银白卡上转深色） */
 .tnode__type {
   flex: none;
   font-size: 10px;
   letter-spacing: .16em;
-  color: #a7b8c9;
+  color: var(--card-ink-mute, #6b7f94);
 }
-.tnode--myth .tnode__type { color: var(--gold); }
-.tnode--hist .tnode__type { color: var(--silver-300); }
+.tnode--myth .tnode__type { color: var(--card-gold, #8a6a2a); }
+.tnode--hist .tnode__type { color: var(--card-ink-soft, #33506b); }
 
 /* 节点名称 */
 .tnode__name {
@@ -401,27 +403,27 @@ html.anim .stage--page .orn--tr { animation-name: fadeTopPage; }
   font-size: clamp(13px, 1.04vw, 15px);
   line-height: 1.42;
   letter-spacing: .03em;
-  color: var(--silver-50);
+  color: var(--card-ink-strong, #0a1f38);
   transition: color .45s ease;
 }
-.tnode--myth .tnode__name { color: #e2c58e; }
-html.js-tree .tnode__toggle:hover .tnode__name { color: #fff; }
-html.js-tree .tnode--myth .tnode__toggle:hover .tnode__name { color: #f0d9a8; }
+.tnode--myth .tnode__name { color: #8a5c1e; }
+html.js-tree .tnode__toggle:hover .tnode__name { color: var(--card-ink, #0f2c4c); }
+html.js-tree .tnode--myth .tnode__toggle:hover .tnode__name { color: #6e4a16; }
 
 /* 悬浮时名称与类型标注一并提亮，强化"可点击"暗示 */
-html.js-tree .tnode__toggle:hover .tnode__type { color: var(--silver-200); }
-html.js-tree .tnode--myth .tnode__toggle:hover .tnode__type { color: #e9cf96; }
+html.js-tree .tnode__toggle:hover .tnode__type { color: var(--card-ink-soft, #33506b); }
+html.js-tree .tnode--myth .tnode__toggle:hover .tnode__type { color: var(--card-gold, #8a6a2a); }
 
 /* 概要已移入展开面板作导语：默认态卡片只留「类型 + 标题」，
    点构图才够干净；一句话概括在点开详情里完整可见。 */
 .tnode__brief {
   margin: 0;
   padding-bottom: 10px;
-  border-bottom: 1px solid rgba(217, 178, 106, .18);
+  border-bottom: 1px solid rgba(138, 106, 42, .22);
   font-family: var(--font-sans);
   font-size: 13px;
   line-height: 1.75;
-  color: #dbe6f2;
+  color: var(--card-ink-soft, #33506b);
   text-wrap: pretty;
 }
 
@@ -457,17 +459,14 @@ html.js-tree .tnode.is-open .tnode__body { grid-template-rows: 1fr; }
 /* 详情内容面板：视觉样式集中在此，不影响折叠 */
 .tnode__panel {
   padding: clamp(16px, 2.2vw, 24px);
-  background:
-    linear-gradient(180deg, rgba(10, 24, 42, .97), rgba(7, 18, 34, .96));
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  border: 1px solid rgba(217, 178, 106, .18);
+  background: var(--card-bg, linear-gradient(180deg, #f7faff 0%, #eef4fb 58%, #e3ecf7 100%));
+  border: 1px solid rgba(163, 185, 213, .4);
   border-radius: var(--card-radius-sm, 8px);
   display: grid;
   gap: 12px;
   max-height: min(46vh, 420px);
   overflow-y: auto;
-  box-shadow: 0 18px 42px -14px rgba(2, 8, 18, .9);
+  box-shadow: 0 18px 42px -14px rgba(2, 8, 18, .5);
 }
 
 .tnode__panel > :first-child { margin-top: 0; }
@@ -480,18 +479,18 @@ html.js-tree .tnode.is-open .tnode__body { grid-template-rows: 1fr; }
   font-family: var(--font-sans);
   font-size: 14px;
   line-height: 1.8;
-  color: var(--silver-300);
+  color: var(--card-ink-soft, #33506b);
 }
 
 /* 脉络限定标注：加竖线区分"这是限定条件，不是正文" */
 .tnode__caveat {
   margin: 0;
   padding: 2px 0 2px 14px;
-  border-left: 1px solid rgba(217, 226, 233, .26);
+  border-left: 1px solid rgba(15, 44, 76, .25);
   font-family: var(--font-sans);
   font-size: 13px;
   line-height: 1.7;
-  color: #a7b8c9;
+  color: var(--card-ink-mute, #6b7f94);
 }
 
 /* ---------- 7. 呼吸位：土布底浅色段 ---------- */

@@ -30,21 +30,27 @@ body { overflow-x: hidden; }
   display: grid;
   grid-template-rows: auto auto auto auto;
   align-content: start;
-  padding: clamp(14px, 2.2vh, 26px) clamp(16px, 3.4vw, 54px) clamp(12px, 2.2vh, 28px);
+  padding: clamp(14px, 2.2vh, 26px) clamp(80px, 10vw, 150px) clamp(12px, 2.2vh, 28px);
+  /* 浅色纸底：把页面级文字令牌从银白反转为深靛蓝，保证可读性 */
+  --silver-50:  #0a1f38;
+  --silver-100: #0f2c4c;
+  --silver-200: #16395f;
+  --silver-300: #33506b;
+  --silver-400: #6b7f94;
+  --gold:    #8a6a2a;
+  --gold-hi: #6f551f;
+  --gold-mid:#7a5e25;
 }
 
 .paper {
   position: absolute;
   inset: 0;
   z-index: -2;
-  background:
-    radial-gradient(ellipse 62% 48% at 50% 34%, rgba(217, 178, 106, .08) 0%, rgba(217, 178, 106, 0) 68%),
-    radial-gradient(ellipse 90% 70% at 50% 110%, rgba(5, 14, 26, .9) 0%, rgba(5, 14, 26, 0) 62%),
-    linear-gradient(165deg, rgba(8, 22, 40, .88) 0%, rgba(7, 18, 32, .9) 45%, rgba(4, 12, 22, .92) 100%),
-    url("../bg-batik.jpg");
-  background-size: 420px auto;
-  background-position: center;
-  background-repeat: repeat;
+  /* 左右对称卷草纹样背景：保持原图浅色留白 + 两侧深蓝纹样带，上下 repeat-y 无缝 */
+  background: url("../bg-sym.jpg");
+  background-size: 100% auto;
+  background-position: top center;
+  background-repeat: repeat-y;
 }
 
 .grain {
@@ -57,14 +63,14 @@ body { overflow-x: hidden; }
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* 四周压暗，把注意力收到中间的人物卡上 */
+/* 四周极淡收束，保持纸面感（浅色底不再压暗角） */
 .page::after {
   content: "";
   position: absolute;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(ellipse 74% 66% at 50% 46%, rgba(3, 10, 20, 0) 46%, rgba(3, 10, 20, .62) 100%);
+  background: radial-gradient(ellipse 74% 66% at 50% 46%, rgba(15, 44, 76, 0) 46%, rgba(15, 44, 76, .06) 100%);
 }
 
 /* ==========================================================================
@@ -83,11 +89,12 @@ body { overflow-x: hidden; }
   gap: .5em;
   align-items: center;
 }
-.crumb li { display: flex; align-items: center; gap: .5em; color: var(--silver-400); }
-.crumb li:not(:last-child)::after { content: "/"; color: rgba(142, 165, 194, .45); }
-.crumb a { color: var(--silver-300); text-decoration: none; transition: color .5s ease; }
-.crumb a:hover { color: var(--gold); }
-.crumb [aria-current] { color: var(--silver-200); }
+/* 面包屑落在左侧深蓝纹样带上，用固定浅色文字保证可读 */
+.crumb li { display: flex; align-items: center; gap: .5em; color: #b3c5dd; }
+.crumb li:not(:last-child)::after { content: "/"; color: rgba(179, 197, 221, .5); }
+.crumb a { color: #d3e0f1; text-decoration: none; transition: color .5s ease; }
+.crumb a:hover { color: #f7e6c2; }
+.crumb [aria-current] { color: #ffffff; }
 
 .head {
   display: flex;
@@ -108,11 +115,11 @@ body { overflow-x: hidden; }
   letter-spacing: .08em;
   line-height: 1.05;
   color: var(--silver-50);
-  background: linear-gradient(180deg, #f6faff 8%, #dce6f3 46%, #a9bfd8 100%);
+  background: linear-gradient(180deg, #0a1f38 8%, #16395f 46%, #33506b 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 2px 26px rgba(217, 178, 106, .22);
+  text-shadow: 0 1px 18px rgba(217, 178, 106, .18);
 }
 .page-title .gap { display: inline-block; width: .6em; }
 
@@ -269,12 +276,10 @@ body { overflow-x: hidden; }
   cursor: pointer;
   color: inherit;
   font-family: inherit;
-  border: 1px solid rgba(196, 216, 240, .13);
+  border: 1px solid rgba(163, 185, 213, .4);
   border-radius: var(--card-radius-sm, 8px);
-  background: linear-gradient(180deg,
-    rgba(22, 52, 84, .42) 0%,
-    rgba(9, 26, 46, .38) 100%);
-  box-shadow: inset 0 1px 0 rgba(226, 238, 252, .06);
+  background: var(--card-bg, linear-gradient(180deg, #f7faff 0%, #eef4fb 58%, #e3ecf7 100%));
+  box-shadow: var(--card-shadow, 0 2px 10px rgba(2, 8, 18, .28));
   transition: border-color .6s var(--ease-soft),
               background .6s var(--ease-soft),
               transform .6s var(--ease-soft);
@@ -289,9 +294,9 @@ body { overflow-x: hidden; }
   bottom: 16%;
   width: 2px;
   background: linear-gradient(180deg,
-    rgba(217, 178, 106, 0) 0%,
-    rgba(217, 178, 106, .7) 50%,
-    rgba(217, 178, 106, 0) 100%);
+    rgba(138, 106, 42, 0) 0%,
+    rgba(138, 106, 42, .7) 50%,
+    rgba(138, 106, 42, 0) 100%);
   opacity: 0;
   transform: scaleY(.5);
   transition: opacity .6s var(--ease-soft), transform .6s var(--ease-soft);
@@ -299,17 +304,15 @@ body { overflow-x: hidden; }
 
 .person__card:hover,
 .person__card.is-active {
-  border-color: rgba(217, 178, 106, .34);
-  background: linear-gradient(180deg,
-    rgba(28, 62, 96, .5) 0%,
-    rgba(10, 28, 48, .46) 100%);
+  border-color: rgba(138, 106, 42, .5);
+  background: var(--card-bg-hover, linear-gradient(180deg, #ffffff 0%, #f3f8fd 60%, #e8effa 100%));
   transform: translateX(4px);
 }
 .person__card:hover::before,
 .person__card.is-active::before { opacity: 1; transform: scaleY(1); }
 
 .person__card:focus-visible {
-  outline: 1px solid rgba(217, 178, 106, .7);
+  outline: 1px solid rgba(138, 106, 42, .7);
   outline-offset: 3px;
 }
 
@@ -320,7 +323,7 @@ body { overflow-x: hidden; }
   font-weight: 400;
   letter-spacing: .1em;
   line-height: 1.3;
-  color: var(--silver-50);
+  color: var(--card-ink-strong, #0a1f38);
   white-space: nowrap;
 }
 
@@ -330,7 +333,7 @@ body { overflow-x: hidden; }
   font-size: clamp(11.5px, 1.5vh, 13px);
   letter-spacing: .04em;
   line-height: 1.5;
-  color: var(--role-tone);
+  color: var(--card-accent, #b03a2e);
 }
 
 .person__more {
@@ -339,11 +342,11 @@ body { overflow-x: hidden; }
   font-family: var(--font-hei);
   font-size: clamp(11px, 1.3vh, 12px);
   letter-spacing: .06em;
-  color: var(--silver-400);
-  opacity: .75;
+  color: var(--card-ink-mute, #6b7f94);
+  opacity: .85;
   transition: color .5s ease, opacity .5s ease;
 }
-.person__card:hover .person__more { color: var(--gold); opacity: 1; }
+.person__card:hover .person__more { color: var(--card-gold, #8a6a2a); opacity: 1; }
 
 /* --- 入场：脚本确认后才加 html.anim，动画失效也不影响可读 --- */
 html.anim .roster__stage,
@@ -529,14 +532,10 @@ body.no-scroll { overflow: hidden; }
   cursor: pointer;
   color: inherit;
   font-family: inherit;
-  border: 1px solid rgba(196, 216, 240, .14);
+  border: 1px solid rgba(163, 185, 213, .4);
   border-radius: var(--card-radius-sm, 8px);
-  background: linear-gradient(180deg,
-    rgba(22, 52, 84, .46) 0%,
-    rgba(9, 26, 46, .42) 58%,
-    rgba(6, 19, 34, .48) 100%);
-  box-shadow: inset 0 1px 0 rgba(226, 238, 252, .07),
-              0 16px 40px -26px rgba(0, 0, 0, .85);
+  background: var(--card-bg, linear-gradient(180deg, #f7faff 0%, #eef4fb 58%, #e3ecf7 100%));
+  box-shadow: var(--card-shadow, 0 2px 10px rgba(2, 8, 18, .28));
   transition: border-color .5s var(--ease-soft),
               transform .5s var(--ease-soft),
               box-shadow .5s var(--ease-soft);
@@ -544,14 +543,13 @@ body.no-scroll { overflow: hidden; }
 
 .news__card:hover,
 .news__card:focus-visible {
-  border-color: rgba(217, 178, 106, .32);
+  border-color: rgba(138, 106, 42, .5);
   transform: translateY(var(--lift, -5px));
-  box-shadow: inset 0 1px 0 rgba(226, 238, 252, .12),
-              0 22px 48px -28px rgba(0, 0, 0, .92);
+  box-shadow: var(--card-shadow-hover, 0 18px 34px -14px rgba(2, 8, 18, .5));
 }
 
 .news__card:focus-visible {
-  outline: 1px solid rgba(217, 178, 106, .7);
+  outline: 1px solid rgba(138, 106, 42, .7);
   outline-offset: 3px;
 }
 
@@ -559,7 +557,7 @@ body.no-scroll { overflow: hidden; }
   font-family: var(--font-hei);
   font-size: clamp(11px, 1.4vh, 12.5px);
   letter-spacing: .08em;
-  color: var(--gold);
+  color: var(--card-gold, #8a6a2a);
 }
 
 .news__title {
@@ -568,7 +566,7 @@ body.no-scroll { overflow: hidden; }
   font-weight: 400;
   letter-spacing: .05em;
   line-height: 1.5;
-  color: var(--silver-50);
+  color: var(--card-ink-strong, #0a1f38);
 }
 
 .news__lead {
@@ -576,18 +574,18 @@ body.no-scroll { overflow: hidden; }
   font-size: clamp(12.5px, 1.5vh, 14px);
   line-height: 1.9;
   letter-spacing: .015em;
-  color: var(--silver-300);
+  color: var(--card-ink-soft, #33506b);
 }
 
 .news__more {
   font-family: var(--font-hei);
   font-size: clamp(12px, 1.4vh, 13px);
   letter-spacing: .1em;
-  color: var(--silver-400);
+  color: var(--card-ink-mute, #6b7f94);
   transition: color .5s ease;
 }
 .news__card:hover .news__more,
-.news__card:focus-visible .news__more { color: var(--gold); }
+.news__card:focus-visible .news__more { color: var(--card-gold, #8a6a2a); }
 
 /* ==========================================================================
    7. 资讯详情弹层：内部元素从四周滑入
