@@ -143,33 +143,6 @@
   margin: 0;
 }
 
-/* ---------- 侧栏小卡 ---------- */
-.bi-side-card {
-  background: rgba(245, 230, 200, .04);
-  border: 1px solid rgba(245, 230, 200, .22);
-  border-radius: 8px;
-  padding: 20px;
-  margin-top: 24px;
-}
-.bi-side-card__title {
-  font-size: 14px;
-  color: var(--exp-wax);
-  margin-bottom: 12px;
-  font-weight: 600;
-}
-.bi-side-card__list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  font-size: 13px;
-  color: var(--exp-text-dim);
-}
-.bi-side-card__list li {
-  padding: 4px 0;
-  border-bottom: 1px solid rgba(245, 230, 200, .08);
-}
-.bi-side-card__list li:last-child { border-bottom: none; }
-
 /* ---------- 产地卡（3列） ---------- */
 .bi-origin-grid {
   display: grid;
