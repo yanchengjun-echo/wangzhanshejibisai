@@ -131,12 +131,41 @@ body { overflow-x: hidden; }
 .roster {
   display: grid;
   grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
-  gap: clamp(24px, 3.4vw, 60px);
+  row-gap: clamp(14px, 2.2vh, 26px);
+  column-gap: clamp(24px, 3.4vw, 60px);
   align-items: center;
   width: 100%;
   max-width: 1180px;
   margin: 0 auto;
   padding: 0 0 clamp(8px, 1.6vh, 18px);
+}
+
+/* --- 人物区小标题（占满整行） --- */
+.roster__head {
+  grid-column: 1 / -1;
+  text-align: center;
+}
+.roster__title {
+  margin: 0;
+  font-family: var(--font-kai);
+  font-weight: 400;
+  font-size: clamp(24px, 3.2vh, 34px);
+  letter-spacing: .12em;
+  line-height: 1.2;
+  color: var(--silver-50);
+  background: linear-gradient(180deg, #f6faff 6%, #dce6f3 48%, #a9bfd8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 22px rgba(217, 178, 106, .18);
+}
+.roster__sub {
+  margin: .7em 0 0;
+  font-family: var(--font-kai);
+  font-size: clamp(12px, 1.7vh, 15px);
+  letter-spacing: .28em;
+  text-indent: .28em;
+  color: var(--silver-400);
 }
 
 /* --- 左侧人物大图 --- */
@@ -342,7 +371,7 @@ html.anim .person { animation-delay: calc(.1s + var(--i, 0) * .06s); }
 @media (max-width: 940px) {
   .roster {
     grid-template-columns: minmax(0, 1fr);
-    gap: clamp(18px, 2.6vh, 28px);
+    row-gap: clamp(14px, 2.4vh, 24px);
     max-width: 720px;
   }
 
