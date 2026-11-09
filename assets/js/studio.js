@@ -86,6 +86,16 @@
   function start() {
     initPreview();
 
+    // 从 URL ?mode=dye|embroidery 读取初始模式（workbench.html 独立页用）
+    try {
+      var q = new URLSearchParams(location.search);
+      var m0 = q.get('mode');
+      if (m0 === 'dye' || m0 === 'embroidery') {
+        mode = null;   // 让 setMode 强制走一遍，面板/按钮态统一
+        setMode(m0);
+      }
+    } catch (err) { /* URLSearchParams 不可用时忽略，用默认 dye */ }
+
     qsa('[data-mode]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         setMode(btn.getAttribute('data-mode'));

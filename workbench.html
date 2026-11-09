@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>巧手成纹 · 蜡染与苗绣工作台 | 银绣山河</title>
+<meta name="description" content="银绣山河线上体验：亲手画一笔蜡、浸一次染缸，看冰裂纹在靛蓝布上蔓延；再用虚拟绣绷走一遍平绣与打籽绣的针脚。">
+<meta name="theme-color" content="#0A1219">
+<meta name="color-scheme" content="dark">
+<!-- 首帧防白屏 -->
+<style data-first-paint>
+  html, body { background: #061527; }
+  body { color: #d3e0f1; }
+</style>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a1f38'/%3E%3Ccircle cx='16' cy='16' r='9.5' fill='none' stroke='%23dce6f3' stroke-width='1.5' stroke-dasharray='1.6 2.4'/%3E%3Cpath d='M10.5 18.5c3-4.6 8.4-4.2 11-1.2-2.2-4.6-7.6-4.4-9.2-2.4' fill='%23dce6f3'/%3E%3C/svg%3E">
+<link rel="canonical" href="https://yinxue-shanhe.app.workbuddy.host/workbench.html">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="巧手成纹 · 蜡染与苗绣线上体验">
+<meta property="og:description" content="画一笔蜡，浸一次染缸，看冰裂纹在靛蓝布上蔓延。">
+<meta property="og:image" content="assets/bg-water.jpg">
+<meta property="og:locale" content="zh_CN">
+
+<link rel="preload" href="assets/fonts/youran-xiaokai-title.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/bg-water.jpg" as="image">
+<!-- 样式表自愈：分享链接偶发中途断流时，某张 CSS 会整份不生效，页面退化成无样式
+     （导航消失、列表序号露出来、卡片排版消失）。解析完成后再核对每张表是否真的
+     解析出规则，失败的带时间戳重取，最多两次；正常加载时什么都不做，不影响缓存。 -->
+<script data-css-guard>
+(function () {
+  var MAX = 2;
+  function heal() {
+    var links = document.querySelectorAll('link[rel="stylesheet"]');
+    for (var i = 0; i < links.length; i++) {
+      var l = links[i];
+      var n = parseInt(l.getAttribute('data-css-retry') || '0', 10);
+      if (n >= MAX) continue;
+      var ok = false;
+      if (l.sheet) {
+        try { ok = !!(l.sheet.cssRules && l.sheet.cssRules.length); }
+        catch (e) { ok = true; }   /* 跨源时读不到规则，视为正常 */
+      }
+      if (!ok) {
+        l.setAttribute('data-css-retry', String(n + 1));
+        l.href = l.href.split('?')[0] + '?fix=' + Date.now();
+      }
+    }
+  }
+  window.addEventListener('load', heal);
+  setTimeout(heal, 3000);
+})();
+</script>
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="stylesheet" href="assets/css/experience.css">
+<link rel="stylesheet" href="assets/css/batik.css">
+<link rel="stylesheet" href="assets/css/bgm.css">
+<link rel="stylesheet" href="assets/css/chrome.css">
+
+<!-- 入口屏入场动画开关：脚本确认能跑才挂，动画没跑起来时内容也完整可见 -->
+<script>
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.documentElement.classList.add('intro-anim');
+  }
+</script>
+</head>
+<body class="exp-root">
+
+<a class="skip-link" href="#workbench">跳到主要内容</a>
+
+<header class="topbar">
+  <div class="topbar__inner">
+    <a class="topbar__brand" href="index.html" aria-label="银绣山河 · 返回首页">
+      <span class="topbar__mark" aria-hidden="true">绣</span>
+      <span class="topbar__name">银绣山河</span>
+    </a>
+    <span class="topbar__divider" aria-hidden="true"></span>
+    <nav class="topbar__nav" aria-label="主导航">
+      <a class="topbar__link" href="index.html">首页</a>
+      <a class="topbar__link" href="history.html">历史溯源</a>
+      <a class="topbar__link" href="gallery.html">纹样图鉴</a>
+      <a class="topbar__link" href="inheritors.html">匠心传承</a>
+      <a class="topbar__link" href="experience.html" aria-current="page">互动创作</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page exp-page" id="workbench">
+
+  <!-- 纸面颗粒：与展馆 / 历史两页同一种材质，压在工作台最底层 -->
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- ===== 面包屑 ===== -->
+  <nav class="crumb" aria-label="面包屑导航">
+    <ol>
+      <li><a href="index.html">首页</a></li>
+      <li aria-current="page">互动创作</li>
+    </ol>
+  </nav>
+
+  <!-- ===== 页头：与展馆 / 历史两页同构（大标题拆两块，中缝留金线）===== -->
+  <header class="head">
+    <h1 class="page-title" aria-label="巧手成纹">
+      <span aria-hidden="true" style="--d:.1s">巧手</span>
+      <span class="gap" aria-hidden="true"></span>
+      <span aria-hidden="true" style="--d:.34s">成纹</span>
+    </h1>
+    <p class="tagline">画一笔蜡 · 浸一次染缸 · 走一针苗绣</p>
+  </header>
+
+  <!-- ===== 三栏主体 ===== -->
+  <div class="exp-body" id="main">
+
+    <!-- 左：工具面板 -->
+    <aside class="exp-side exp-side--left" aria-label="创作工具">
+
+      <section class="panel">
+        <h2 class="panel__title">体验模式</h2>
+        <div class="seg" role="group" aria-label="选择体验模式">
+          <button class="seg__item" type="button" data-mode="dye" aria-pressed="true">蜡染</button>
+          <button class="seg__item" type="button" data-mode="embroidery" aria-pressed="false">苗绣</button>
+        </div>
+      </section>
+
+      <!-- 蜡染：五步流程 rail -->
+      <section class="panel batik-rail" data-panel="dye">
+        <h2 class="panel__title">工序</h2>
+        <ol id="batikSteps">
+          <li class="cur" data-step="CLOTH"><span class="no">01</span><span class="lbl">选布</span></li>
+          <li data-step="WAX"><span class="no">02</span><span class="lbl">上蜡</span></li>
+          <li data-step="DYE"><span class="no">03</span><span class="lbl">浸染</span></li>
+          <li data-step="DEWAX"><span class="no">04</span><span class="lbl">脱蜡</span></li>
+          <li data-step="DONE"><span class="no">05</span><span class="lbl">成品</span></li>
+        </ol>
+        <p class="batik-rail__note">只有落在底稿墨线上的笔触，才会留下蜡。</p>
+      </section>
+
+      <!-- 苗绣工具 -->
+      <section class="panel" data-panel="embroidery" hidden>
+        <h2 class="panel__title">针法</h2>
+        <div class="seg" role="group" aria-label="选择针法">
+          <button class="seg__item" type="button" data-stitch="flat" aria-pressed="true">平绣</button>
+          <button class="seg__item" type="button" data-stitch="seed" aria-pressed="false">打籽绣</button>
+        </div>
+        <hr class="panel__rule">
+        <h2 class="panel__title">丝线颜色</h2>
+        <div class="swatches" id="threadSwatches" role="group" aria-label="丝线颜色">
+          <button class="swatch" type="button" style="--c:#C23B22" data-color="#C23B22" aria-pressed="true"  aria-label="苗绣红"></button>
+          <button class="swatch" type="button" style="--c:#5B2C6F" data-color="#5B2C6F" aria-pressed="false" aria-label="苗绣紫"></button>
+          <button class="swatch" type="button" style="--c:#D9A03C" data-color="#D9A03C" aria-pressed="false" aria-label="姜黄"></button>
+          <button class="swatch" type="button" style="--c:#2E7D6B" data-color="#2E7D6B" aria-pressed="false" aria-label="松绿"></button>
+          <button class="swatch" type="button" style="--c:#1F4E79" data-color="#1F4E79" aria-pressed="false" aria-label="靛蓝"></button>
+          <button class="swatch" type="button" style="--c:#E8E4D8" data-color="#E8E4D8" aria-pressed="false" aria-label="素白"></button>
+        </div>
+        <hr class="panel__rule">
+        <h2 class="panel__title">针法演示</h2>
+        <div class="stitch-demo" id="stitchDemo" aria-hidden="true"></div>
+      </section>
+
+    </aside>
+
+    <!-- 中：画布舞台 -->
+    <section class="exp-stage" id="expStage" aria-label="创作画布">
+
+      <!-- 蜡染：单画布 + 蜡刀 + 提示 + 加载遮罩 -->
+      <div class="canvas-wrap batik-wrap" data-canvas="dye">
+        <div class="batik-frame" id="batikFrame">
+          <canvas id="batik-stage" width="1000" height="1043" aria-label="蜡染布面"></canvas>
+          <div class="batik-knife" id="batikKnife" aria-hidden="true">
+            <svg viewBox="0 0 32 36" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 28 L14 2 L18 2 L26 28 L22 30 L16 8 L10 30 Z" fill="#e6cfa3" stroke="#8a7a5a" stroke-width="1"/>
+              <circle cx="16" cy="30" r="3" fill="#8a7a5a"/>
+            </svg>
+          </div>
+          <div class="batik-toast" id="batikToast" role="status" aria-live="polite"></div>
+          <div class="batik-load" id="batikLoad">
+            <div>
+              <div class="batik-spinner" aria-hidden="true"></div>
+              <p class="batik-load__kicker">PATTERN</p>
+              <h2 id="batikLoadTitle">正在准备纹样</h2>
+              <p id="batikLoadMsg">第一次加载需要读取纹样像素，请稍候。</p>
+              <button class="btn btn--ghost" id="batikRetry" type="button" hidden>重新加载</button>
+            </div>
+          </div>
+        </div>
+        <p class="batik-hint" id="batikHint">选一块布，再选一稿纹样。</p>
+      </div>
+
+      <!-- 苗绣：虚拟绣绷 -->
+      <div class="canvas-wrap" data-canvas="embroidery" hidden>
+        <div class="hoop" id="embroideryHoop">
+          <svg class="hoop-svg" id="hoopSvg" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <!-- 布面质感：径向渐变模拟绷紧的坯布受光 -->
+              <radialGradient id="hoopClothGrad" cx="34%" cy="27%" r="78%">
+                <stop offset="0" stop-color="#FCFAF2" />
+                <stop offset=".55" stop-color="#F0EADA" />
+                <stop offset="1" stop-color="#DCD2BA" />
+              </radialGradient>
+
+              <!-- 可绣区域：背扇轮廓，超出部分被裁掉 -->
+              <clipPath id="hoopClip">
+                <path d="M300 96 C 402 96 478 156 478 252 C 478 362 400 452 300 508
+                         C 200 452 122 362 122 252 C 122 156 198 96 300 96 Z" />
+              </clipPath>
+            </defs>
+
+            <!-- 木绷圈：外圈木色 + 内侧高光，整体 600×600 等比缩放，永远是正圆 -->
+            <circle class="hoop-wood" cx="300" cy="300" r="292" />
+            <circle class="hoop-wood-inner" cx="300" cy="300" r="279" />
+
+            <!-- 绷紧的坯布 -->
+            <circle class="hoop-cloth" cx="300" cy="300" r="279" fill="url(#hoopClothGrad)" />
+
+            <!-- 底样引导线 -->
+            <g class="hoop-guide">
+              <path d="M300 152 C 356 206 356 320 300 398 C 244 320 244 206 300 152 Z" />
+              <circle cx="300" cy="276" r="58" />
+              <path d="M300 208 L 300 344" />
+              <path d="M232 276 L 368 276" />
+            </g>
+
+            <!-- 背扇外轮廓 -->
+            <path class="hoop-outline"
+                  d="M300 96 C 402 96 478 156 478 252 C 478 362 400 452 300 508
+                     C 200 452 122 362 122 252 C 122 156 198 96 300 96 Z" />
+
+            <!-- 针迹层：clip 到背扇轮廓内 -->
+            <g id="stitchLayer" clip-path="url(#hoopClip)"></g>
+          </svg>
+        </div>
+        <p class="canvas-hint" id="hoopHint">在绣绷上移动鼠标，一针一针走线</p>
+      </div>
+
+    </section>
+
+    <!-- 右：预览与操作 -->
+    <aside class="exp-side exp-side--right" aria-label="实时预览与操作">
+
+      <section class="panel">
+        <h2 class="panel__title">实时预览</h2>
+        <div class="preview-box">
+          <canvas id="previewCanvas" class="preview-canvas"></canvas>
+          <span class="preview-label" id="previewLabel">素坯</span>
+        </div>
+      </section>
+
+      <!-- 蜡染：五步操作面板（选布 / 上蜡 / 浸染 / 脱蜡 / 成品） -->
+      <section class="panel" data-panel="dye">
+        <section class="batik-pane show" id="batik-p-CLOTH">
+          <h2>选一块布</h2>
+          <p>本白棉布吃蜡最稳，月白偏冷，浅茶偏暖。选一稿纹样，蜡会沿着墨线走。</p>
+          <p class="batik-label">布色</p>
+          <div class="batik-swatches" id="batikClothDots"></div>
+          <p class="batik-label">纹样</p>
+          <div class="batik-patterns" id="batikPatCards"></div>
+          <button class="btn btn--primary btn--block" id="batikBtnStart" type="button" aria-disabled="true" style="margin-top:18px">绷布 · 开始上蜡</button>
+        </section>
+
+        <section class="batik-pane" id="batik-p-WAX">
+          <h2>沿底稿描蜡</h2>
+          <p>按住鼠标拖动，沿着淡蓝底稿描。只有落在墨线上的笔触才会留下蜡。</p>
+          <div class="batik-progress"><i id="batikProgFill"></i></div>
+          <p class="batik-progress-txt" id="batikProgTxt">上蜡 0%</p>
+          <label class="batik-switch"><input type="checkbox" id="batikGuide" checked> 显示底稿</label>
+          <div class="batik-row">
+            <button class="btn btn--ghost" id="batikBtnUndo" type="button">撤销一笔</button>
+            <button class="btn btn--ghost" id="batikBtnClear" type="button">清空</button>
+          </div>
+          <button class="batik-link-btn" id="batikBtnFill" type="button">演示：补全剩余蜡线</button>
+          <button class="btn btn--primary btn--block" id="batikBtnToDye" type="button" aria-disabled="true">浸入染缸</button>
+          <p class="batik-fine">达到 55% 才能入染。蜡线越完整，成品的留白越多。</p>
+        </section>
+
+        <section class="batik-pane" id="batik-p-DYE">
+          <h2>靛蓝上身</h2>
+          <p>蜡挡住的地方仍是布色；蓝从布底漫上来。出缸时偏黄绿，接触空气后才慢慢转深蓝。</p>
+          <p class="batik-status" id="batikDyeStatus">浸染中，请稍候。</p>
+        </section>
+
+        <section class="batik-pane" id="batik-p-DEWAX">
+          <h2>沸水脱蜡</h2>
+          <p>蜡化开、浮起。蓝底白纹这时才真正定下来，冰裂也会在布面上留下细纹。</p>
+          <button class="btn btn--primary btn--block" id="batikBtnDewax" type="button">入锅脱蜡</button>
+        </section>
+
+        <section class="batik-pane" id="batik-p-DONE">
+          <h2>你的蜡染</h2>
+          <p>一块布，从白到蓝，从蜡到纹。冰裂是蜡与蓝留下的意外。</p>
+          <img class="batik-done-preview" id="batikDonePrev" alt="完成的蜡染作品">
+          <div class="batik-done-meta">
+            <span>2000 × 2086 PNG</span>
+            <span>银绣山河 · 蜡染体验</span>
+          </div>
+          <div class="batik-row">
+            <button class="btn btn--primary" id="batikBtnSave" type="button">保存图片</button>
+            <button class="btn" id="batikBtnAgain" type="button">再做一块</button>
+          </div>
+        </section>
+      </section>
+
+      <section class="panel" data-panel="embroidery" hidden>
+        <h2 class="panel__title">操作</h2>
+        <button class="btn btn--primary btn--block" type="button" id="btnStitchClear">清空针迹</button>
+        <p class="panel__note" id="stitchCount" role="status" aria-live="polite">已绣 0 针</p>
+      </section>
+
+    </aside>
+
+  </div>
+
+  <!-- ===== 页脚 ===== -->
+  <footer class="page-foot">
+    <div class="foot-rule" aria-hidden="true"></div>
+    <div class="foot-meta">
+      <a href="index.html">返回首页</a>
+      <span class="sep" aria-hidden="true">|</span>
+      <span>画蜡 · 浸染 · 冰裂 · 平绣 · 打籽绣　五种技法</span>
+    </div>
+  </footer>
+</div>
+
+
+<div class="batik-proto" id="batikProto">纹样资源未能内嵌，请通过 HTTP 打开（线上链接或本地服务器）。</div>
+<div id="batik-debug"></div>
+
+<script src="assets/js/studio.js"></script>
+<script src="assets/js/patterns.js"></script>
+<script src="assets/js/batik.js"></script>
+<script src="assets/js/embroidery.js"></script>
+<script src="assets/js/bgm.js"></script>
+</body>
+</html>

@@ -53,7 +53,7 @@
 </script>
 <link rel="stylesheet" href="assets/css/main.css">
 <link rel="stylesheet" href="assets/css/experience.css">
-<link rel="stylesheet" href="assets/css/batik.css">
+<link rel="stylesheet" href="assets/css/batik-intro.css">
 <link rel="stylesheet" href="assets/css/bgm.css">
 <link rel="stylesheet" href="assets/css/chrome.css">
 
@@ -346,7 +346,7 @@
 <section class="intro" id="intro" aria-label="线上体验入口">
 
   <!-- ===== 左：数字蜡染 ===== -->
-  <a class="portal portal-batik" href="#workbench" data-enter="dye"
+  <a class="portal portal-batik" href="workbench.html?mode=dye" data-enter="dye"
      aria-label="进入数字蜡染体验：画蜡 · 浸染 · 去蜡">
     <span class="portal__bg" aria-hidden="true"></span>
     <span class="batik-motifs" aria-hidden="true">
@@ -364,7 +364,7 @@
   </a>
 
   <!-- ===== 右：数字苗绣 ===== -->
-  <a class="portal portal-emb" href="#workbench" data-enter="embroidery"
+  <a class="portal portal-emb" href="workbench.html?mode=embroidery" data-enter="embroidery"
      aria-label="进入数字苗绣体验：引线 · 锁绣 · 成章">
     <span class="portal__bg" aria-hidden="true"></span>
     <span class="stitch-motifs" aria-hidden="true">
@@ -395,251 +395,308 @@
 </section>
 
 <!-- ======================================================================
-     工作台：蜡染（画蜡 → 浸染 → 冰裂）与苗绣（虚拟绣绷）
+     蜡染介绍：入口屏往下滑，先读一段蜡染的来龙去脉，再进工作台
+     内容来源：队友 batik-intro.html（概念/概况/历史/工艺/纹样/今日）
      ====================================================================== -->
-<div class="page exp-page" id="workbench">
+<section class="bi" aria-label="蜡染介绍">
 
-  <!-- 纸面颗粒：与展馆 / 历史两页同一种材质，压在工作台最底层 -->
-  <div class="grain" aria-hidden="true"></div>
-
-  <!-- ===== 面包屑 ===== -->
-  <nav class="crumb" aria-label="面包屑导航">
-    <ol>
-      <li><a href="index.html">首页</a></li>
-      <li aria-current="page">互动创作</li>
-    </ol>
-  </nav>
-
-  <!-- ===== 页头：与展馆 / 历史两页同构（大标题拆两块，中缝留金线）===== -->
-  <header class="head">
-    <h1 class="page-title" aria-label="巧手成纹">
-      <span aria-hidden="true" style="--d:.1s">巧手</span>
-      <span class="gap" aria-hidden="true"></span>
-      <span aria-hidden="true" style="--d:.34s">成纹</span>
-    </h1>
-    <p class="tagline">画一笔蜡 · 浸一次染缸 · 走一针苗绣</p>
-  </header>
-
-  <!-- ===== 三栏主体 ===== -->
-  <div class="exp-body" id="main">
-
-    <!-- 左：工具面板 -->
-    <aside class="exp-side exp-side--left" aria-label="创作工具">
-
-      <section class="panel">
-        <h2 class="panel__title">体验模式</h2>
-        <div class="seg" role="group" aria-label="选择体验模式">
-          <button class="seg__item" type="button" data-mode="dye" aria-pressed="true">蜡染</button>
-          <button class="seg__item" type="button" data-mode="embroidery" aria-pressed="false">苗绣</button>
+  <!-- ===== Hero ===== -->
+  <div class="bi-hero" id="bi-hero">
+    <div class="bi__wrap">
+      <div>
+        <p class="bi-hero__eyebrow">银绣山河 · 巧手成纹</p>
+        <h1 class="bi-hero__title">蜡染</h1>
+        <p class="bi-hero__subtitle">蜡缬 · 蓝底白花 · 冰纹天成</p>
+        <p class="bi-hero__def">以蜡为防染剂，以蓝靛为色，以布为纸——先画蜡，后浸染，再脱蜡，染出蓝与白之间最耐看的纹。</p>
+        <div class="bi-hero__badges">
+          <span class="bi-hero__badge">国家级非物质文化遗产 · 编号 Ⅷ—25</span>
+          <span class="bi-hero__badge">核心传承地：贵州（安顺 · 丹寨 · 织金）</span>
+          <span class="bi-hero__badge">分布：湖南 · 贵州 · 四川 · 云南</span>
+          <span class="bi-hero__badge">古称"蜡缬" · 与绞缬、灰缬、夹缬并称古代四大印花技艺</span>
         </div>
-      </section>
-
-      <!-- 蜡染：五步流程 rail -->
-      <section class="panel batik-rail" data-panel="dye">
-        <h2 class="panel__title">工序</h2>
-        <ol id="batikSteps">
-          <li class="cur" data-step="CLOTH"><span class="no">01</span><span class="lbl">选布</span></li>
-          <li data-step="WAX"><span class="no">02</span><span class="lbl">上蜡</span></li>
-          <li data-step="DYE"><span class="no">03</span><span class="lbl">浸染</span></li>
-          <li data-step="DEWAX"><span class="no">04</span><span class="lbl">脱蜡</span></li>
-          <li data-step="DONE"><span class="no">05</span><span class="lbl">成品</span></li>
-        </ol>
-        <p class="batik-rail__note">只有落在底稿墨线上的笔触，才会留下蜡。</p>
-      </section>
-
-      <!-- 苗绣工具 -->
-      <section class="panel" data-panel="embroidery" hidden>
-        <h2 class="panel__title">针法</h2>
-        <div class="seg" role="group" aria-label="选择针法">
-          <button class="seg__item" type="button" data-stitch="flat" aria-pressed="true">平绣</button>
-          <button class="seg__item" type="button" data-stitch="seed" aria-pressed="false">打籽绣</button>
-        </div>
-        <hr class="panel__rule">
-        <h2 class="panel__title">丝线颜色</h2>
-        <div class="swatches" id="threadSwatches" role="group" aria-label="丝线颜色">
-          <button class="swatch" type="button" style="--c:#C23B22" data-color="#C23B22" aria-pressed="true"  aria-label="苗绣红"></button>
-          <button class="swatch" type="button" style="--c:#5B2C6F" data-color="#5B2C6F" aria-pressed="false" aria-label="苗绣紫"></button>
-          <button class="swatch" type="button" style="--c:#D9A03C" data-color="#D9A03C" aria-pressed="false" aria-label="姜黄"></button>
-          <button class="swatch" type="button" style="--c:#2E7D6B" data-color="#2E7D6B" aria-pressed="false" aria-label="松绿"></button>
-          <button class="swatch" type="button" style="--c:#1F4E79" data-color="#1F4E79" aria-pressed="false" aria-label="靛蓝"></button>
-          <button class="swatch" type="button" style="--c:#E8E4D8" data-color="#E8E4D8" aria-pressed="false" aria-label="素白"></button>
-        </div>
-        <hr class="panel__rule">
-        <h2 class="panel__title">针法演示</h2>
-        <div class="stitch-demo" id="stitchDemo" aria-hidden="true"></div>
-      </section>
-
-    </aside>
-
-    <!-- 中：画布舞台 -->
-    <section class="exp-stage" id="expStage" aria-label="创作画布">
-
-      <!-- 蜡染：单画布 + 蜡刀 + 提示 + 加载遮罩 -->
-      <div class="canvas-wrap batik-wrap" data-canvas="dye">
-        <div class="batik-frame" id="batikFrame">
-          <canvas id="batik-stage" width="1000" height="1043" aria-label="蜡染布面"></canvas>
-          <div class="batik-knife" id="batikKnife" aria-hidden="true">
-            <svg viewBox="0 0 32 36" xmlns="http://www.w3.org/2000/svg">
-              <path d="M6 28 L14 2 L18 2 L26 28 L22 30 L16 8 L10 30 Z" fill="#e6cfa3" stroke="#8a7a5a" stroke-width="1"/>
-              <circle cx="16" cy="30" r="3" fill="#8a7a5a"/>
-            </svg>
-          </div>
-          <div class="batik-toast" id="batikToast" role="status" aria-live="polite"></div>
-          <div class="batik-load" id="batikLoad">
-            <div>
-              <div class="batik-spinner" aria-hidden="true"></div>
-              <p class="batik-load__kicker">PATTERN</p>
-              <h2 id="batikLoadTitle">正在准备纹样</h2>
-              <p id="batikLoadMsg">第一次加载需要读取纹样像素，请稍候。</p>
-              <button class="btn btn--ghost" id="batikRetry" type="button" hidden>重新加载</button>
-            </div>
-          </div>
-        </div>
-        <p class="batik-hint" id="batikHint">选一块布，再选一稿纹样。</p>
       </div>
-
-      <!-- 苗绣：虚拟绣绷 -->
-      <div class="canvas-wrap" data-canvas="embroidery" hidden>
-        <div class="hoop" id="embroideryHoop">
-          <svg class="hoop-svg" id="hoopSvg" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet">
-            <defs>
-              <!-- 布面质感：径向渐变模拟绷紧的坯布受光 -->
-              <radialGradient id="hoopClothGrad" cx="34%" cy="27%" r="78%">
-                <stop offset="0" stop-color="#FCFAF2" />
-                <stop offset=".55" stop-color="#F0EADA" />
-                <stop offset="1" stop-color="#DCD2BA" />
-              </radialGradient>
-
-              <!-- 可绣区域：背扇轮廓，超出部分被裁掉 -->
-              <clipPath id="hoopClip">
-                <path d="M300 96 C 402 96 478 156 478 252 C 478 362 400 452 300 508
-                         C 200 452 122 362 122 252 C 122 156 198 96 300 96 Z" />
-              </clipPath>
-            </defs>
-
-            <!-- 木绷圈：外圈木色 + 内侧高光，整体 600×600 等比缩放，永远是正圆 -->
-            <circle class="hoop-wood" cx="300" cy="300" r="292" />
-            <circle class="hoop-wood-inner" cx="300" cy="300" r="279" />
-
-            <!-- 绷紧的坯布 -->
-            <circle class="hoop-cloth" cx="300" cy="300" r="279" fill="url(#hoopClothGrad)" />
-
-            <!-- 底样引导线 -->
-            <g class="hoop-guide">
-              <path d="M300 152 C 356 206 356 320 300 398 C 244 320 244 206 300 152 Z" />
-              <circle cx="300" cy="276" r="58" />
-              <path d="M300 208 L 300 344" />
-              <path d="M232 276 L 368 276" />
-            </g>
-
-            <!-- 背扇外轮廓 -->
-            <path class="hoop-outline"
-                  d="M300 96 C 402 96 478 156 478 252 C 478 362 400 452 300 508
-                     C 200 452 122 362 122 252 C 122 156 198 96 300 96 Z" />
-
-            <!-- 针迹层：clip 到背扇轮廓内 -->
-            <g id="stitchLayer" clip-path="url(#hoopClip)"></g>
-          </svg>
+      <figure class="bi-fig bi-hero__fig">
+        <div class="bi-fig__media bi-fig__media--tall">
+          <img src="assets/batik/hero.jpg" alt="丹寨县扬武镇排莫村苗族蜡染传承人与蜡染作品">
         </div>
-        <p class="canvas-hint" id="hoopHint">在绣绷上移动鼠标，一针一针走线</p>
-      </div>
-
-    </section>
-
-    <!-- 右：预览与操作 -->
-    <aside class="exp-side exp-side--right" aria-label="实时预览与操作">
-
-      <section class="panel">
-        <h2 class="panel__title">实时预览</h2>
-        <div class="preview-box">
-          <canvas id="previewCanvas" class="preview-canvas"></canvas>
-          <span class="preview-label" id="previewLabel">素坯</span>
-        </div>
-      </section>
-
-      <!-- 蜡染：五步操作面板（选布 / 上蜡 / 浸染 / 脱蜡 / 成品） -->
-      <section class="panel" data-panel="dye">
-        <section class="batik-pane show" id="batik-p-CLOTH">
-          <h2>选一块布</h2>
-          <p>本白棉布吃蜡最稳，月白偏冷，浅茶偏暖。选一稿纹样，蜡会沿着墨线走。</p>
-          <p class="batik-label">布色</p>
-          <div class="batik-swatches" id="batikClothDots"></div>
-          <p class="batik-label">纹样</p>
-          <div class="batik-patterns" id="batikPatCards"></div>
-          <button class="btn btn--primary btn--block" id="batikBtnStart" type="button" aria-disabled="true" style="margin-top:18px">绷布 · 开始上蜡</button>
-        </section>
-
-        <section class="batik-pane" id="batik-p-WAX">
-          <h2>沿底稿描蜡</h2>
-          <p>按住鼠标拖动，沿着淡蓝底稿描。只有落在墨线上的笔触才会留下蜡。</p>
-          <div class="batik-progress"><i id="batikProgFill"></i></div>
-          <p class="batik-progress-txt" id="batikProgTxt">上蜡 0%</p>
-          <label class="batik-switch"><input type="checkbox" id="batikGuide" checked> 显示底稿</label>
-          <div class="batik-row">
-            <button class="btn btn--ghost" id="batikBtnUndo" type="button">撤销一笔</button>
-            <button class="btn btn--ghost" id="batikBtnClear" type="button">清空</button>
-          </div>
-          <button class="batik-link-btn" id="batikBtnFill" type="button">演示：补全剩余蜡线</button>
-          <button class="btn btn--primary btn--block" id="batikBtnToDye" type="button" aria-disabled="true">浸入染缸</button>
-          <p class="batik-fine">达到 55% 才能入染。蜡线越完整，成品的留白越多。</p>
-        </section>
-
-        <section class="batik-pane" id="batik-p-DYE">
-          <h2>靛蓝上身</h2>
-          <p>蜡挡住的地方仍是布色；蓝从布底漫上来。出缸时偏黄绿，接触空气后才慢慢转深蓝。</p>
-          <p class="batik-status" id="batikDyeStatus">浸染中，请稍候。</p>
-        </section>
-
-        <section class="batik-pane" id="batik-p-DEWAX">
-          <h2>沸水脱蜡</h2>
-          <p>蜡化开、浮起。蓝底白纹这时才真正定下来，冰裂也会在布面上留下细纹。</p>
-          <button class="btn btn--primary btn--block" id="batikBtnDewax" type="button">入锅脱蜡</button>
-        </section>
-
-        <section class="batik-pane" id="batik-p-DONE">
-          <h2>你的蜡染</h2>
-          <p>一块布，从白到蓝，从蜡到纹。冰裂是蜡与蓝留下的意外。</p>
-          <img class="batik-done-preview" id="batikDonePrev" alt="完成的蜡染作品">
-          <div class="batik-done-meta">
-            <span>2000 × 2086 PNG</span>
-            <span>银绣山河 · 蜡染体验</span>
-          </div>
-          <div class="batik-row">
-            <button class="btn btn--primary" id="batikBtnSave" type="button">保存图片</button>
-            <button class="btn" id="batikBtnAgain" type="button">再做一块</button>
-          </div>
-        </section>
-      </section>
-
-      <section class="panel" data-panel="embroidery" hidden>
-        <h2 class="panel__title">操作</h2>
-        <button class="btn btn--primary btn--block" type="button" id="btnStitchClear">清空针迹</button>
-        <p class="panel__note" id="stitchCount" role="status" aria-live="polite">已绣 0 针</p>
-      </section>
-
-    </aside>
-
+        <figcaption>丹寨县扬武镇排莫村苗族蜡染传承人与蜡染作品（图源：贵州图片库 · 黔像荟萃）</figcaption>
+      </figure>
+    </div>
   </div>
 
-  <!-- ===== 页脚 ===== -->
-  <footer class="page-foot">
-    <div class="foot-rule" aria-hidden="true"></div>
-    <div class="foot-meta">
-      <a href="index.html">返回首页</a>
-      <span class="sep" aria-hidden="true">|</span>
-      <span>画蜡 · 浸染 · 冰裂 · 平绣 · 打籽绣　五种技法</span>
+  <!-- ===== 目录 ===== -->
+  <nav class="bi-toc" aria-label="蜡染介绍目录">
+    <div class="bi__wrap">
+      <div class="bi-toc__list">
+        <a href="#bi-concept">01 · 什么是蜡染</a>
+        <a href="#bi-overview">02 · 技艺概况</a>
+        <a href="#bi-history">03 · 历史源流</a>
+        <a href="#bi-process">04 · 工艺流程</a>
+        <a href="#bi-motif">05 · 纹样与寓意</a>
+        <a href="#bi-today">06 · 今日蜡染</a>
+      </div>
     </div>
-  </footer>
-</div>
+  </nav>
 
-<div class="batik-proto" id="batikProto">纹样资源未能内嵌，请通过 HTTP 打开（线上链接或本地服务器）。</div>
-<div id="batik-debug"></div>
+  <!-- ===== 01 什么是蜡染 ===== -->
+  <div class="bi-section" id="bi-concept">
+    <div class="bi__wrap">
+      <p class="bi-section__eyebrow">01 · 概念</p>
+      <h2 class="bi-section__title">什么是蜡染</h2>
+      <p class="bi-section__lead">蜡染是我国古老的民间传统纺织印染手工艺，古称"蜡缬"。</p>
+      <div class="bi-two-col">
+        <div class="bi-section__body">
+          <h3>防染原理</h3>
+          <p>用蜡刀蘸取熔化的蜡液（蜂蜡，常掺石蜡）在白布上绘出花纹。蜡所到之处，染液浸不进去；入蓝靛缸浸染、沸水脱蜡之后，被蜡护住的地方仍是布的本色，布面便显出蓝底白花，或白底蓝花。</p>
+          <h3>冰纹</h3>
+          <p>蜡在冷却与浸染中自然龟裂，染液顺着裂缝渗进布面，留下如冰花、如龟纹、如瓷釉"开片"的细线。每一块布的冰纹都独一无二，这是蜡染区别于其他印染工艺的显著特征。</p>
+          <h3>植物染</h3>
+          <p>蓝靛取自板蓝根等植物的茎叶，经浸泡、发酵、打靛而成。贵州民间俗称蜡染为"蜡花"，苗族称"棒（báng）"。</p>
+        </div>
+        <div>
+          <figure class="bi-fig">
+            <div class="bi-fig__media">
+              <img src="assets/batik/concept.jpg" alt="蜡染冰纹细节，蜡防染原理示意">
+            </div>
+            <figcaption>神秘莫测的冰纹——蜡防染原理的天然证据（图源：网络）</figcaption>
+          </figure>
+          <div class="bi-side-card">
+            <p class="bi-side-card__title">古代四大印花技艺</p>
+            <ul class="bi-side-card__list">
+              <li>蜡缬（蜡染）</li>
+              <li>绞缬（扎染）</li>
+              <li>灰缬（蓝印花布）</li>
+              <li>夹缬（夹板印染）</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<script src="assets/js/intro.js"></script>
-<script src="assets/js/studio.js"></script>
-<script src="assets/js/patterns.js"></script>
-<script src="assets/js/batik.js"></script>
-<script src="assets/js/embroidery.js"></script>
+  <!-- ===== 02 技艺概况 ===== -->
+  <div class="bi-section" id="bi-overview">
+    <div class="bi__wrap">
+      <p class="bi-section__eyebrow">02 · 概况</p>
+      <h2 class="bi-section__title">技艺概况</h2>
+      <p class="bi-section__lead">蜡染流布于湖南、贵州、四川、云南等西南省区；贵州是传承最集中、风格最丰富的地方，有"蜡染之乡"之称。</p>
+
+      <div class="bi-origin-grid">
+        <div class="bi-card">
+          <p class="bi-card__title">安顺</p>
+          <p class="bi-card__text">中国唯一的蜡染文化博物馆设在这里；图案细致成熟，还有贵州少见的彩色蜡染，色彩瑰丽，有刺绣般的效果。</p>
+        </div>
+        <div class="bi-card">
+          <p class="bi-card__title">丹寨</p>
+          <p class="bi-card__text">被海内外誉为"东方第一染"；纹样夸张变形，古朴典雅、粗犷豪放。</p>
+        </div>
+        <div class="bi-card">
+          <p class="bi-card__title">织金</p>
+          <p class="bi-card__text">以鱼鸟纹与几何纹见长，用最小的蜡刀、以指甲辅助构图，被称作"世界上最精细的蜡染"。</p>
+        </div>
+      </div>
+
+      <div class="bi-section__body">
+        <h3>用途</h3>
+        <p>从盛装到日用——女性盛装、童装、床单、被面、围腰、背扇、包袱布、手帕、挎包、门帘窗帘……蜡染始终长在生活里。</p>
+        <h3>传承习俗</h3>
+        <p>按苗族习俗，母亲教女儿，女孩自幼栽靛植棉、纺纱织布、画蜡浸染，代代相传。蜡染与岁时节庆、婚丧嫁娶、祭祖敬神相伴，是"活"在日子里的艺术。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 03 历史源流 ===== -->
+  <div class="bi-section" id="bi-history">
+    <div class="bi__wrap">
+      <p class="bi-section__eyebrow">03 · 发展</p>
+      <h2 class="bi-section__title">历史源流</h2>
+      <p class="bi-section__lead">一支蜡刀，一把蓝靛，从两千多年前走到今天。</p>
+
+      <div class="bi-two-col">
+        <div class="bi-timeline">
+          <div class="bi-timeline__item"><p class="bi-timeline__year">秦汉</p><p class="bi-timeline__text">西南少数民族已掌握蜡防染技术，至今两千余年。</p></div>
+          <div class="bi-timeline__item"><p class="bi-timeline__year">东汉</p><p class="bi-timeline__text">蜡染技术已相当成熟。</p></div>
+          <div class="bi-timeline__item"><p class="bi-timeline__year">西晋</p><p class="bi-timeline__text">已能染出十余种彩色蜡染制品。</p></div>
+          <div class="bi-timeline__item"><p class="bi-timeline__year">唐代</p><p class="bi-timeline__text">蜡染十分盛行。</p></div>
+          <div class="bi-timeline__item"><p class="bi-timeline__year">宋代</p><p class="bi-timeline__text">《溪蛮丛笑》记"点蜡幔"，仿铜鼓纹样点蜡入靛；南宋《岭外代答》记"徭斑布"，用镂花木板夹布、灌入熔蜡。</p></div>
+          <div class="bi-timeline__item"><p class="bi-timeline__year">清代</p><p class="bi-timeline__text">《贵州通志》记熔蜡绘花、浸靛、去蜡显花；光绪《珙县志》记"罗渡苗民取蜡熔而绘于布，染后煮布洗蜡，成蜡染裙"。</p></div>
+          <div class="bi-timeline__item"><p class="bi-timeline__year">2006 年</p><p class="bi-timeline__text">丹寨苗族蜡染技艺列入第一批国家级非物质文化遗产名录（编号 Ⅷ—25）。</p></div>
+          <div class="bi-timeline__item"><p class="bi-timeline__year">2008 年</p><p class="bi-timeline__text">安顺蜡染技艺列入第二批国家级非物质文化遗产名录。</p></div>
+          <div class="bi-timeline__item"><p class="bi-timeline__year">2011 年</p><p class="bi-timeline__text">蜡染技艺（苗族蜡染技艺，申报地区：四川珙县、贵州黄平）列入第三批国家级非物质文化遗产名录。</p></div>
+          <div class="bi-timeline__item"><p class="bi-timeline__year">2020 年</p><p class="bi-timeline__text">丹寨蜡染服饰登陆伦敦国际时装周。</p></div>
+          <div class="bi-timeline__item"><p class="bi-timeline__year">2021 年</p><p class="bi-timeline__text">《千鸟图》蜡染长卷被中国国家博物馆收藏。</p></div>
+          <div class="bi-timeline__item"><p class="bi-timeline__year">今天</p><p class="bi-timeline__text">贵州建立非遗纹样数据库，用 AI 提取超十万个纹样辅助标准化生产；蜡染走进巴黎、米兰时装周，也回到寻常生活。</p></div>
+        </div>
+        <div>
+          <figure class="bi-fig">
+            <div class="bi-fig__media bi-fig__media--tall">
+              <img src="assets/batik/history.jpg" alt="宋代鹭鸟纹彩色蜡染褶裙，贵州省博物馆藏">
+            </div>
+            <figcaption>宋代鹭鸟纹彩色蜡染褶裙，贵州省博物馆藏（图源：贵州省博物馆）</figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 04 工艺流程 ===== -->
+  <div class="bi-section" id="bi-process">
+    <div class="bi__wrap">
+      <p class="bi-section__eyebrow">04 · 工艺</p>
+      <h2 class="bi-section__title">工艺流程</h2>
+      <p class="bi-section__lead">从棉籽到蓝布，一件蜡染要经过十余道工序。苗族蜡染有"点蜡""画蜡"两种画法；画蜡是其中最具创造力的一步——留在布上的纹，全凭铜刀走过的蜡迹。</p>
+
+      <div class="bi-steps-grid">
+        <div class="bi-card bi-step-card">
+          <p class="bi-step-card__num">壹</p>
+          <p class="bi-step-card__name">织布</p>
+          <p class="bi-step-card__desc">植棉、纺纱、织布，先把素白的布织出来。</p>
+        </div>
+        <div class="bi-card bi-step-card">
+          <p class="bi-step-card__num">贰</p>
+          <p class="bi-step-card__name">制靛</p>
+          <p class="bi-step-card__desc">板蓝根浸泡、发酵、打靛，做成染缸里的蓝。</p>
+        </div>
+        <div class="bi-card bi-step-card">
+          <p class="bi-step-card__num">叁</p>
+          <p class="bi-step-card__name">熔蜡</p>
+          <p class="bi-step-card__desc">蜂蜡掺石蜡加热化开，保持最顺手的温度。</p>
+        </div>
+        <div class="bi-card bi-step-card">
+          <figure class="bi-fig bi-step-fig">
+            <div class="bi-fig__media">
+              <img src="assets/batik/craft-04.jpg" alt="苗族妇女正在为粗布上蜡" loading="lazy">
+            </div>
+            <figcaption>苗族妇女正在为粗布上蜡（图源：贵州图片库 · 徐朦）</figcaption>
+          </figure>
+          <p class="bi-step-card__num">肆</p>
+          <p class="bi-step-card__name">画蜡</p>
+          <p class="bi-step-card__desc">蜡刀蘸蜡，沿心中图样在布上描画（点蜡 / 画蜡）。</p>
+        </div>
+      </div>
+      <div class="bi-steps-grid bi-steps-grid--row2">
+        <div class="bi-card bi-step-card">
+          <figure class="bi-fig bi-step-fig">
+            <div class="bi-fig__media">
+              <img src="assets/batik/craft-05.jpg" alt="蓝靛染料浸满的双手" loading="lazy">
+            </div>
+            <figcaption>蓝靛染料浸满的双手（图源：网络）</figcaption>
+          </figure>
+          <p class="bi-step-card__num">伍</p>
+          <p class="bi-step-card__name">浸染</p>
+          <p class="bi-step-card__desc">布入靛缸反复浸染、出缸氧化，蓝一层层加深。</p>
+        </div>
+        <div class="bi-card bi-step-card">
+          <p class="bi-step-card__num">陆</p>
+          <p class="bi-step-card__name">脱蜡</p>
+          <p class="bi-step-card__desc">沸水煮布，蜡融化浮起，被护住的花纹显白。</p>
+        </div>
+        <div class="bi-card bi-step-card">
+          <figure class="bi-fig bi-step-fig">
+            <div class="bi-fig__media">
+              <img src="assets/batik/craft-07.jpg" alt="苗族妇女收卷已经晒干的蜡染布" loading="lazy">
+            </div>
+            <figcaption>苗族妇女收卷已经晒干的蜡染布（图源：贵州图片库 · 徐朦）</figcaption>
+          </figure>
+          <p class="bi-step-card__num">柒</p>
+          <p class="bi-step-card__name">成布</p>
+          <p class="bi-step-card__desc">漂洗、晾晒、缝合，成为衣裳、被面或背扇。</p>
+        </div>
+      </div>
+
+      <div class="bi-supplement">
+        <p class="bi-supplement__title">五彩蜡染</p>
+        <p class="bi-supplement__text">在蓝白之上点染红（杨梅汁）、黄（栀子汁）作"笔彩"，蜡绘与浸染各需两次，色彩如锦似绣。</p>
+      </div>
+
+      <div class="bi-cta">
+        <a class="bi-cta__btn" href="workbench.html?mode=dye">想亲手走一遍？进入"巧手成纹"线上体验 ↓</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 05 纹样与寓意 ===== -->
+  <div class="bi-section" id="bi-motif">
+    <div class="bi__wrap">
+      <p class="bi-section__eyebrow">05 · 纹样</p>
+      <h2 class="bi-section__title">纹样与寓意</h2>
+      <p class="bi-section__lead">图纹是蜡染的灵魂。一纹多义，满而不乱——蝴蝶、鱼、铜鼓、花草与几何线，都是生活的记忆与愿望。</p>
+
+      <div class="bi-motif-grid">
+        <div class="bi-card">
+          <p class="bi-card__title">蝴蝶纹</p>
+          <p class="bi-card__text">源自苗族创世传说"蝴蝶妈妈"，象征生命起源与祖先庇佑。</p>
+        </div>
+        <div class="bi-card">
+          <p class="bi-card__title">鱼纹</p>
+          <p class="bi-card__text">多子多福、年年有余，变形夸张又活灵活现。</p>
+        </div>
+        <div class="bi-card">
+          <p class="bi-card__title">铜鼓纹</p>
+          <p class="bi-card__text">以铜鼓为样，连着太阳、星辰与祖先崇拜。</p>
+        </div>
+        <div class="bi-card">
+          <p class="bi-card__title">几何纹</p>
+          <p class="bi-card__text">山、水、田埂、路途，抽象成秩序井然的线与格。</p>
+        </div>
+      </div>
+
+      <div class="bi-gallery">
+        <figure class="bi-fig">
+          <div class="bi-fig__media bi-fig__media--square">
+            <img src="assets/batik/pattern-peacock.jpg" alt="孔雀花枝纹样（底稿）" loading="lazy">
+          </div>
+          <figcaption class="bi-gallery__caption">孔雀花枝纹样（底稿）</figcaption>
+        </figure>
+        <figure class="bi-fig">
+          <div class="bi-fig__media bi-fig__media--square">
+            <img src="assets/batik/pattern-birds.jpg" alt="鸟纹九宫格（底稿）" loading="lazy">
+          </div>
+          <figcaption class="bi-gallery__caption">鸟纹九宫格（底稿）</figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 06 今日蜡染 ===== -->
+  <div class="bi-section" id="bi-today">
+    <div class="bi__wrap">
+      <p class="bi-section__eyebrow">06 · 今天</p>
+      <h2 class="bi-section__title">今日蜡染</h2>
+      <p class="bi-section__lead">蜡染没有停在博物馆里。传承人、合作社、设计师与年轻人，正把它带回生活。</p>
+
+      <div class="bi-case-grid">
+        <div class="bi-card">
+          <p class="bi-card__title">传承</p>
+          <p class="bi-card__text">宁航蜡染创始人宁曼丽十余年间带领 48 位非遗传承人，走进中国民族博物馆，走上国际时装周的 T 台。</p>
+        </div>
+        <div class="bi-card">
+          <p class="bi-card__title">产业</p>
+          <p class="bi-card__text">黎平侗品源合作社以"品牌带产业、合作社带农户"，累计培训 3000 余人次，带动 1200 余人就业。</p>
+        </div>
+        <div class="bi-card">
+          <p class="bi-card__title">生活</p>
+          <p class="bi-card__text">凯里的蜡染咖啡店、蜡染主题民宿、贵州"村T"的 50 米风雨长廊——蜡染成为日常，也成为风景。</p>
+        </div>
+        <div class="bi-card">
+          <p class="bi-card__title">出海</p>
+          <p class="bi-card__text">从巴黎、米兰时装周到国际艺术展，蓝白纹样成为"中国风"的世界名片。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 结语 + 体验引导 ===== -->
+  <div class="bi-cta" style="padding-bottom:0">
+    <div class="bi__wrap">
+      <p class="bi-cta__text">一尺蓝布，从秦汉染到今天；蓝白之间，是千万双巧手留下的人间烟火。欢迎来贵州，寻你的"一方蓝"。</p>
+      <a class="bi-cta__btn" href="workbench.html?mode=dye">进入"巧手成纹"线上体验 ↓</a>
+      <div class="bi-cta__seal" aria-hidden="true">染</div>
+    </div>
+  </div>
+
+</section>
+
 <script src="assets/js/bgm.js"></script>
 </body>
 </html>
