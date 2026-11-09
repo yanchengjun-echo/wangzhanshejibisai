@@ -1,0 +1,327 @@
+/* ==========================================================================
+   银绣山河 · 03 板块「巧手成纹」——数字蜡染（队友版整合）
+   --------------------------------------------------------------------------
+   玩法：选布 → 上蜡（沿纹样底稿墨线描蜡，落空提示）→ 浸染 → 脱蜡 → 成品
+   纹样：9 稿（孔雀花枝 / 鸟纹·回首 / 鸟纹·展翅 / 纹样·四~九），
+        白底深色线稿，页面读取像素生成「只能描墨线」的蒙版。
+   依赖：必须在 http:// 下打开（file:// 会被浏览器拦截像素读取）。
+
+   本文件只负责蜡染工作台的样式，配色沿用全站靛蓝 / 银白 / 蜡黄令牌，
+   结构与苗绣共用工作台三栏（左步骤 / 中画布 / 右操作）。
+   与队友原版 batik.html 的区别：去掉了自带的顶栏与 hero（用全站顶栏 +
+   页头），三类容器挂进现有 exp-side / exp-stage。
+   ========================================================================== */
+
+/* ---------- 蜡染局部令牌（对齐全站，不污染苗绣） ---------- */
+:root {
+  --batik-wax: #E6CFA3;         /* 蜡黄（队友原版 #e6cfa3） */
+  --batik-wax-deep: #C9AD78;
+  --batik-paper: #F4EDDD;       /* 坯布纸色 */
+  --batik-ink: #10243A;         /* 墨线深蓝 */
+  --batik-line: rgba(230, 207, 163, .20);
+  --batik-line-strong: rgba(230, 207, 163, .38);
+  --batik-text: #EFE7D8;
+  --batik-muted: rgba(239, 231, 216, .58);
+}
+
+/* ==========================================================================
+   1. 蜡染画布舞台（挂进 .exp-stage 内）
+   ========================================================================== */
+.batik-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  padding: 12px;
+  background: linear-gradient(160deg, rgba(22, 34, 47, .92), rgba(11, 22, 33, .96) 70%);
+}
+
+.batik-frame {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.batik-frame::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1px solid rgba(230, 207, 163, .10);
+  pointer-events: none;
+  z-index: 2;
+}
+
+#batik-stage {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  max-width: 720px;
+  height: auto;
+  aspect-ratio: 1000 / 1043;
+  background: var(--batik-paper);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+  touch-action: none;
+  user-select: none;
+  cursor: crosshair;
+}
+.batik-frame.waxing #batik-stage { cursor: none; }
+.batik-frame.shake { animation: batik-shake .26s ease; }
+@keyframes batik-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  50% { transform: translateX(4px); }
+  75% { transform: translateX(-2px); }
+}
+
+.batik-hint {
+  margin: 10px 2px 0;
+  font-size: 12px;
+  line-height: 1.9;
+  color: var(--batik-muted);
+  letter-spacing: .04em;
+  min-height: 2.2em;
+  text-align: center;
+}
+
+/* 蜡刀光标 */
+.batik-knife {
+  position: fixed;
+  left: 0; top: 0;
+  width: 34px; height: 34px;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-9px, -28px) rotate(-10deg);
+  transition: opacity .12s ease;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .35));
+}
+.batik-knife.show { opacity: 1; }
+.batik-knife.bad { filter: drop-shadow(0 0 3px rgba(177, 74, 58, .9)); }
+.batik-knife svg { display: block; width: 100%; height: 100%; }
+
+/* 提示 toast */
+.batik-toast {
+  position: absolute;
+  left: 50%;
+  bottom: 26px;
+  z-index: 30;
+  transform: translate(-50%, 10px);
+  opacity: 0;
+  pointer-events: none;
+  padding: 9px 15px;
+  background: rgba(9, 17, 26, .92);
+  border: 1px solid var(--batik-line);
+  color: var(--batik-paper);
+  font-size: 12px;
+  letter-spacing: .05em;
+  white-space: nowrap;
+  transition: opacity .2s ease, transform .2s ease;
+  max-width: 90%;
+}
+.batik-toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* 加载遮罩 */
+.batik-load {
+  position: absolute;
+  inset: 14px;
+  z-index: 25;
+  display: none;
+  place-items: center;
+  background: rgba(8, 17, 27, .78);
+  backdrop-filter: blur(3px);
+  text-align: center;
+  padding: 28px;
+}
+.batik-load.show { display: grid; }
+.batik-load__kicker { margin: 0 0 12px; font-size: 10px; letter-spacing: .32em; color: var(--batik-wax); opacity: .8; }
+.batik-load h2 { margin: 0 0 8px; font-family: var(--exp-font-title); font-weight: 500; font-size: 24px; letter-spacing: .08em; }
+.batik-load p { margin: 0 auto 18px; max-width: 320px; color: var(--batik-muted); font-size: 12px; line-height: 1.9; }
+.batik-spinner {
+  width: 24px; height: 24px; margin: 0 auto 18px;
+  border: 1px solid rgba(230, 207, 163, .2);
+  border-top-color: var(--batik-wax);
+  border-radius: 50%;
+  animation: batik-spin 1s linear infinite;
+}
+.batik-load.error .batik-spinner { display: none; }
+@keyframes batik-spin { to { transform: rotate(360deg); } }
+
+/* ==========================================================================
+   2. 左栏：五步流程 rail
+   ========================================================================== */
+.batik-rail ol { list-style: none; margin: 0; padding: 0; position: relative; }
+.batik-rail ol::before {
+  content: "";
+  position: absolute;
+  left: 13px; top: 16px; bottom: 22px;
+  width: 1px;
+  background: linear-gradient(var(--batik-line-strong), rgba(230, 207, 163, .06));
+}
+.batik-rail li {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 0;
+  color: rgba(239, 231, 216, .40);
+  font-size: 13px;
+  letter-spacing: .08em;
+  transition: color .25s ease;
+}
+.batik-rail li .no {
+  position: relative; z-index: 1;
+  flex: 0 0 auto;
+  width: 27px; height: 27px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  border: 1px solid rgba(230, 207, 163, .22);
+  font-family: var(--exp-font-title);
+  font-size: 11px;
+  background: var(--exp-indigo-950);
+  transition: .25s ease;
+}
+.batik-rail li.cur { color: var(--batik-wax); }
+.batik-rail li.cur .no { background: #0b1621; color: var(--batik-wax); border-color: var(--batik-wax); box-shadow: 0 0 0 4px rgba(230, 207, 163, .08); }
+.batik-rail li.done { color: rgba(239, 231, 216, .72); }
+.batik-rail li.done .no { border-color: var(--batik-wax-deep); color: var(--batik-wax-deep); }
+.batik-rail__note { margin: 18px 0 0; padding-left: 2px; font-size: 11px; line-height: 2; color: rgba(239, 231, 216, .38); }
+
+/* ==========================================================================
+   3. 右栏：操作面板（选布 / 上蜡 / 浸染 / 脱蜡 / 成品）
+   ========================================================================== */
+.batik-pane { display: none; }
+.batik-pane.show { display: block; animation: batik-paneIn .35s ease both; }
+@keyframes batik-paneIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.batik-pane h2 {
+  margin: 0 0 10px;
+  font-family: var(--exp-font-title);
+  font-weight: 500;
+  font-size: 20px;
+  letter-spacing: .08em;
+  color: var(--exp-text);
+}
+.batik-pane p { margin: 0 0 14px; color: var(--batik-muted); font-size: 12px; line-height: 2; }
+.batik-label { margin: 16px 0 10px; font-size: 10px; letter-spacing: .22em; color: rgba(239, 231, 216, .48); }
+
+/* 布色圆点 */
+.batik-swatches { display: flex; gap: 12px; margin: 0 0 4px; }
+.batik-swatch {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(230, 207, 163, .25);
+  cursor: pointer; padding: 0; position: relative;
+  transition: .2s ease;
+}
+.batik-swatch:hover { transform: translateY(-1px); }
+.batik-swatch.sel { box-shadow: 0 0 0 4px rgba(230, 207, 163, .10); border-color: var(--batik-wax); }
+.batik-swatch.sel::after { content: ""; position: absolute; inset: -5px; border: 1px solid var(--batik-wax); border-radius: 50%; }
+
+/* 纹样网格 */
+.batik-patterns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.batik-pat {
+  padding: 6px 6px 5px;
+  background: rgba(8, 17, 27, .35);
+  border: 1px solid rgba(230, 207, 163, .14);
+  cursor: pointer; transition: .2s ease;
+  text-align: left; color: var(--batik-muted);
+}
+.batik-pat:hover { border-color: rgba(230, 207, 163, .35); }
+.batik-pat.sel { border-color: var(--batik-wax); background: rgba(230, 207, 163, .06); }
+.batik-pat canvas { display: block; width: 100%; height: auto; background: #fff; }
+.batik-pat span {
+  display: block; padding-top: 6px;
+  font-size: 10px; letter-spacing: .04em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.batik-pat.loading canvas { opacity: .4; }
+
+/* 上蜡进度 */
+.batik-progress { height: 4px; background: rgba(239, 231, 216, .10); margin: 14px 0 8px; overflow: hidden; }
+.batik-progress i {
+  display: block; height: 100%; width: 0;
+  background: linear-gradient(90deg, var(--batik-wax-deep), var(--batik-wax));
+  transition: width .18s ease;
+}
+.batik-progress-txt { margin: 0 0 16px !important; font-size: 11px !important; color: rgba(239, 231, 216, .62) !important; letter-spacing: .08em; }
+
+.batik-switch { display: flex; align-items: center; gap: 8px; margin: 0 0 14px; font-size: 11px; color: var(--batik-muted); cursor: pointer; }
+.batik-switch input { accent-color: var(--batik-wax); width: 13px; height: 13px; }
+
+/* 按钮（沿用全站 btn 风格，补蜡染专用态） */
+.batik-pane .btn {
+  width: 100%;
+  margin-top: 6px;
+}
+.batik-row { display: flex; gap: 8px; margin-top: 10px; }
+.batik-row .btn { flex: 1; }
+.batik-link-btn {
+  display: block; margin: 10px 0 16px; padding: 0;
+  border: 0; background: none;
+  color: rgba(239, 231, 216, .38);
+  font-size: 11px; letter-spacing: .06em;
+  text-decoration: underline; text-underline-offset: 3px;
+  cursor: pointer;
+}
+.batik-link-btn:hover { color: var(--batik-wax); }
+.batik-fine { margin: 12px 0 0 !important; font-size: 10px !important; line-height: 1.8 !important; color: rgba(239, 231, 216, .34) !important; }
+.batik-status {
+  margin-top: 18px !important; padding: 10px 12px;
+  border-left: 2px solid var(--batik-wax-deep);
+  background: rgba(0, 0, 0, .18);
+  font-size: 11px !important; color: rgba(239, 231, 216, .72) !important;
+}
+
+/* 成品 */
+.batik-done-preview { display: block; width: 100%; height: auto; margin: 4px 0 16px; border: 1px solid var(--batik-line); background: #0b1621; }
+.batik-done-meta { display: flex; justify-content: space-between; gap: 12px; margin: 0 0 16px; font-size: 10px; letter-spacing: .08em; color: rgba(239, 231, 216, .42); }
+
+/* ==========================================================================
+   4. 协议提示条 + 调试
+   ========================================================================== */
+.batik-proto {
+  position: fixed; left: 0; right: 0; top: 0;
+  z-index: 150; display: none;
+  padding: 9px 16px;
+  background: #5a211b; color: #ffe9df;
+  font-size: 12px; text-align: center; letter-spacing: .03em;
+}
+.batik-proto.show { display: block; }
+#batik-debug {
+  position: fixed; left: 10px; bottom: 10px;
+  z-index: 200; display: none;
+  max-width: min(520px, calc(100vw - 20px));
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, .78);
+  border: 1px solid rgba(120, 220, 200, .25);
+  color: #9fe6d8;
+  font: 11px/1.6 Consolas, "Courier New", monospace;
+  white-space: pre-wrap;
+}
+#batik-debug.show { display: block; }
+
+/* ==========================================================================
+   5. 响应式
+   ========================================================================== */
+@media (max-width: 860px) {
+  /* 窄屏：rail 转横向步骤条 */
+  .batik-rail ol { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+  .batik-rail ol::before { display: none; }
+  .batik-rail li { flex: 0 0 auto; padding: 6px 10px; border: 1px solid rgba(230, 207, 163, .12); font-size: 11px; }
+  .batik-rail li .no { width: 22px; height: 22px; font-size: 10px; }
+  .batik-rail__note { display: none; }
+  .batik-wrap { padding: 8px; }
+  .batik-frame::before { inset: 3px; }
+  .batik-load { inset: 8px; padding: 18px; }
+  .batik-toast { font-size: 11px; bottom: 16px; }
+  .batik-patterns { gap: 6px; }
+  .batik-pat span { font-size: 9px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .batik-pane.show { animation: none; }
+}

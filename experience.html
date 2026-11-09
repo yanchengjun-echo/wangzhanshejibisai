@@ -53,6 +53,7 @@
 </script>
 <link rel="stylesheet" href="assets/css/main.css">
 <link rel="stylesheet" href="assets/css/experience.css">
+<link rel="stylesheet" href="assets/css/batik.css">
 <link rel="stylesheet" href="assets/css/bgm.css">
 <link rel="stylesheet" href="assets/css/chrome.css">
 
@@ -433,21 +434,17 @@
         </div>
       </section>
 
-      <!-- 蜡染工具 -->
-      <section class="panel" data-panel="dye">
-        <h2 class="panel__title">笔触粗细</h2>
-        <div class="seg" role="group" aria-label="笔触粗细">
-          <button class="seg__item" type="button" data-wax-width="4" aria-pressed="false">细</button>
-          <button class="seg__item" type="button" data-wax-width="6" aria-pressed="true">中</button>
-          <button class="seg__item" type="button" data-wax-width="10" aria-pressed="false">粗</button>
-        </div>
-        <hr class="panel__rule">
+      <!-- 蜡染：五步流程 rail -->
+      <section class="panel batik-rail" data-panel="dye">
         <h2 class="panel__title">工序</h2>
-        <ol class="steps" id="dyeSteps" aria-label="蜡染工序进度">
-          <li class="step is-active" data-step="waxing"><span class="step__dot"></span>画蜡</li>
-          <li class="step" data-step="dyeing"><span class="step__dot"></span>浸染</li>
-          <li class="step" data-step="cracking"><span class="step__dot"></span>冰裂</li>
+        <ol id="batikSteps">
+          <li class="cur" data-step="CLOTH"><span class="no">01</span><span class="lbl">选布</span></li>
+          <li data-step="WAX"><span class="no">02</span><span class="lbl">上蜡</span></li>
+          <li data-step="DYE"><span class="no">03</span><span class="lbl">浸染</span></li>
+          <li data-step="DEWAX"><span class="no">04</span><span class="lbl">脱蜡</span></li>
+          <li data-step="DONE"><span class="no">05</span><span class="lbl">成品</span></li>
         </ol>
+        <p class="batik-rail__note">只有落在底稿墨线上的笔触，才会留下蜡。</p>
       </section>
 
       <!-- 苗绣工具 -->
@@ -477,11 +474,28 @@
     <!-- 中：画布舞台 -->
     <section class="exp-stage" id="expStage" aria-label="创作画布">
 
-      <!-- 蜡染：双层 canvas（底层素布+蜡迹 / 上层靛蓝遮罩） -->
-      <div class="canvas-wrap" data-canvas="dye">
-        <canvas id="dyeFabric" class="canvas canvas--fabric"></canvas>
-        <canvas id="dyeBlue" class="canvas canvas--blue"></canvas>
-        <p class="canvas-hint" id="dyeHint">按住并拖动，在素布上画一笔蜡</p>
+      <!-- 蜡染：单画布 + 蜡刀 + 提示 + 加载遮罩 -->
+      <div class="canvas-wrap batik-wrap" data-canvas="dye">
+        <div class="batik-frame" id="batikFrame">
+          <canvas id="batik-stage" width="1000" height="1043" aria-label="蜡染布面"></canvas>
+          <div class="batik-knife" id="batikKnife" aria-hidden="true">
+            <svg viewBox="0 0 32 36" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 28 L14 2 L18 2 L26 28 L22 30 L16 8 L10 30 Z" fill="#e6cfa3" stroke="#8a7a5a" stroke-width="1"/>
+              <circle cx="16" cy="30" r="3" fill="#8a7a5a"/>
+            </svg>
+          </div>
+          <div class="batik-toast" id="batikToast" role="status" aria-live="polite"></div>
+          <div class="batik-load" id="batikLoad">
+            <div>
+              <div class="batik-spinner" aria-hidden="true"></div>
+              <p class="batik-load__kicker">PATTERN</p>
+              <h2 id="batikLoadTitle">正在准备纹样</h2>
+              <p id="batikLoadMsg">第一次加载需要读取纹样像素，请稍候。</p>
+              <button class="btn btn--ghost" id="batikRetry" type="button" hidden>重新加载</button>
+            </div>
+          </div>
+        </div>
+        <p class="batik-hint" id="batikHint">选一块布，再选一稿纹样。</p>
       </div>
 
       <!-- 苗绣：虚拟绣绷 -->
@@ -535,7 +549,8 @@
     <!-- 右：预览与操作 -->
     <aside class="exp-side exp-side--right" aria-label="实时预览与操作">
 
-      <section class="panel">
+      <!-- 实时预览：苗绣模式下的针迹缩略（蜡染模式下隐藏，成品预览在下方 DONE 面板） -->
+      <section class="panel" data-panel="embroidery">
         <h2 class="panel__title">实时预览</h2>
         <div class="preview-box">
           <canvas id="previewCanvas" class="preview-canvas"></canvas>
@@ -543,12 +558,58 @@
         </div>
       </section>
 
+      <!-- 蜡染：五步操作面板（选布 / 上蜡 / 浸染 / 脱蜡 / 成品） -->
       <section class="panel" data-panel="dye">
-        <h2 class="panel__title">操作</h2>
-        <button class="btn btn--primary btn--block" type="button" id="btnDye">浸入染缸</button>
-        <hr class="panel__rule">
-        <button class="btn btn--block" type="button" id="btnReset">重新开始</button>
-        <p class="panel__note" id="dyeNote" role="status" aria-live="polite"></p>
+        <section class="batik-pane show" id="batik-p-CLOTH">
+          <h2>选一块布</h2>
+          <p>本白棉布吃蜡最稳，月白偏冷，浅茶偏暖。选一稿纹样，蜡会沿着墨线走。</p>
+          <p class="batik-label">布色</p>
+          <div class="batik-swatches" id="batikClothDots"></div>
+          <p class="batik-label">纹样</p>
+          <div class="batik-patterns" id="batikPatCards"></div>
+          <button class="btn btn--primary btn--block" id="batikBtnStart" type="button" aria-disabled="true" style="margin-top:18px">绷布 · 开始上蜡</button>
+        </section>
+
+        <section class="batik-pane" id="batik-p-WAX">
+          <h2>沿底稿描蜡</h2>
+          <p>按住鼠标拖动，沿着淡蓝底稿描。只有落在墨线上的笔触才会留下蜡。</p>
+          <div class="batik-progress"><i id="batikProgFill"></i></div>
+          <p class="batik-progress-txt" id="batikProgTxt">上蜡 0%</p>
+          <label class="batik-switch"><input type="checkbox" id="batikGuide" checked> 显示底稿</label>
+          <div class="batik-row">
+            <button class="btn btn--ghost" id="batikBtnUndo" type="button">撤销一笔</button>
+            <button class="btn btn--ghost" id="batikBtnClear" type="button">清空</button>
+          </div>
+          <button class="batik-link-btn" id="batikBtnFill" type="button">演示：补全剩余蜡线</button>
+          <button class="btn btn--primary btn--block" id="batikBtnToDye" type="button" aria-disabled="true">浸入染缸</button>
+          <p class="batik-fine">达到 55% 才能入染。蜡线越完整，成品的留白越多。</p>
+        </section>
+
+        <section class="batik-pane" id="batik-p-DYE">
+          <h2>靛蓝上身</h2>
+          <p>蜡挡住的地方仍是布色；蓝从布底漫上来。出缸时偏黄绿，接触空气后才慢慢转深蓝。</p>
+          <p class="batik-status" id="batikDyeStatus">浸染中，请稍候。</p>
+        </section>
+
+        <section class="batik-pane" id="batik-p-DEWAX">
+          <h2>沸水脱蜡</h2>
+          <p>蜡化开、浮起。蓝底白纹这时才真正定下来，冰裂也会在布面上留下细纹。</p>
+          <button class="btn btn--primary btn--block" id="batikBtnDewax" type="button">入锅脱蜡</button>
+        </section>
+
+        <section class="batik-pane" id="batik-p-DONE">
+          <h2>你的蜡染</h2>
+          <p>一块布，从白到蓝，从蜡到纹。冰裂是蜡与蓝留下的意外。</p>
+          <img class="batik-done-preview" id="batikDonePrev" alt="完成的蜡染作品">
+          <div class="batik-done-meta">
+            <span>2000 × 2086 PNG</span>
+            <span>银绣山河 · 蜡染体验</span>
+          </div>
+          <div class="batik-row">
+            <button class="btn btn--primary" id="batikBtnSave" type="button">保存图片</button>
+            <button class="btn" id="batikBtnAgain" type="button">再做一块</button>
+          </div>
+        </section>
       </section>
 
       <section class="panel" data-panel="embroidery" hidden>
@@ -572,9 +633,12 @@
   </footer>
 </div>
 
+<div class="batik-proto" id="batikProto">蜡染纹样需读取图片像素，请通过 HTTP 打开（线上链接或本地服务器），直接双击 file:// 会被浏览器拦截。</div>
+<div id="batik-debug"></div>
+
 <script src="assets/js/intro.js"></script>
 <script src="assets/js/studio.js"></script>
-<script src="assets/js/dye.js"></script>
+<script src="assets/js/batik.js"></script>
 <script src="assets/js/embroidery.js"></script>
 <script src="assets/js/bgm.js"></script>
 </body>
