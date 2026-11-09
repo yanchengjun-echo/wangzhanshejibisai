@@ -31,6 +31,9 @@
 
 @media (max-width: 860px) {
   :root { --page-pad: 15px; }
+  /* 页面主体（子页）在窄屏下两侧卷草纹样带更宽，需比顶栏更大的避让留白；
+     顶栏继续用 --page-pad（15px），页面主体单独用 --page-pad-body 避开纹样带 */
+  :root { --page-pad-body: clamp(56px, 16vw, 90px); }
 }
 
 /* ---------- 2. 跳转链接（键盘用户可见，鼠标用户不可见） ---------- */
@@ -199,7 +202,7 @@
 
 /* 左右留白统一：顶栏、展馆、历史、体验四者右边界对齐 */
 .page,
-.exp-page { padding-left: var(--page-pad); padding-right: var(--page-pad); }
+.exp-page { padding-left: var(--page-pad-body, var(--page-pad)); padding-right: var(--page-pad-body, var(--page-pad)); }
 
 /* 体验页的粘性舞台同理：贴在顶栏下沿，而不是盖到顶栏底下 */
 .intro__scene {

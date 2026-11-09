@@ -384,11 +384,6 @@ html.anim .person { animation-delay: calc(.1s + var(--i, 0) * .06s); }
 
 /* 手机：进一步收紧 */
 @media (max-width: 560px) {
-  /* 窄屏：两侧卷草纹样带约占视口 11%，内容区留白提到 13% 避让，文字不压纹样 */
-  .page {
-    padding-left: max(46px, 13vw);
-    padding-right: max(46px, 13vw);
-  }
   .head { padding: clamp(4px, 1.4vh, 12px) 0 clamp(8px, 1.8vh, 18px); }
   .tagline { letter-spacing: .22em; text-indent: .22em; }
 

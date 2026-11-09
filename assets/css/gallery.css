@@ -137,6 +137,7 @@ body { overflow-x: hidden; }
   gap: clamp(18px, 2.6vw, 38px);
   align-items: start;
   min-height: 0;
+  min-width: 0;
 }
 
 /* --- 左侧分类索引 --- */
@@ -245,6 +246,8 @@ body { overflow-x: hidden; }
   display: flex;
   flex-direction: column;
   gap: clamp(14px, 2.2vh, 22px);
+  /* 关键：约束轮播 flex 轨道的横向溢出，避免撑破 .page 右侧 padding */
+  overflow-x: clip;
 }
 .section-head {
   display: flex;
@@ -272,6 +275,7 @@ body { overflow-x: hidden; }
 .grid {
   /* 纯块级容器：首图 + .masonry 瀑布流 */
   display: block;
+  min-width: 0;
 }
 /* CSS 原生多列瀑布流：卡片按文档顺序自动流入各列，
    无需 JS 预加载宽高比，首屏即可渲染，图片随滚动懒加载 */
@@ -356,11 +360,17 @@ body { overflow-x: hidden; }
   box-shadow: var(--card-shadow, 0 2px 10px rgba(2, 8, 18, .28));
   overflow: hidden;
   margin-bottom: clamp(14px, 1.8vw, 24px);
+  /* 关键：轮播是 block，但作为 .grid 的 flex-item 链条上的一环，
+     明确锁死宽度不超父容器，避免 .caro-track 的横向 flex 溢出撑破 .page */
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 .caro-track {
   display: flex;
   transition: transform .7s var(--ease-soft);
   will-change: transform;
+  width: 100%;
 }
 .caro-track.no-anim { transition: none; }
 .caro-slide {
@@ -726,11 +736,6 @@ html.anim .body { animation: riseIn .8s .08s var(--ease-soft) both; }
 }
 
 @media (max-width: 620px) {
-  /* 窄屏：两侧卷草纹样带约占视口 11%，内容区留白提到 13% 避让，文字不压纹样 */
-  .page {
-    padding-left: max(46px, 13vw);
-    padding-right: max(46px, 13vw);
-  }
   .masonry {
     --masonry-cols: 2;
     column-gap: 8px;
