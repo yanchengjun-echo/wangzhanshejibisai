@@ -109,7 +109,7 @@
 
     <!-- 活动资讯：对角交叉构图（左上图 + 右下字，左下字 + 右下图） -->
   <section class="activity" aria-labelledby="activity-title">
-    <header class="activity__head">
+    <header class="activity__head" data-reveal="fade">
       <h2 class="activity__title" id="activity-title">近期动态</h2>
       <p class="activity__sub">山间有盛会 · 一针一线皆回响</p>
     </header>
@@ -189,13 +189,13 @@
 
 <main class="roster" id="main" aria-label="非遗代表性传承人">
 
-    <header class="roster__head">
+    <header class="roster__head" data-reveal="fade">
       <h2 class="roster__title" id="roster-title">非遗代表性传承人</h2>
       <p class="roster__sub">一手一艺 · 一生一事</p>
     </header>
 
     <!-- 左侧人物大图：hover 右侧卡片时切换，默认显示第一位 -->
-    <div class="roster__stage">
+    <div class="roster__stage" data-reveal>
       <figure class="portrait" id="stage">
         <div class="portrait__frame">
           <img id="stage-img" class="is-on" src="assets/portraits/yang-guangbin.jpg" alt="杨光宾 · 苗族银饰锻制技艺" width="800" height="1000">
@@ -208,7 +208,7 @@
     </div>
 
     <!-- 右侧人物卡片列表 -->
-    <ul class="people">
+    <ul class="people" data-reveal>
 
       <li class="person" style="--i:0">
         <button class="person__card" type="button" data-index="0" aria-haspopup="dialog">
@@ -264,12 +264,12 @@
 
   <!-- 照片墙：苗族节庆热闹图集（扁平化） -->
   <section class="gallery" aria-labelledby="gallery-title">
-    <header class="gallery__head">
+    <header class="gallery__head" data-reveal="fade">
       <h2 class="gallery__title" id="gallery-title">节庆掠影</h2>
       <p class="gallery__sub">盛装如海 · 银铃满山</p>
     </header>
 
-    <div class="gallery__grid">
+    <div class="gallery__grid" data-reveal>
       <figure class="shot shot--a">
         <img src="assets/festival/gallery-1.jpg" alt="雷山苗年万人芦笙踩鼓" width="800" height="600" loading="lazy">
         <figcaption class="shot__cap">万人芦笙 · 踩鼓迎年</figcaption>
@@ -299,7 +299,7 @@
 
   <!-- 节日日历：高光标注未来一年苗族节日，点击看详情 -->
   <section class="festival" aria-labelledby="festival-title">
-    <header class="festival__head">
+    <header class="festival__head" data-reveal="fade">
       <h2 class="festival__title" id="festival-title">节庆日历</h2>
       <p class="festival__sub">未来一年 · 山间的盛大约定</p>
     </header>
@@ -379,5 +379,6 @@
 <script src="assets/js/activity.js"></script>
 <script src="assets/js/festival.js"></script>
 <script src="assets/js/bgm.js"></script>
+<script src="assets/js/reveal.js"></script>
 </body>
 </html>

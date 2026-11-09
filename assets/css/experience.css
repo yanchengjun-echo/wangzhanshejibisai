@@ -10,29 +10,29 @@
 
 /* ---------- 1. 设计令牌 ---------- */
 :root {
-  /* 靛蓝系：蜡染缸 */
-  --exp-indigo-950: #0A1219;
-  --exp-indigo-900: #101B26;
-  --exp-indigo-800: #1A2A3A;   /* 主靛蓝 */
-  --exp-indigo-700: #24384C;
-  --exp-indigo-600: #33506B;
+  /* 靛蓝系：蜡染缸 → 对齐全站 indigo 系 */
+  --exp-indigo-950: #061527;
+  --exp-indigo-900: #0a1f38;
+  --exp-indigo-800: #0f2c4c;   /* 主靛蓝 */
+  --exp-indigo-700: #16395f;
+  --exp-indigo-600: #33506b;
 
-  /* 素白系：待染坯布 */
-  --exp-paper:      #F5F5F0;   /* 素白（画布/预览底） */
-  --exp-paper-2:    #E8E8E0;
-  --exp-paper-3:    #D6D6CC;
+  /* 素白系：待染坯布 → 对齐全站银白 */
+  --exp-paper:      #f6faff;   /* 素白（画布/预览底） */
+  --exp-paper-2:    #e6eefa;
+  --exp-paper-3:    #d3e0f1;
 
-  /* 苗绣红：朱线 */
-  --exp-red:        #C23B22;
-  --exp-red-soft:   #D9573C;
-  --exp-red-deep:   #8F2A17;
+  /* 苗绣红：朱线 → 对齐全站朱红（降饱和） */
+  --exp-red:        #b03a2e;
+  --exp-red-soft:   #c34b3a;
+  --exp-red-deep:   #8a2c22;
 
-  /* 苗绣紫：靛紫 */
-  --exp-purple:     #5B2C6F;
-  --exp-purple-soft:#7A4291;
+  /* 苗绣紫：靛紫 → 收敛为靛蓝，去除杂色 */
+  --exp-purple:     #33506b;
+  --exp-purple-soft:#4a6d92;
 
-  /* 蜡与裂 */
-  --exp-wax:        #F5E6C8;   /* 半透明蜡黄 */
+  /* 蜡与裂：蜡黄 → 对齐全站金色（仅做交互高亮） */
+  --exp-wax:        #d9b26a;
   --exp-crack:      #0A1017;   /* 冰裂纹深蓝黑 */
 
   /* 文字 */
@@ -56,7 +56,7 @@
 
   /* 尺寸 */
   --exp-side-w: clamp(196px, 15vw, 232px);
-  --exp-radius: 12px;
+  --exp-radius: 10px;
   --exp-radius-sm: 8px;
 }
 

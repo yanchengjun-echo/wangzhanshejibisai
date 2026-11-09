@@ -95,7 +95,7 @@
 
   function cardHTML(it, isFeature) {
     var author = it.author ? '<span class="author">· ' + it.author + '</span>' : '';
-    var cls = 'card' + (isFeature ? ' card--feature' : '');
+    var cls = 'card' + (isFeature ? ' card--feature' : '') + ' anim-card';
     var featureHint = isFeature
       ? '<span class="feature-hint">本类精选 · 点击查看详情</span>'
       : '';
@@ -107,6 +107,7 @@
       ? '<img src="' + it.big + '" alt="' + it.name + '" decoding="async">'
       : '<img data-src="' + it.small + '" alt="' + it.name + '" decoding="async">';
     return '<article class="' + cls + '" tabindex="0" role="button" ' +
+        'data-reveal ' +
         'data-id="' + it.id + '" ' +
         'aria-label="查看藏品：' + it.name + '">' +
         '<div class="thumb">' + imgTag + '</div>' +

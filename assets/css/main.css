@@ -31,12 +31,75 @@
 
   --ink: #12305b;              /* 纹样墨色 */
 
+  /* ---- 全站统一扁平化卡片（各页卡片复用，保证视觉一致） ---- */
+  --card-radius: 10px;                       /* 卡片圆角：统一 10px */
+  --card-radius-sm: 8px;                     /* 小卡/标签圆角 */
+  --card-border: rgba(211, 224, 241, .14);   /* 细银边 */
+  --card-bg: rgba(20, 38, 62, .38);          /* 卡片底：靛蓝半透明 */
+  --card-bg-hover: rgba(26, 48, 76, .5);     /* 悬浮底 */
+  --card-shadow: 0 2px 10px rgba(2, 8, 18, .28);       /* 轻阴影 */
+  --card-shadow-hover: 0 18px 34px -14px rgba(2, 8, 18, .65); /* 悬浮阴影 */
+  --lift: -5px;                              /* hover 抬升量 */
+  --section-gap: clamp(56px, 9vh, 96px);     /* 区块纵向间距 */
+  --wrap-w: 1180px;                          /* 内容最大宽度 */
+  --wrap-pad: clamp(20px, 3.4vw, 48px);      /* 内容左右留白 */
+
   --font-brush: "YouranXiaokai", "Slideyouran", "STKaiti", "KaiTi", "Kaiti SC", "楷体", serif;
   --font-serif: "Songti SC", "Noto Serif SC", "Source Han Serif SC", Georgia, "Times New Roman", serif;
   --font-num:   "Songti SC", "Noto Serif SC", Georgia, "Times New Roman", serif;
 
   /* 缓入缓出，整体偏慢 */
   --ease-soft: cubic-bezier(.19, 1, .22, 1);
+}
+
+/* ==========================================================================
+   全站统一交互动效（滚动渐显 + 卡片抬升 + 图片缩放 + 标题淡入）
+   渐进增强：无 JS 时元素默认可见；observer 失效有兜底
+   ========================================================================== */
+/* 卡片通用 hover：抬升 + 阴影加深（各页卡片可复用，无需各自定义） */
+.anim-card {
+  transition: transform .5s var(--ease-soft), box-shadow .5s ease, border-color .5s ease, background .5s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .anim-card:hover {
+    transform: translateY(var(--lift, -5px));
+    box-shadow: var(--card-shadow-hover);
+    border-color: rgba(211, 224, 241, .28);
+  }
+}
+/* 卡片内图片 hover 缓慢缩放 */
+.anim-img {
+  transition: transform .6s var(--ease-soft);
+}
+@media (hover: hover) and (pointer: fine) {
+  .anim-card:hover .anim-img { transform: scale(1.045); }
+}
+/* 滚动渐显：由脚本加 .is-visible 触发；初始 .reveal 为隐藏态 */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity .7s var(--ease-soft), transform .7s var(--ease-soft);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* 标题/区块淡入（脚本加 .is-visible） */
+.reveal--fade {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity .8s var(--ease-soft), transform .8s var(--ease-soft);
+}
+.reveal--fade.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* 尊重系统"减少动态效果" */
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .reveal--fade { opacity: 1; transform: none; transition: none; }
+  .anim-card, .anim-img { transition: none; }
+  .anim-card:hover { transform: none; }
+  .anim-card:hover .anim-img { transform: none; }
 }
 
 * { box-sizing: border-box; }

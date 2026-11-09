@@ -270,7 +270,7 @@ body { overflow-x: hidden; }
   color: inherit;
   font-family: inherit;
   border: 1px solid rgba(196, 216, 240, .13);
-  border-radius: 4px;
+  border-radius: var(--card-radius-sm, 8px);
   background: linear-gradient(180deg,
     rgba(22, 52, 84, .42) 0%,
     rgba(9, 26, 46, .38) 100%);
@@ -530,22 +530,22 @@ body.no-scroll { overflow: hidden; }
   color: inherit;
   font-family: inherit;
   border: 1px solid rgba(196, 216, 240, .14);
-  border-radius: 4px;
+  border-radius: var(--card-radius-sm, 8px);
   background: linear-gradient(180deg,
     rgba(22, 52, 84, .46) 0%,
     rgba(9, 26, 46, .42) 58%,
     rgba(6, 19, 34, .48) 100%);
   box-shadow: inset 0 1px 0 rgba(226, 238, 252, .07),
               0 16px 40px -26px rgba(0, 0, 0, .85);
-  transition: border-color .6s var(--ease-soft),
-              transform .6s var(--ease-soft),
-              box-shadow .6s var(--ease-soft);
+  transition: border-color .5s var(--ease-soft),
+              transform .5s var(--ease-soft),
+              box-shadow .5s var(--ease-soft);
 }
 
 .news__card:hover,
 .news__card:focus-visible {
   border-color: rgba(217, 178, 106, .32);
-  transform: translateY(-2px);
+  transform: translateY(var(--lift, -5px));
   box-shadow: inset 0 1px 0 rgba(226, 238, 252, .12),
               0 22px 48px -28px rgba(0, 0, 0, .92);
 }

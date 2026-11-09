@@ -16,11 +16,8 @@
    不会外溢影响首页 / 展馆 / 体验页。 */
 
 :root {
-  /* 苗绣浓彩：本页只用朱红一处（当前节点竖线），其余两色备而不用 */
-  --embroidery-red:   #c8342b;
+  /* 金银双色：本页只保留金/银两色，红绿紫等杂色已收敛 */
   --embroidery-gold:  #d9a32b;
-  --embroidery-green: #2e6b4f;
-  --embroidery-plum:  #7a3b6b;
 
   /* 土布底：呼吸位浅色段的底色 */
   --hemp:      #e8e2d3;
@@ -309,7 +306,7 @@ html.anim .stage--page .orn--tr { animation-name: fadeTopPage; }
   padding: 8px 11px 10px;
   background: linear-gradient(180deg, rgba(9, 22, 40, .92), rgba(7, 18, 34, .88));
   border: 1px solid rgba(198, 219, 244, .16);
-  border-radius: 3px;
+  border-radius: var(--card-radius-sm, 8px);
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
   transition: transform .5s var(--ease-soft), box-shadow .5s var(--ease-soft);
@@ -331,9 +328,9 @@ html.anim .stage--page .orn--tr { animation-name: fadeTopPage; }
   }
 }
 
-/* 当前节点：点开在读的那一节，用一条刺绣色竖线作标记（全页唯一强调点） */
+/* 当前节点：点开在读的那一节，用一条金色竖线作标记（全页唯一强调点） */
 .tnode.is-current .tnode__card {
-  box-shadow: inset 3px 0 0 var(--embroidery-red);
+  box-shadow: inset 3px 0 0 var(--embroidery-gold);
 }
 
 /* 点开某一节时，其余卡片退到背景，避免被详情浮层压出半截「残影」 */
@@ -465,7 +462,7 @@ html.js-tree .tnode.is-open .tnode__body { grid-template-rows: 1fr; }
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   border: 1px solid rgba(217, 178, 106, .18);
-  border-radius: 3px;
+  border-radius: var(--card-radius-sm, 8px);
   display: grid;
   gap: 12px;
   max-height: min(46vh, 420px);
